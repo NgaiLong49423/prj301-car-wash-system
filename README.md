@@ -22,8 +22,8 @@ Dự án Java Web Servlet thuần cho môn **PRJ301** - Ứng dụng web đượ
 - **IDE**: NetBeans
 - **Java Version**: JDK 8
 - **Web Framework**: Servlet & JSP
-- **Database**: [Tùy chỉnh theo dự án]
-- **Server**: Tomcat [Phiên bản]
+- **Database**: SQL Server 
+- **Server**: Tomcat 9
 
 ---
 
@@ -31,9 +31,8 @@ Dự án Java Web Servlet thuần cho môn **PRJ301** - Ứng dụng web đượ
 
 - Java Development Kit (JDK) 8 trở lên
 - NetBeans 8.0 hoặc cao hơn
-- Apache Tomcat (nếu chạy standalone)
-- MySQL/SQL Server (nếu có database)
-
+- Apache Tomcat 9
+- SQL Server 
 ---
 
 ## 🚀 Cách Chạy Dự Án
@@ -44,15 +43,6 @@ Dự án Java Web Servlet thuần cho môn **PRJ301** - Ứng dụng web đượ
 3. Chọn **Run Project** hoặc nhấn `F6`
 4. Trình duyệt sẽ mở tự động tại `http://localhost:8080/[project-name]`
 
-### Sử dụng Terminal:
-```bash
-# Build project
-cd d:\Semester 4\PRJ301\PRJ301
-mvn clean build
-
-# Chạy trên Tomcat
-catalina run
-```
 
 ---
 
