@@ -1,0 +1,31 @@
+/target/
+/.idea/
+/*.iml
+/nbproject/
+/nbbuild/
+/nbdist/
+
+# IntelliJ IDEA
+/.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+
+# Compiled files
+*.class
+*.jar
+*.war
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temp files
+*~
+*.tmp
