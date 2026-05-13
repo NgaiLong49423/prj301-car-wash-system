@@ -29,12 +29,12 @@ AutoWash Pro là một giải pháp quản lý rửa xe hiệp chế tích hợp
 
 ## 👥 Thành Viên Nhóm 6
 
-| STT | MSSV | Họ và Tên |
-|-----|------|----------|
-| 1 | SE190095 | Nguyễn Anh Kiệt |
-| 2 | SE190732 | Ngô Gia Long |
-| 3 | SE190081 | Phạm Hoàng Phúc |
-| 4 | SE193061 | Nguyễn Minh Hiền |
+| STT | MSSV | Họ và Tên | Vai Trò |
+|-----|------|----------|---------|
+| 1 | SE190732 | Ngô Gia Long | Leader |
+| 2 | SE190095 | Nguyễn Anh Kiệt | |
+| 3 | SE190081 | Phạm Hoàng Phúc | |
+| 4 | SE193061 | Nguyễn Minh Trí | |
 
 ---
 
