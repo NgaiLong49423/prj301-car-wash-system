@@ -35,7 +35,7 @@ CREATE TABLE Tier (
 CREATE TABLE Account (
     AccountID INT PRIMARY KEY,
     Username VARCHAR(50) UNIQUE NOT NULL,
-    Password VARCHAR(50) NOT NULL,
+    PasswordHash VARCHAR(255) NOT NULL,
     Role VARCHAR(20) NOT NULL -- 'Admin' hoặc 'Customer'
 );
 
