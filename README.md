@@ -133,7 +133,30 @@ AutoWash Pro là một giải pháp quản lý rửa xe hiệp chế tích hợp
 
 ---
 
-## 📋 Yêu Cầu Hệ Thống
+## � Database Architecture
+
+### Entity Relationship Diagram (ERD)
+
+Sơ đồ ERD được thiết kế bởi **Phạm Hoàng Phúc** mô tả cấu trúc toàn bộ database:
+
+![AutoWash Pro ERD Diagram](Screenshot/z7834287226506_069e4eab03233fdacce954bab337cff7.jpg)
+
+### Các Bảng Chính
+
+| Bảng | Mô Tả |
+|------|-------|
+| **Customers** | Lưu trữ thông tin khách hàng, email, số điện thoại |
+| **LoyaltyAccounts** | Quản lý tài khoản loyalty, cấp bậc, điểm tích lũy |
+| **Vehicles** | Thông tin xe (biển số, nhãn hiệu, màu sắc) |
+| **Bookings** | Đặt lịch rửa xe, thời gian, trạng thái |
+| **Transactions** | Lịch sử giao dịch, thanh toán, dùng điểm |
+| **LoyaltyTiers** | Định nghĩa các cấp bậc (Member, Silver, Gold, Platinum) |
+| **Services** | Các dịch vụ rửa xe (bao gồm giá, thời gian) |
+| **Rewards** | Danh sách các phần thưởng có thể đổi |
+
+---
+
+## �📋 Yêu Cầu Hệ Thống
 
 - **Java Development Kit (JDK):** Version 8 trở lên
 - **NetBeans:** Version 8.0 hoặc cao hơn
