@@ -1,131 +1,161 @@
-﻿-- =============================================
--- 1. TẠO DATABASE (Tự động xóa DB cũ nếu đã tồn tại để reset data)
--- =============================================
-USE master;
+﻿/* PROJECT: Vehicle Service Management System
+   ENGINE: Microsoft SQL Server
+*/
+
+-- 1. Tạo Database
+CREATE DATABASE AutoWashPro_DB;
 GO
 
-IF DB_ID('AutoWash_Project') IS NOT NULL
-BEGIN
-    -- Ngắt toàn bộ kết nối đang dùng DB này để ép xóa
-    ALTER DATABASE AutoWash_Project SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE AutoWash_Project;
-END
+USE AutoWashPro_DB;
 GO
 
-CREATE DATABASE AutoWash_Project;
-GO
-
-USE AutoWash_Project;
-GO
-
--- =============================================
--- 2. TẠO CÁC BẢNG (TABLES) - Theo thứ tự chuẩn để không lỗi Khóa ngoại
--- =============================================
-
--- Bảng Hạng thành viên
-CREATE TABLE Tier (
-    TierID INT PRIMARY KEY,
-    TierName NVARCHAR(50) NOT NULL,
-    RequiredWashes INT NOT NULL,
-    RequiredSpend DECIMAL(18,2) NOT NULL,
-    PointMultiplier FLOAT NOT NULL
+-- 2. Tạo bảng MembershipTier (Hạng thành viên)
+CREATE TABLE MembershipTier (
+    tier_id INT PRIMARY KEY IDENTITY(1,1),
+    tier_name VARCHAR(50) NOT NULL,
+    min_points INT DEFAULT 0,
+    discount_percent DECIMAL(5,2),
+    benefits TEXT
 );
 
--- Bảng Tài khoản đăng nhập
-CREATE TABLE Account (
-    AccountID INT PRIMARY KEY,
-    Username VARCHAR(50) UNIQUE NOT NULL,
-    PasswordHash VARCHAR(255) NOT NULL,
-    Role VARCHAR(20) NOT NULL -- 'Admin' hoặc 'Customer'
-);
-
--- Bảng Khách hàng (Liên kết với Account và Tier)
+-- 3. Tạo bảng Customer (Khách hàng)
 CREATE TABLE Customer (
-    CustomerID INT PRIMARY KEY,
-    AccountID INT FOREIGN KEY REFERENCES Account(AccountID),
-    FullName NVARCHAR(100) NOT NULL,
-    Phone VARCHAR(15) UNIQUE NOT NULL,
-    LicensePlate VARCHAR(20) UNIQUE NOT NULL,
-    TotalWashes INT DEFAULT 0,
-    TotalSpend DECIMAL(18,2) DEFAULT 0,
-    TierID INT FOREIGN KEY REFERENCES Tier(TierID)
+    customer_id INT PRIMARY KEY IDENTITY(1,1),
+    full_name NVARCHAR(100) NOT NULL,
+    phone VARCHAR(15),
+    email VARCHAR(100),
+    join_date DATETIME DEFAULT GETDATE(),
+    total_points INT DEFAULT 0,
+    tier_id INT,
+    CONSTRAINT FK_Customer_Tier FOREIGN KEY (tier_id) REFERENCES MembershipTier(tier_id)
 );
 
--- Bảng Phần thưởng cấu hình sẵn
-CREATE TABLE Reward_Promotion (
-    RewardID INT PRIMARY KEY,
-    RewardName NVARCHAR(100) NOT NULL,
-    PointsCost INT NOT NULL
+-- 4. Tạo bảng Vehicle (Phương tiện)
+CREATE TABLE Vehicle (
+    vehicle_id INT PRIMARY KEY IDENTITY(1,1),
+    customer_id INT,
+    license_plate VARCHAR(20) UNIQUE NOT NULL,
+    brand NVARCHAR(50),
+    model NVARCHAR(50),
+    color NVARCHAR(30),
+    CONSTRAINT FK_Vehicle_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
 );
 
--- Bảng Đặt lịch rửa xe
+-- 5. Tạo bảng Service (Dịch vụ)
+CREATE TABLE Service (
+    service_id INT PRIMARY KEY IDENTITY(1,1),
+    service_name NVARCHAR(100) NOT NULL,
+    price DECIMAL(18,2) NOT NULL,
+    duration INT -- tính bằng phút
+);
+
+-- 6. Tạo bảng Booking (Đặt lịch)
 CREATE TABLE Booking (
-    BookingID INT PRIMARY KEY,
-    CustomerID INT FOREIGN KEY REFERENCES Customer(CustomerID),
-    BookingDate DATETIME NOT NULL,
-    ScheduledTime DATETIME NOT NULL,
-    Status VARCHAR(20) NOT NULL -- 'Pending', 'Confirmed', 'Completed', 'Cancelled'
+    booking_id INT PRIMARY KEY IDENTITY(1,1),
+    customer_id INT,
+    vehicle_id INT,
+    booking_date DATE,
+    booking_time TIME,
+    status NVARCHAR(50),
+    total_price DECIMAL(18,2),
+    CONSTRAINT FK_Booking_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    CONSTRAINT FK_Booking_Vehicle FOREIGN KEY (vehicle_id) REFERENCES Vehicle(vehicle_id)
 );
 
--- Bảng Lịch sử rửa xe (Ghi nhận thực tế)
-CREATE TABLE Wash_History (
-    WashID INT PRIMARY KEY,
-    CustomerID INT FOREIGN KEY REFERENCES Customer(CustomerID),
-    WashDate DATETIME NOT NULL,
-    Amount DECIMAL(18,2) NOT NULL
+-- 7. Tạo bảng BookingService (Bảng trung gian Dịch vụ trong Booking)
+CREATE TABLE BookingService (
+    booking_id INT,
+    service_id INT,
+    quantity INT DEFAULT 1,
+    price DECIMAL(18,2),
+    PRIMARY KEY (booking_id, service_id),
+    CONSTRAINT FK_BS_Booking FOREIGN KEY (booking_id) REFERENCES Booking(booking_id),
+    CONSTRAINT FK_BS_Service FOREIGN KEY (service_id) REFERENCES Service(service_id)
 );
 
--- Bảng Giao dịch điểm số (Cộng/Trừ điểm)
-CREATE TABLE Point_Transaction (
-    TransactionID INT PRIMARY KEY,
-    CustomerID INT FOREIGN KEY REFERENCES Customer(CustomerID),
-    PointsAdded INT NOT NULL, -- Số âm nếu là đổi điểm (Redeem)
-    TransactionDate DATETIME NOT NULL,
-    ExpiryDate DATETIME NOT NULL
+-- 8. Tạo bảng Reward (Phần thưởng)
+CREATE TABLE Reward (
+    reward_id INT PRIMARY KEY IDENTITY(1,1),
+    reward_name NVARCHAR(100),
+    required_points INT,
+    description TEXT
 );
 
--- =============================================
--- 3. INSERT DỮ LIỆU MẪU (MOCK DATA)
--- =============================================
+-- 9. Tạo bảng Redemption (Đổi thưởng)
+CREATE TABLE Redemption (
+    redemption_id INT PRIMARY KEY IDENTITY(1,1),
+    customer_id INT,
+    reward_id INT,
+    redeem_date DATETIME DEFAULT GETDATE(),
+    status NVARCHAR(50),
+    CONSTRAINT FK_Redemption_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    CONSTRAINT FK_Redemption_Reward FOREIGN KEY (reward_id) REFERENCES Reward(reward_id)
+);
 
-INSERT INTO Tier (TierID, TierName, RequiredWashes, RequiredSpend, PointMultiplier)
-VALUES 
-(1, 'Member', 1, 0, 1.0),
-(2, 'Silver', 5, 2000000, 1.1),
-(3, 'Gold', 15, 6000000, 1.2),
-(4, 'Platinum', 30, 15000000, 1.3);
+-- 10. Tạo bảng Promotion (Khuyến mãi)
+CREATE TABLE Promotion (
+    promotion_id INT PRIMARY KEY IDENTITY(1,1),
+    title NVARCHAR(200),
+    discount_percent DECIMAL(5,2),
+    start_date DATE,
+    end_date DATE,
+    target_tier NVARCHAR(50)
+);
 
-INSERT INTO Account (AccountID, Username, Password, Role)
-VALUES 
-(1, 'admin', '123', 'Admin'),
-(2, 'khachhang1', '123', 'Customer'),
-(3, 'khachhang2', '123', 'Customer');
+-- 11. Tạo bảng AIRecommendation (Gợi ý AI)
+CREATE TABLE AIRecommendation (
+    recommendation_id INT PRIMARY KEY IDENTITY(1,1),
+    customer_id INT,
+    promotion_id INT,
+    recommendation_reason TEXT,
+    created_at DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_AI_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    CONSTRAINT FK_AI_Promotion FOREIGN KEY (promotion_id) REFERENCES Promotion(promotion_id)
+);
 
-INSERT INTO Customer (CustomerID, AccountID, FullName, Phone, LicensePlate, TotalWashes, TotalSpend, TierID)
-VALUES 
-(1, 2, N'Nguyễn Văn A', '0901234567', '61B1-12345', 2, 500000, 1),
-(2, 3, N'Trần Thị B', '0987654321', '59X1-98765', 16, 6500000, 3);
+-- 12. Tạo bảng LoyaltyTransaction (Giao dịch tích điểm)
+CREATE TABLE LoyaltyTransaction (
+    transaction_id INT PRIMARY KEY IDENTITY(1,1),
+    customer_id INT,
+    booking_id INT,
+    points INT,
+    transaction_type VARCHAR(50), -- E.g., 'Earned', 'Spent'
+    created_at DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_LT_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    CONSTRAINT FK_LT_Booking FOREIGN KEY (booking_id) REFERENCES Booking(booking_id)
+);
 
-INSERT INTO Reward_Promotion (RewardID, RewardName, PointsCost)
-VALUES 
-(1, N'Đánh bóng miễn phí', 300),
-(2, N'Rửa xe tiêu chuẩn', 500),
-(3, N'Mã giảm giá 10%', 150);
+-- 13. Tạo bảng LPRLog (Lịch sử nhận diện biển số)
+CREATE TABLE LPRLog (
+    log_id INT PRIMARY KEY IDENTITY(1,1),
+    vehicle_id INT,
+    detected_plate VARCHAR(20),
+    checkin_time DATETIME DEFAULT GETDATE(),
+    confidence_score DECIMAL(5,4),
+    CONSTRAINT FK_LPR_Vehicle FOREIGN KEY (vehicle_id) REFERENCES Vehicle(vehicle_id)
+);
 
-INSERT INTO Booking (BookingID, CustomerID, BookingDate, ScheduledTime, Status)
-VALUES 
-(1, 1, GETDATE(), DATEADD(day, 2, GETDATE()), 'Pending'),
-(2, 2, GETDATE(), DATEADD(day, 1, GETDATE()), 'Confirmed');
+-- 14. Tạo bảng Feedback (Đánh giá)
+CREATE TABLE Feedback (
+    feedback_id INT PRIMARY KEY IDENTITY(1,1),
+    customer_id INT,
+    booking_id INT,
+    rating INT CHECK (rating BETWEEN 1 AND 5),
+    comment TEXT,
+    created_at DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_FB_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    CONSTRAINT FK_FB_Booking FOREIGN KEY (booking_id) REFERENCES Booking(booking_id)
+);
 
-INSERT INTO Wash_History (WashID, CustomerID, WashDate, Amount)
-VALUES 
-(1, 1, '2026-05-01 09:00:00', 250000),
-(2, 1, '2026-05-10 14:30:00', 250000),
-(3, 2, '2026-05-12 10:00:00', 500000);
-
-INSERT INTO Point_Transaction (TransactionID, CustomerID, PointsAdded, TransactionDate, ExpiryDate)
-VALUES 
-(1, 1, 250, '2026-05-01', DATEADD(year, 1, '2026-05-01')),
-(2, 2, 600, '2025-06-01', DATEADD(year, 1, '2025-06-01'));
-
-PRINT N'✅ Khởi tạo Database AutoWash_PRJ301 và chèn dữ liệu mẫu thành công!';
+-- 15. Tạo bảng Payment (Thanh toán)
+CREATE TABLE Payment (
+    payment_id INT PRIMARY KEY IDENTITY(1,1),
+    booking_id INT,
+    amount DECIMAL(18,2),
+    payment_method NVARCHAR(50),
+    payment_status NVARCHAR(50),
+    transaction_code VARCHAR(100),
+    paid_at DATETIME,
+    CONSTRAINT FK_Payment_Booking FOREIGN KEY (booking_id) REFERENCES Booking(booking_id)
+);
+GO
