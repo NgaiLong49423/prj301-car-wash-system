@@ -24,11 +24,13 @@ CREATE TABLE Customer (
     full_name NVARCHAR(100) NOT NULL,
     phone VARCHAR(15),
     email VARCHAR(100),
+    [password] NVARCHAR(255),
     join_date DATETIME DEFAULT GETDATE(),
     total_points INT DEFAULT 0,
     tier_id INT,
     CONSTRAINT FK_Customer_Tier FOREIGN KEY (tier_id) REFERENCES MembershipTier(tier_id)
-);
+    );
+
 
 -- 4. Tạo bảng Vehicle (Phương tiện)
 CREATE TABLE Vehicle (
