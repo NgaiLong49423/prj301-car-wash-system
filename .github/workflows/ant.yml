@@ -25,9 +25,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p ./lib-extra
+          # Use github.com/apache/netbeans/raw/... as requested
           curl -L --fail --retry 3 --retry-delay 2 \
             -o ./lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar \
-            https://raw.githubusercontent.com/apache/netbeans/rel-nb82/netbeans/java/ant/extra/org-netbeans-modules-java-j2seproject-copylibstask.jar
+            https://github.com/apache/netbeans/raw/rel-nb82/netbeans/java/ant/extra/org-netbeans-modules-java-j2seproject-copylibstask.jar
           # quick sanity check: jar is a zip, should start with 'PK'
           head -c 2 ./lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar | od -An -t x1 | tr -d ' \n' | grep -qi '^504b$'
 
