@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -20,22 +20,29 @@ jobs:
           java-version: "8"
           distribution: temurin
 
-      - name: Download NetBeans CopyLibs (Windows)
-        shell: pwsh
+      - name: Download NetBeans CopyLibs
+        shell: bash
         run: |
-          New-Item -ItemType Directory -Force -Path "./lib-extra" | Out-Null
-          Invoke-WebRequest -Uri "https://github.com/apache/netbeans/raw/rel-nb82/netbeans/java/ant/extra/org-netbeans-modules-java-j2seproject-copylibstask.jar" -OutFile "./lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar"
+          set -euo pipefail
+          mkdir -p ./lib-extra
+          curl -L --fail --retry 3 --retry-delay 2 \
+            -o ./lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar \
+            https://raw.githubusercontent.com/apache/netbeans/rel-nb82/netbeans/java/ant/extra/org-netbeans-modules-java-j2seproject-copylibstask.jar
+          # quick sanity check: jar is a zip, should start with 'PK'
+          head -c 2 ./lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar | od -An -t x1 | tr -d ' \n' | grep -qi '^504b$'
 
       - name: Patch CopyLibs path in project.properties
-        shell: pwsh
+        shell: bash
         run: |
-          $propFile = "AutoWashPro-Website/nbproject/project.properties"
-          $copyLibsJar = "${env:GITHUB_WORKSPACE}/lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar"
-          Add-Content -Path $propFile -Value "libs.CopyLibs.classpath=$copyLibsJar"
+          set -euo pipefail
+          PROP_FILE="AutoWashPro-Website/nbproject/project.properties"
+          COPYLIBS_JAR="$GITHUB_WORKSPACE/lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar"
+          echo "libs.CopyLibs.classpath=$COPYLIBS_JAR" >> "$PROP_FILE"
 
       - name: Build with Ant
-        shell: pwsh
+        shell: bash
         run: |
+          set -euo pipefail
           ant -f AutoWashPro-Website/build.xml
 
       - name: Archive WAR file
