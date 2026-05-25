@@ -20,24 +20,25 @@ jobs:
           java-version: "8"
           distribution: temurin
 
-      - name: Download NetBeans CopyLibs
+      - name: Download NetBeans CopyLibs (from Maven Central)
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p ./lib-extra
-          # Use github.com/apache/netbeans/raw/... as requested
+          # Download the NetBeans j2seproject module JAR from Maven Central
+          # This JAR contains the CopyLibs Ant task classes and antlib.xml.
           curl -L --fail --retry 3 --retry-delay 2 \
-            -o ./lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar \
-            https://github.com/apache/netbeans/raw/rel-nb82/netbeans/java/ant/extra/org-netbeans-modules-java-j2seproject-copylibstask.jar
-          # quick sanity check: jar is a zip, should start with 'PK'
-          head -c 2 ./lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar | od -An -t x1 | tr -d ' \n' | grep -qi '^504b$'
+            -o ./lib-extra/org-netbeans-modules-java-j2seproject.jar \
+            https://repo.maven.apache.org/maven2/org/netbeans/modules/org-netbeans-modules-java-j2seproject/RELEASE210/org-netbeans-modules-java-j2seproject-RELEASE210.jar
+          # sanity check: jar is a zip, should start with 'PK'
+          head -c 2 ./lib-extra/org-netbeans-modules-java-j2seproject.jar | od -An -t x1 | tr -d ' \n' | grep -qi '^504b$'
 
       - name: Patch CopyLibs path in project.properties
         shell: bash
         run: |
           set -euo pipefail
           PROP_FILE="AutoWashPro-Website/nbproject/project.properties"
-          COPYLIBS_JAR="$GITHUB_WORKSPACE/lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar"
+          COPYLIBS_JAR="$GITHUB_WORKSPACE/lib-extra/org-netbeans-modules-java-j2seproject.jar"
           echo "libs.CopyLibs.classpath=$COPYLIBS_JAR" >> "$PROP_FILE"
 
       - name: Build with Ant
