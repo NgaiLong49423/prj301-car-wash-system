@@ -2,41 +2,45 @@ name: Java CI with Ant (JDK 8, Tomcat 9, NetBeans CopyLibs)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 8
-      uses: actions/setup-java@v4
-      with:
-        java-version: '8'
-        distribution: 'temurin'
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: "8"
+          distribution: temurin
 
-    - name: Download NetBeans CopyLibs
-      run: |
-        mkdir -p ./lib-extra
-        wget https://github.com/apache/netbeans/raw/rel-nb82/netbeans/java/ant/extra/org-netbeans-modules-java-j2seproject-copylibstask.jar \
-          -O ./lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar
+      - name: Download NetBeans CopyLibs (Windows)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "./lib-extra" | Out-Null
+          Invoke-WebRequest -Uri "https://github.com/apache/netbeans/raw/rel-nb82/netbeans/java/ant/extra/org-netbeans-modules-java-j2seproject-copylibstask.jar" -OutFile "./lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar"
 
-    - name: Patch CopyLibs path in project.properties
-      run: |
-        echo "libs.CopyLibs.classpath=$GITHUB_WORKSPACE/lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar" >> AutoWashPro-Website/nbproject/project.properties
+      - name: Patch CopyLibs path in project.properties
+        shell: pwsh
+        run: |
+          $propFile = "AutoWashPro-Website/nbproject/project.properties"
+          $copyLibsJar = "${env:GITHUB_WORKSPACE}/lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar"
+          Add-Content -Path $propFile -Value "libs.CopyLibs.classpath=$copyLibsJar"
 
-    - name: Build with Ant
-      run: ant -f AutoWashPro-Website/build.xml
+      - name: Build with Ant
+        shell: pwsh
+        run: |
+          ant -f AutoWashPro-Website/build.xml
 
-    # Optional: Archive WAR artifact if you want to download after build
-    - name: Archive WAR file
-      if: success()
-      uses: actions/upload-artifact@v4
-      with:
-        name: war
-        path: AutoWashPro-Website/dist/*.war
+      - name: Archive WAR file
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: war
+          path: AutoWashPro-Website/dist/*.war
