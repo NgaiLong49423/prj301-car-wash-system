@@ -1,4 +1,4 @@
-name: Java CI
+name: Java CI with Ant (JDK 8, Tomcat 9, NetBeans CopyLibs)
 
 on:
   push:
@@ -8,10 +8,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
     - name: Set up JDK 8
       uses: actions/setup-java@v3
@@ -19,14 +20,23 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
 
-    - name: Download CopyLibs
+    - name: Download NetBeans CopyLibs
       run: |
         mkdir -p ./lib-extra
-        wget https://repo.maven.apache.org/maven2/org/netbeans/modules/org-netbeans-modules-java-j2seproject-copylibstask/1.0/org-netbeans-modules-java-j2seproject-copylibstask-1.0.jar -O ./lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar
+        wget https://github.com/apache/netbeans/raw/rel-nb82/netbeans/java/ant/extra/org-netbeans-modules-java-j2seproject-copylibstask.jar \
+          -O ./lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar
 
-    - name: Set CopyLibs path
+    - name: Patch CopyLibs path in project.properties
       run: |
         echo "libs.CopyLibs.classpath=$GITHUB_WORKSPACE/lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar" >> AutoWashPro-Website/nbproject/project.properties
 
     - name: Build with Ant
       run: ant -f AutoWashPro-Website/build.xml
+
+    # Optional: Archive WAR artifact if you want to download after build
+    - name: Archive WAR file
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: war
+        path: AutoWashPro-Website/dist/*.war
