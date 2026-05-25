@@ -1,6 +1,3 @@
-# This workflow will build a Java project with Ant
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-ant
-
 name: Java CI
 
 on:
@@ -11,15 +8,25 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
+
     - name: Set up JDK 8
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v3
       with:
         java-version: '8'
         distribution: 'temurin'
+
+    - name: Download CopyLibs
+      run: |
+        mkdir -p ./lib-extra
+        wget https://repo.maven.apache.org/maven2/org/netbeans/modules/org-netbeans-modules-java-j2seproject-copylibstask/1.0/org-netbeans-modules-java-j2seproject-copylibstask-1.0.jar -O ./lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar
+
+    - name: Set CopyLibs path
+      run: |
+        echo "libs.CopyLibs.classpath=$GITHUB_WORKSPACE/lib-extra/org-netbeans-modules-java-j2seproject-copylibstask.jar" >> AutoWashPro-Website/nbproject/project.properties
+
     - name: Build with Ant
-      run: ant -noinput -buildfile AutoWashPro-Website/build.xml
+      run: ant -f AutoWashPro-Website/build.xml
