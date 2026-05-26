@@ -3,11 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Semester%204/PRJ301/prj301-car-wash-system/AutoWashPro-Website/src/java/dto/NewClass.java</file>
-            <file>file:/D:/Semester%204/PRJ301/prj301-car-wash-system/AutoWashPro-Website/web/index.html</file>
-            <file>file:/D:/Semester%204/PRJ301/prj301-car-wash-system/AutoWashPro-Website/src/java/dao/NewClass.java</file>
-            <file>file:/D:/Semester%204/PRJ301/prj301-car-wash-system/AutoWashPro-Website/src/java/controller/NewClass.java</file>
-            <file>file:/D:/Semester%204/PRJ301/prj301-car-wash-system/AutoWashPro-Website/src/java/mylib/DBUtils.java</file>
+            <file>file:/D:/netbeans/prj301-car-wash-system/AutoWashPro-Website/web/META-INF/context.xml</file>
+            <file>file:/D:/netbeans/prj301-car-wash-system/AutoWashPro-Website/src/java/dao/UserDAO.java</file>
+            <file>file:/D:/netbeans/prj301-car-wash-system/AutoWashPro-Website/src/java/controller/Login.java</file>
+            <file>file:/D:/netbeans/prj301-car-wash-system/AutoWashPro-Website/web/index.html</file>
+            <file>file:/D:/netbeans/prj301-car-wash-system/AutoWashPro-Website/src/java/controller/Logout.java</file>
+            <file>file:/D:/netbeans/prj301-car-wash-system/AutoWashPro-Website/web/WEB-INF/web.xml</file>
+            <file>file:/D:/netbeans/prj301-car-wash-system/AutoWashPro-Website/src/java/dto/User.java</file>
+            <file>file:/D:/netbeans/prj301-car-wash-system/AutoWashPro-Website/src/java/mylib/DBUtils.java</file>
         </group>
     </open-files>
 </project-private>
