@@ -14,10 +14,10 @@ public class UserDAO {
     PreparedStatement ps = null;
     ResultSet rs = null;
 
-    public User login(String username, String password) {
+    public User login(String email, String password) {
 
-        String query = "SELECT * FROM users "
-                + "WHERE username = ? AND password = ?";
+        String query = "SELECT * FROM Customer "
+                + "WHERE email = ? AND password = ?";
 
         try {
 
@@ -25,21 +25,23 @@ public class UserDAO {
 
             ps = conn.prepareStatement(query);
 
-            ps.setString(1, username);
+            ps.setString(1, email);
             ps.setString(2, password);
 
             rs = ps.executeQuery();
 
-            while (rs.next()) {
+            if (rs.next()) {
 
                 return new User(
-                        rs.getInt(1),
-                        rs.getString(2),
-                        rs.getString(3)
+                        rs.getInt("customer_id"),
+                        rs.getString("email"),
+                        rs.getString("password")
                 );
             }
 
         } catch (ClassNotFoundException | SQLException e) {
+
+            e.printStackTrace();
         }
 
         return null;

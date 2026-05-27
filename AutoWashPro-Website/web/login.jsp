@@ -52,7 +52,7 @@
     <form action="login" method="post">
 
         <input type="text"
-               name="username"
+               name="email"
                placeholder="Username"
                required>
 

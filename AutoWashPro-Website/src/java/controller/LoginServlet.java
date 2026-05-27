@@ -17,12 +17,12 @@ public class LoginServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        String username = request.getParameter("username");
+        String email = request.getParameter("email");
         String password = request.getParameter("password");
 
         UserDAO dao = new UserDAO();
 
-        User user = dao.login(username, password);
+        User user = dao.login(email, password);
 
         if (user != null) {
 

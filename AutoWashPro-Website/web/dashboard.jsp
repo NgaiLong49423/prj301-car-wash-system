@@ -1,23 +1,20 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="dto.User"%>
 
 <%
+    User c = (User) session.getAttribute("account");
 
-    User u =
-        (User) session.getAttribute("account");
-
-    if(u == null){
-
+    if(c == null){
         response.sendRedirect("login.jsp");
         return;
     }
-
 %>
 <!DOCTYPE html>
 
 <html class="light" lang="vi"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>AquaSmart - Trang ch? R?a xe Th�ng minh</title>
+<title>AquaSmart - Trang chủ Rửa xe Thông minh</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -131,9 +128,9 @@
 <span class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim font-bold">AquaSmart</span>
 <nav class="hidden md:flex gap-6 items-center">
 <a class="font-label-md text-label-md text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1" href="#">Dashboard</a>
-<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors" href="#">D?ch v?</a>
-<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors" href="#">L?ch s?</a>
-<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors" href="#">?u ?�i</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors" href="#">Dịch vụ</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors" href="#">Lịch sử</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors" href="#">Ưu đãi</a>
 </nav>
 </div>
 <div class="flex items-center gap-4">
@@ -146,7 +143,7 @@
 <!-- Side Navigation Bar (Desktop) -->
 <aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-surface dark:bg-on-background border-r border-outline-variant dark:border-on-surface-variant py-6 hidden md:flex flex-col gap-2">
 <div class="px-6 mb-6">
-<p class="font-label-sm text-label-sm text-outline uppercase tracking-widest">Menu Ch�nh</p>
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-widest">Menu Chính</p>
 </div>
 <a class="text-primary dark:text-primary-fixed-dim border-l-4 border-primary bg-primary-container/10 dark:bg-primary-container/20 font-bold font-label-md text-label-md flex items-center px-6 py-3 gap-3" href="#">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span> Home
@@ -175,8 +172,8 @@
 <!-- Section 1: Header Welcome -->
 <section class="flex flex-col md:flex-row md:items-end justify-between gap-6">
 <div class="space-y-2">
-<h1 class="font-headline-lg text-headline-lg text-on-background">Ch�o m?ng tr? l?i, <%= c.getFullName() %></h1>
-<p class="font-body-md text-body-md text-on-surface-variant">H�m nay l� m?t ng�y tuy?t v?i ?? l�m s?ch "x? y�u" c?a b?n!</p>
+<h1 class="font-headline-lg text-headline-lg text-on-background">Chào mừng trở lại, <%= c.getUsername() %></h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Hôm nay là một ngày tuyệt vời để làm sạch "xế yêu" của bạn!</p>
 </div>
 <div class="flex gap-4">
 <div class="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant flex items-center gap-4">
@@ -184,8 +181,8 @@
 <span class="material-symbols-outlined">calendar_today</span>
 </div>
 <div>
-<p class="font-label-sm text-label-sm text-on-surface-variant">T?ng ??n h�ng</p>
-<p class="font-label-md text-label-md text-on-surface font-bold">24 L?n</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Tổng đơn hàng</p>
+<p class="font-label-md text-label-md text-on-surface font-bold">24 Lần</p>
 </div>
 </div>
 <div class="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant flex items-center gap-4">
@@ -193,7 +190,7 @@
 <span class="material-symbols-outlined">stars</span>
 </div>
 <div>
-<p class="font-label-sm text-label-sm text-on-surface-variant">?i?m t�ch l?y</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Điểm tích lũy</p>
 <p class="font-label-md text-label-md text-on-surface font-bold">1,250 Pts</p>
 </div>
 </div>
@@ -208,13 +205,13 @@
 <span class="material-symbols-outlined text-[160px]" style="font-variation-settings: 'FILL' 1;">local_car_wash</span>
 </div>
 <div class="relative z-10">
-<span class="px-3 py-1 bg-white/20 rounded-full font-label-sm text-label-sm backdrop-blur-md mb-4 inline-block">Tr?ng th�i hi?n t?i</span>
-<h2 class="font-headline-lg text-headline-lg mb-2">Xe c?a b?n ?ang ? giai ?o?n: S?y kh�</h2>
-<p class="font-body-md text-body-md text-primary-fixed">??c t�nh ho�n th�nh sau: 5 ph�t</p>
+<span class="px-3 py-1 bg-white/20 rounded-full font-label-sm text-label-sm backdrop-blur-md mb-4 inline-block">Trạng thái hiện tại</span>
+<h2 class="font-headline-lg text-headline-lg mb-2">Xe của bạn đang ở giai đoạn: Sấy khô</h2>
+<p class="font-body-md text-body-md text-primary-fixed">Ước tính hoàn thành sau: 5 phút</p>
 </div>
 <div class="relative z-10 space-y-4">
 <div class="flex justify-between font-label-md text-label-md">
-<span>Ti?n ?? t?ng th?</span>
+<span>Tiến độ tổng thể</span>
 <span>80%</span>
 </div>
 <div class="h-2 w-full bg-white/20 rounded-full overflow-hidden">
@@ -232,10 +229,10 @@
 <div class="w-20 h-20 bg-secondary-container rounded-full flex items-center justify-center mb-2">
 <span class="material-symbols-outlined text-secondary text-[40px]">qr_code_2</span>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface">M� Nh?n Xe</h3>
-<p class="font-body-md text-body-md text-on-surface-variant px-4">S? d?ng m� n�y t?i tr?m khi xe ho�n t?t ?? nh?n xe nhanh ch�ng.</p>
+<h3 class="font-headline-md text-headline-md text-on-surface">Mã Nhận Xe</h3>
+<p class="font-body-md text-body-md text-on-surface-variant px-4">Sử dụng mã này tại trạm khi xe hoàn tất để nhận xe nhanh chóng.</p>
 <button class="mt-4 font-label-md text-label-md text-primary border border-primary px-6 py-2 rounded-xl hover:bg-primary-container/10 transition-colors">
-                        Xem chi ti?t m�
+                        Xem chi tiết mã
                     </button>
 </div>
 </section>
@@ -244,18 +241,18 @@
 <!-- Quick Booking (Left side) -->
 <div class="lg:col-span-7 space-y-6">
 <div class="flex justify-between items-center">
-<h2 class="font-headline-md text-headline-md text-on-background">D?ch v? N?i b?t</h2>
-<a class="font-label-md text-label-md text-primary flex items-center gap-1" href="#">Xem t?t c? <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
+<h2 class="font-headline-md text-headline-md text-on-background">Dịch vụ Nổi bật</h2>
+<a class="font-label-md text-label-md text-primary flex items-center gap-1" href="#">Xem tất cả <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
 </div>
 <div class="grid grid-cols-2 gap-4">
 <div class="bg-white p-6 rounded-2xl border border-outline-variant card-hover transition-all cursor-pointer group">
 <div class="w-12 h-12 rounded-xl bg-blue-50 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
 <span class="material-symbols-outlined">waves</span>
 </div>
-<h3 class="font-label-md text-label-md mb-1">R?a C? B?n</h3>
-<p class="text-on-surface-variant text-[13px] mb-4">L�m s?ch ngo?i th?t ti�u chu?n</p>
+<h3 class="font-label-md text-label-md mb-1">Rửa Cơ Bản</h3>
+<p class="text-on-surface-variant text-[13px] mb-4">Làm sạch ngoại thất tiêu chuẩn</p>
 <div class="flex justify-between items-center">
-<span class="font-bold text-primary">150.000?</span>
+<span class="font-bold text-primary">150.000đ</span>
 <span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">add_circle</span>
 </div>
 </div>
@@ -263,10 +260,10 @@
 <div class="w-12 h-12 rounded-xl bg-teal-50 text-secondary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
 <span class="material-symbols-outlined">auto_fix_high</span>
 </div>
-<h3 class="font-label-md text-label-md mb-1">?�nh B�ng Cao C?p</h3>
-<p class="text-on-surface-variant text-[13px] mb-4">L?p ph? Ceramic b?o v? s?n</p>
+<h3 class="font-label-md text-label-md mb-1">Đánh Bóng Cao Cấp</h3>
+<p class="text-on-surface-variant text-[13px] mb-4">Lớp phủ Ceramic bảo vệ sơn</p>
 <div class="flex justify-between items-center">
-<span class="font-bold text-primary">850.000?</span>
+<span class="font-bold text-primary">850.000đ</span>
 <span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">add_circle</span>
 </div>
 </div>
@@ -274,10 +271,10 @@
 <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
 <span class="material-symbols-outlined">vacuum</span>
 </div>
-<h3 class="font-label-md text-label-md mb-1">V? Sinh N?i Th?t</h3>
-<p class="text-on-surface-variant text-[13px] mb-4">H�t b?i v� di?t khu?n 99%</p>
+<h3 class="font-label-md text-label-md mb-1">Vệ Sinh Nội Thất</h3>
+<p class="text-on-surface-variant text-[13px] mb-4">Hút bụi và diệt khuẩn 99%</p>
 <div class="flex justify-between items-center">
-<span class="font-bold text-primary">450.000?</span>
+<span class="font-bold text-primary">450.000đ</span>
 <span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">add_circle</span>
 </div>
 </div>
@@ -285,10 +282,10 @@
 <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
 <span class="material-symbols-outlined">toys</span>
 </div>
-<h3 class="font-label-md text-label-md mb-1">R?a ??ng C?</h3>
-<p class="text-on-surface-variant text-[13px] mb-4">T?y r?a khoang m�y chuy�n s�u</p>
+<h3 class="font-label-md text-label-md mb-1">Rửa Động Cơ</h3>
+<p class="text-on-surface-variant text-[13px] mb-4">Tẩy rửa khoang máy chuyên sâu</p>
 <div class="flex justify-between items-center">
-<span class="font-bold text-primary">600.000?</span>
+<span class="font-bold text-primary">600.000đ</span>
 <span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">add_circle</span>
 </div>
 </div>
@@ -297,7 +294,7 @@
 <!-- Recent Booking History (Right side) -->
 <div class="lg:col-span-5 space-y-6">
 <div class="flex justify-between items-center">
-<h2 class="font-headline-md text-headline-md text-on-background">L?ch s? G?n ?�y</h2>
+<h2 class="font-headline-md text-headline-md text-on-background">Lịch sử Gần đây</h2>
 </div>
 <div class="space-y-4">
 <!-- History Item 1 -->
@@ -307,12 +304,12 @@
 </div>
 <div class="flex-1">
 <div class="flex justify-between">
-<h4 class="font-label-md text-label-md text-on-surface">R?a C? B?n</h4>
+<h4 class="font-label-md text-label-md text-on-surface">Rửa Cơ Bản</h4>
 <span class="text-primary font-bold">150k</span>
 </div>
-<p class="text-[12px] text-on-surface-variant">15 Th05, 2024 ? 09:30 AM</p>
+<p class="text-[12px] text-on-surface-variant">15 Th05, 2024 • 09:30 AM</p>
 </div>
-<span class="px-2 py-1 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Ho�n t?t</span>
+<span class="px-2 py-1 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Hoàn tất</span>
 </div>
 <!-- History Item 2 -->
 <div class="flex items-center gap-4 bg-surface-container-low p-4 rounded-2xl border border-outline-variant hover:bg-surface-container transition-colors cursor-pointer">
@@ -324,9 +321,9 @@
 <h4 class="font-label-md text-label-md text-on-surface">Premium Polish</h4>
 <span class="text-primary font-bold">850k</span>
 </div>
-<p class="text-[12px] text-on-surface-variant">10 Th05, 2024 ? 14:15 PM</p>
+<p class="text-[12px] text-on-surface-variant">10 Th05, 2024 • 14:15 PM</p>
 </div>
-<span class="px-2 py-1 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Ho�n t?t</span>
+<span class="px-2 py-1 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Hoàn tất</span>
 </div>
 <!-- History Item 3 -->
 <div class="flex items-center gap-4 bg-surface-container-low p-4 rounded-2xl border border-outline-variant hover:bg-surface-container transition-colors cursor-pointer">
@@ -335,20 +332,20 @@
 </div>
 <div class="flex-1">
 <div class="flex justify-between">
-<h4 class="font-label-md text-label-md text-on-surface">V? Sinh N?i Th?t</h4>
+<h4 class="font-label-md text-label-md text-on-surface">Vệ Sinh Nội Thất</h4>
 <span class="text-primary font-bold">450k</span>
 </div>
-<p class="text-[12px] text-on-surface-variant">01 Th05, 2024 ? 10:00 AM</p>
+<p class="text-[12px] text-on-surface-variant">01 Th05, 2024 • 10:00 AM</p>
 </div>
-<span class="px-2 py-1 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Ho�n t?t</span>
+<span class="px-2 py-1 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Hoàn tất</span>
 </div>
 </div>
 <!-- Reward Card -->
 <div class="bg-on-background p-6 rounded-[24px] text-on-primary-container relative overflow-hidden mt-8">
 <img alt="Background" class="absolute inset-0 w-full h-full object-cover opacity-20" data-alt="A macro shot of soap bubbles and water droplets on a glossy blue car surface. The lighting is bright and energetic, capturing the refreshing essence of a car wash. The image has a modern, clean commercial feel with high-contrast highlights and deep, rich blue tones, reinforcing the brand's premium identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIz-V6nQqQFPSRTKp36Ase4OQl_VrSDsNwW_REslIXaOgkbswHeAmys2yPtJDSQe7Fiea1YGeJdXjzfkOvlr6Kslbs6bbX3jlS2F7cSSx7C_H6IRDAlaFnWwP_HRBGzZ3FJ5flN9Ri-3zT5uOhhAbjlMcbgdVeuHy3SMphsy_BrPnudHFLuO6DVT6n6xKPfFBJbEMfNSIGOh9xnDgfVQTLi8MLCyzxqYRjWKavrA-zQf96Y6z0nqnj0TBnMTW-uWBbl5EckMyd4sB8"/>
 <div class="relative z-10">
-<h4 class="font-headline-md text-headline-md mb-2">Th? Th�nh Vi�n V�ng</h4>
-<p class="font-body-md text-body-md opacity-80 mb-4">B?n ch? c�n 2 l?n r?a n?a ?? nh?n 1 l?n mi?n ph�!</p>
+<h4 class="font-headline-md text-headline-md mb-2">Thẻ Thành Viên Vàng</h4>
+<p class="font-body-md text-body-md opacity-80 mb-4">Bạn chỉ còn 2 lần rửa nữa để nhận 1 lần miễn phí!</p>
 <div class="flex items-center gap-2">
 <div class="flex -space-x-2">
 <div class="w-8 h-8 rounded-full bg-primary border-2 border-on-background flex items-center justify-center"><span class="material-symbols-outlined text-[14px]">check</span></div>
@@ -357,7 +354,7 @@
 <div class="w-8 h-8 rounded-full bg-white/20 border-2 border-on-background flex items-center justify-center"><span class="material-symbols-outlined text-[14px] text-white/40">lock</span></div>
 <div class="w-8 h-8 rounded-full bg-white/20 border-2 border-on-background flex items-center justify-center"><span class="material-symbols-outlined text-[14px] text-white/40">lock</span></div>
 </div>
-<span class="font-label-sm text-label-sm ml-4">3 / 5 Ch?ng ???ng</span>
+<span class="font-label-sm text-label-sm ml-4">3 / 5 Chặng đường</span>
 </div>
 </div>
 </div>
@@ -373,7 +370,7 @@
 </a>
 <a class="flex flex-col items-center text-on-surface-variant" href="#">
 <span class="material-symbols-outlined">local_car_wash</span>
-<span class="text-[10px]">D?ch v?</span>
+<span class="text-[10px]">Dịch vụ</span>
 </a>
 <div class="relative -top-6">
 <button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center">
@@ -382,11 +379,11 @@
 </div>
 <a class="flex flex-col items-center text-on-surface-variant" href="#">
 <span class="material-symbols-outlined">history</span>
-<span class="text-[10px]">L?ch s?</span>
+<span class="text-[10px]">Lịch sử</span>
 </a>
 <a class="flex flex-col items-center text-on-surface-variant" href="#">
 <span class="material-symbols-outlined">person</span>
-<span class="text-[10px]">C� nh�n</span>
+<span class="text-[10px]">Cá nhân</span>
 </a>
 </nav>
 <script>
