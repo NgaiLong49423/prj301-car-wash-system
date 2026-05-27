@@ -10,15 +10,15 @@ INSERT INTO MembershipTier (tier_name, min_points, discount_percent, benefits) V
 ('Platinum', 15000, 0.00, '+30% points, free wash monthly');
 
 -- 2. Insert Customer (Tạo nhiều khách hàng ở các hạng khác nhau để test giao diện)
-INSERT INTO Customer (full_name, phone, email, [password], total_points, tier_id) VALUES
-('Ngo Gia A', '0987654321', 'ang@gmail.com', '1234512345', 800, 1),      -- Khách Member (Chưa đủ 2000 points)
-('Nguyen Van A', '0912345678', 'anv@gmail.com', 'hashed_pass_2', 2500, 2),      -- Khách Silver 
-('Tran Thi B', '0922334455', 'btt@gmail.com', 'hashed_pass_3', 7000, 3),        -- Khách Gold
-('Le Van C', '0933445566', 'cvl@gmail.com', 'hashed_pass_4', 16000, 4),         -- Khách Platinum
-('Pham Minh D', '0944556677', 'dpham@gmail.com', 'hashed_pass_5', 1500, 1),     -- Member khác
-('Hoang Thu E', '0955667788', 'ethu@gmail.com', 'hashed_pass_6', 3200, 2),      -- Silver khác
-('Vu Anh F', '0966778899', 'fvu@gmail.com', 'hashed_pass_7', 8500, 3),          -- Gold khác
-('Dang Hoa G', '0977889900', 'ghoa@gmail.com', 'hashed_pass_8', 18000, 4);      -- Platinum khác
+INSERT INTO Customer (full_name, phone, email, [password], total_spent_money, total_points, tier_id) VALUES
+('Ngo Gia A', '0987654321', 'ang@gmail.com', '1234512345', 800000.00, 800, 1),      -- Member (800K spent = 800 points)
+('Nguyen Van A', '0912345678', 'anv@gmail.com', 'hashed_pass_2', 2500000.00, 2500, 2),      -- Silver (2.5M spent)
+('Tran Thi B', '0922334455', 'btt@gmail.com', 'hashed_pass_3', 7000000.00, 7000, 3),        -- Gold (7M spent)
+('Le Van C', '0933445566', 'cvl@gmail.com', 'hashed_pass_4', 16000000.00, 16000, 4),         -- Platinum (16M spent)
+('Pham Minh D', '0944556677', 'dpham@gmail.com', 'hashed_pass_5', 1500000.00, 1500, 1),     -- Member (1.5M spent)
+('Hoang Thu E', '0955667788', 'ethu@gmail.com', 'hashed_pass_6', 3200000.00, 3200, 2),      -- Silver (3.2M spent)
+('Vu Anh F', '0966778899', 'fvu@gmail.com', 'hashed_pass_7', 8500000.00, 8500, 3),          -- Gold (8.5M spent)
+('Dang Hoa G', '0977889900', 'ghoa@gmail.com', 'hashed_pass_8', 18000000.00, 18000, 4);      -- Platinum (18M spent)
 
 -- 3. Insert Reward (Đúng theo ví dụ trong file requirement của đề)
 -- Đề bài: "Redemption: Points -> discount, free wash (eg. Redeems 300 pts -> gets free wax)"
