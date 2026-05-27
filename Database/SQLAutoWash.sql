@@ -26,7 +26,8 @@ CREATE TABLE Customer (
     email VARCHAR(100),
     [password] NVARCHAR(255),
     join_date DATETIME DEFAULT GETDATE(),
-    total_points INT DEFAULT 0,
+    total_spent_money DECIMAL(18,2) DEFAULT 0,  -- Tiền đã chi tiêu (dùng để tính lên hạng)
+    total_points INT DEFAULT 0,  -- Điểm quy từ tiền chi tiêu (1000 VND = 1 điểm)
     tier_id INT,
     CONSTRAINT FK_Customer_Tier FOREIGN KEY (tier_id) REFERENCES MembershipTier(tier_id)
     );
