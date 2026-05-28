@@ -51,7 +51,7 @@ jobs:
             exit 1
           fi
 
-          CORY_JAR=$(ls "$GITHUB_WORKSPACE"/AutoWashPro-Website/lib/*Cory*.jar 2>/dev/null | head -n 1 || true)
+          CORY_JAR=$(ls "$GITHUB_WORKSPACE"/AutoWashPro-Website/lib/*org-netbeans-modules-java-j2seproject-copylibstask*.jar 2>/dev/null | head -n 1 || true)
           if [ -z "$CORY_JAR" ]; then
             echo "CoryLib jar not found in AutoWashPro-Website/lib. Please ensure the file name contains 'Cory'."
             exit 1
