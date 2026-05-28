@@ -34,6 +34,7 @@
 # Compiled Java Files
 *.class
 *.jar
+!org-netbeans-modules-java-j2seproject-copylibstask.jar
 *.war
 *.ear
 
