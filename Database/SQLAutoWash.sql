@@ -1,8 +1,16 @@
 ﻿/* PROJECT: Vehicle Service Management System
    ENGINE: Microsoft SQL Server
+   INSTRUCTION: Chỉ cần chạy file này, tất cả sẽ được setup tự động
 */
 
--- 1. Tạo Database
+-- 1. Xóa Database cũ nếu tồn tại, sau đó tạo Database mới
+IF EXISTS (SELECT name FROM sys.databases WHERE name = 'AutoWashPro_DB')
+BEGIN
+    ALTER DATABASE AutoWashPro_DB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE AutoWashPro_DB;
+END
+GO
+
 CREATE DATABASE AutoWashPro_DB;
 GO
 
@@ -15,7 +23,7 @@ CREATE TABLE MembershipTier (
     tier_name VARCHAR(50) NOT NULL,
     min_points INT DEFAULT 0,
     discount_percent DECIMAL(5,2),
-    benefits TEXT
+    benefits NVARCHAR(MAX)
 );
 
 -- 3. Tạo bảng Customer (Khách hàng)
@@ -25,6 +33,7 @@ CREATE TABLE Customer (
     phone VARCHAR(15),
     email VARCHAR(100),
     [password] NVARCHAR(255),
+    avatar_url NVARCHAR(500),  -- Lưu đường dẫn ảnh đại diện, VD: /web/uploads/avatars/customer_1.jpg
     join_date DATETIME DEFAULT GETDATE(),
     total_spent_money DECIMAL(18,2) DEFAULT 0,  -- Tiền đã chi tiêu (dùng để tính lên hạng)
     total_points INT DEFAULT 0,  -- Điểm quy từ tiền chi tiêu (1000 VND = 1 điểm)
@@ -81,7 +90,7 @@ CREATE TABLE Reward (
     reward_id INT PRIMARY KEY IDENTITY(1,1),
     reward_name NVARCHAR(100),
     required_points INT,
-    description TEXT
+    description NVARCHAR(MAX)
 );
 
 -- 9. Tạo bảng Redemption (Đổi thưởng)
@@ -110,7 +119,7 @@ CREATE TABLE AIRecommendation (
     recommendation_id INT PRIMARY KEY IDENTITY(1,1),
     customer_id INT,
     promotion_id INT,
-    recommendation_reason TEXT,
+    recommendation_reason NVARCHAR(MAX),
     created_at DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_AI_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
     CONSTRAINT FK_AI_Promotion FOREIGN KEY (promotion_id) REFERENCES Promotion(promotion_id)
@@ -144,7 +153,7 @@ CREATE TABLE Feedback (
     customer_id INT,
     booking_id INT,
     rating INT CHECK (rating BETWEEN 1 AND 5),
-    comment TEXT,
+    comment NVARCHAR(MAX),
     created_at DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_FB_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
     CONSTRAINT FK_FB_Booking FOREIGN KEY (booking_id) REFERENCES Booking(booking_id)
@@ -162,3 +171,6 @@ CREATE TABLE Payment (
     CONSTRAINT FK_Payment_Booking FOREIGN KEY (booking_id) REFERENCES Booking(booking_id)
 );
 GO
+
+
+PRINT 'Database setup hoàn tất! ✅';
