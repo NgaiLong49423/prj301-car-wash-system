@@ -1,34 +1,85 @@
-/target/
-/.idea/
-/*.iml
-/nbproject/
-/nbbuild/
-/nbdist/
+# ==========================================
+# JAVA / NETBEANS PROJECT GITIGNORE
+# ==========================================
 
-# IntelliJ IDEA
+# NetBeans Build Output
+/target/
+/build/
+*/build/
+/dist/
+*/dist/
+/nbbuild/
+*/nbbuild/
+/nbdist/
+*/nbdist/
+
+# NetBeans Private Settings
+/nbproject/private/
+*/nbproject/private/
+/nbproject/
+*/nbproject/
+
+# IDE Files
 /.idea/
+*/.idea/
 *.iml
+/*.iml
 *.iws
 *.ipr
-
-# VS Code
 .vscode/
+.project
+.classpath
+.settings/
 
-# Compiled files
+# Compiled Java Files
 *.class
+*.jar
+!org-netbeans-modules-java-j2seproject-copylibstask.jar
 *.war
+*.ear
 
-# Ignore jar files except in lib folder
-/*.jar
+# Gradle
+.gradle/
+build/
 
-# OS files
+# Maven
+*.md5
+*.sha1
+
+# OS Files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
 # Logs
 *.log
+logs/
 
-# Temp files
+# Temp Files
 *~
 *.tmp
-/AutoWashPro-Website/dist/
+*.bak
+*.swp
+*.swo
+
+# IDE Specific
+.classpath
+.project
+.settings
+*.sublime-project
+*.sublime-workspace
+
+# Node (if used for frontend)
+node_modules/
+npm-debug.log
+
+# Database backup files (local development only)
+# Database/backup files are OK to commit, but local test data backups shouldn't be
+
+# Generated files
+*.ser
+.metadata/
