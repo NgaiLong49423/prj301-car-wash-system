@@ -127,13 +127,18 @@
         
         try {
             // Kiểm tra login
-            if (session.getAttribute("userName") == null) {
+            Object sessionAccount = session.getAttribute("account");
+            if (sessionAccount == null) {
                 response.sendRedirect("login.jsp");
                 return;
             }
             
             // ✅ Lấy tất cả data từ Request (BE đã tính toán hết) - với null-safety
-            userName = (String) session.getAttribute("userName");
+            String displayName = (String) request.getAttribute("USER_DISPLAY_NAME");
+            if (displayName == null) {
+                displayName = (String) session.getAttribute("userName");
+            }
+            userName = displayName;
             if (userName == null) userName = "Guest";
             
             Long totalSpentMoneyObj = (Long) request.getAttribute("TOTAL_SPENT_MONEY");
@@ -192,8 +197,8 @@
             LUXE WASH
         </div>
         <nav class="flex gap-lg">
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="home">
-                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">home</span>
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="dashboard.jsp">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;" >home</span>
                 Home
             </a>
             <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="profile">
@@ -206,7 +211,7 @@
             </a>
             <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="rewards">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">military_tech</span>
-                Rewards
+                Membership
             </a>
             <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="logout">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>
@@ -431,7 +436,14 @@
                 <%
                     if (rewardList != null && !rewardList.isEmpty()) {
                         int rewardIndex = 0;
-                        for (RewardDTO reward : rewardList) {
+                        for (Object __r_obj : rewardList) {
+                            if (!(__r_obj instanceof RewardDTO)) {
+                                // Unexpected type in list — log to server and skip
+                                System.err.println("Unexpected REWARD_LIST element type: " + (__r_obj == null ? "null" : __r_obj.getClass().getName()));
+                                rewardIndex++;
+                                continue;
+                            }
+                            RewardDTO reward = (RewardDTO) __r_obj;
                             boolean canRedeem = userPoints >= reward.getPointsRequired();
                             String icon = rewardIcons.get(rewardIndex) != null ? rewardIcons.get(rewardIndex) : "payments";
                 %>
@@ -483,7 +495,7 @@
 
     <!-- BottomNavBar (Mobile) -->
     <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface-container/80 backdrop-blur-2xl border-t border-white/5 shadow-2xl rounded-t-xl">
-        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="home">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="dashboard.jsp">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">home</span>
             <span class="font-label-bold text-[10px]">Home</span>
         </a>

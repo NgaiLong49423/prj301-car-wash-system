@@ -6,7 +6,7 @@
 -- 1. Xóa Database cũ nếu tồn tại, sau đó tạo Database mới
 IF EXISTS (SELECT name FROM sys.databases WHERE name = 'AutoWashPro_DB')
 BEGIN
-    ALTER DATABASE AutoWashPro_DB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    ALTER DATABASE AutoWashPro_DB SET MULTI_USER WITH ROLLBACK IMMEDIATE;
     DROP DATABASE AutoWashPro_DB;
 END
 GO
