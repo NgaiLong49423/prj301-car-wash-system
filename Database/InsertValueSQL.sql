@@ -11,14 +11,14 @@ INSERT INTO MembershipTier (tier_name, min_points, discount_percent, benefits) V
 
 -- 2. Insert Customer (Tạo nhiều khách hàng ở các hạng khác nhau để test giao diện)
 INSERT INTO Customer (full_name, phone, email, [password], total_spent_money, total_points, tier_id) VALUES
-('Ngo Gia A', '0987654321', 'ang@gmail.com', '1234512345', 800000.00, 800, 1),      -- Member (800K spent = 800 points)
-('Nguyen Van A', '0912345678', 'anv@gmail.com', 'hashed_pass_2', 2500000.00, 2500, 2),      -- Silver (2.5M spent)
-('Tran Thi B', '0922334455', 'btt@gmail.com', 'hashed_pass_3', 7000000.00, 7000, 3),        -- Gold (7M spent)
-('Le Van C', '0933445566', 'cvl@gmail.com', 'hashed_pass_4', 16000000.00, 16000, 4),         -- Platinum (16M spent)
-('Pham Minh D', '0944556677', 'dpham@gmail.com', 'hashed_pass_5', 1500000.00, 1500, 1),     -- Member (1.5M spent)
-('Hoang Thu E', '0955667788', 'ethu@gmail.com', 'hashed_pass_6', 3200000.00, 3200, 2),      -- Silver (3.2M spent)
-('Vu Anh F', '0966778899', 'fvu@gmail.com', 'hashed_pass_7', 8500000.00, 8500, 3),          -- Gold (8.5M spent)
-('Dang Hoa G', '0977889900', 'ghoa@gmail.com', 'hashed_pass_8', 18000000.00, 18000, 4);      -- Platinum (18M spent)
+('Ngo Gia A', '0987654321', 'ang@gmail.com', '123456', 800000.00, 600, 1),      -- Member (800K spent = 800 points)
+('Nguyen Van A', '0912345678', 'anv@gmail.com', '123456', 2500000.00, 1200, 2),      -- Silver (2.5M spent)
+('Tran Thi B', '0922334455', 'btt@gmail.com', '123456', 7000000.00, 4000, 3),        -- Gold (7M spent)
+('Le Van C', '0933445566', 'cvl@gmail.com', '123456', 16000000.00, 1000, 4),         -- Platinum (16M spent)
+('Pham Minh D', '0944556677', 'dpham@gmail.com', '123456', 1500000.00, 1500, 1),     -- Member (1.5M spent)
+('Hoang Thu E', '0955667788', 'ethu@gmail.com', '123456', 3200000.00, 3200, 2),      -- Silver (3.2M spent)
+('Vu Anh F', '0966778899', 'fvu@gmail.com', '123456', 8500000.00, 8500, 3),          -- Gold (8.5M spent)
+('Dang Hoa G', '0977889900', 'ghoa@gmail.com', '123456', 18000000.00, 18000, 4);      -- Platinum (18M spent)
 
 -- 3. Insert Reward (Đúng theo ví dụ trong file requirement của đề)
 -- Đề bài: "Redemption: Points -> discount, free wash (eg. Redeems 300 pts -> gets free wax)"
@@ -125,7 +125,13 @@ INSERT INTO Feedback (customer_id, booking_id, rating, comment, created_at) VALU
 (6, 9, 3, N'Chất lượng bình thường, có thể cải thiện hơn', '2026-05-27 10:15:00'),
 (7, 10, 5, N'Rất hài lòng, sẽ quay lại', '2026-05-27 14:45:00');
 
--- 9. Insert AI Recommendation (Gợi ý AI dựa trên hành vi)
+-- 9. Insert Promotion (Bắt buộc phải có trước AIRecommendation vì AIRecommendation dùng promotion_id làm khóa ngoại)
+INSERT INTO Promotion (title, discount_percent, start_date, end_date, target_tier) VALUES
+(N'Khuyến mãi rửa xe mùa hè', 20.00, '2026-05-01', '2026-06-30', N'Member'),
+(N'Ưu đãi lên hạng Silver', 15.00, '2026-05-01', '2026-07-31', N'Silver'),
+(N'Ưu đãi chăm sóc xe Gold/Platinum', 30.00, '2026-05-01', '2026-08-31', N'Gold');
+
+-- 10. Insert AI Recommendation (Gợi ý AI dựa trên hành vi)
 INSERT INTO AIRecommendation (customer_id, promotion_id, recommendation_reason, created_at) VALUES
 (1, 1, N'Gợi ý rửa xe vào mùa hè, được giảm 20%', GETDATE()),
 (2, 2, N'Khách hạng Silver sắp lên Gold, cố gắng thêm 3500 điểm nữa', GETDATE()),
@@ -134,7 +140,7 @@ INSERT INTO AIRecommendation (customer_id, promotion_id, recommendation_reason, 
 (5, 1, N'Khách Member mới, cơ hội lên Silver với 1200 điểm nữa', GETDATE()),
 (6, 2, N'Gợi ý dịch vụ vệ sinh nội thất theo mùa', GETDATE());
 
--- 10. Insert LPR Log (Ghi nhận lịch sử phát hiện biển số)
+-- 11. Insert LPR Log (Ghi nhận lịch sử phát hiện biển số)
 INSERT INTO LPRLog (vehicle_id, detected_plate, checkin_time, confidence_score) VALUES
 (1, '61B1-123.45', '2026-05-20 09:55:00', 0.9999),
 (1, '61B1-123.45', '2026-05-21 13:55:00', 0.9998),
