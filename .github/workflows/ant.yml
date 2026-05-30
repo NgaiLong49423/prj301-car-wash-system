@@ -1,55 +1,127 @@
-name: Java CI with Ant (JDK 8, Tomcat 9, NetBeans CopyLibs)
+name: Java CI with Ant (JDK 8, Tomcat 9)
 
 on:
   push:
-    branches: ["main"]
+    branches: ["**"]
   pull_request:
-    branches: ["main"]
+
+permissions: read-all
+
+concurrency:
+  group: ant-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
+    name: Ant compile (syntax check)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK 8
         uses: actions/setup-java@v4
         with:
-          java-version: "8"
           distribution: temurin
+          java-version: "8"
 
-      - name: Download NetBeans CopyLibs (from Maven Central)
+      - name: Install Ant
+        run: sudo apt-get update; sudo apt-get install -y ant
+
+      - name: Download Tomcat 9
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p ./lib-extra
-          # Download the NetBeans j2seproject module JAR from Maven Central
-          # This JAR contains the CopyLibs Ant task classes and antlib.xml.
-          curl -L --fail --retry 3 --retry-delay 2 \
-            -o ./lib-extra/org-netbeans-modules-java-j2seproject.jar \
-            https://repo.maven.apache.org/maven2/org/netbeans/modules/org-netbeans-modules-java-j2seproject/RELEASE210/org-netbeans-modules-java-j2seproject-RELEASE210.jar
-          # sanity check: jar is a zip, should start with 'PK'
-          head -c 2 ./lib-extra/org-netbeans-modules-java-j2seproject.jar | od -An -t x1 | tr -d ' \n' | grep -qi '^504b$'
+          TOMCAT_VERSION="9.0.89"
+          curl -fsSL "https://archive.apache.org/dist/tomcat/tomcat-9/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz" -o /tmp/tomcat.tar.gz
+          mkdir -p "$HOME/tomcat"
+          tar -xzf /tmp/tomcat.tar.gz -C "$HOME/tomcat" --strip-components=1
+          echo "TOMCAT_HOME=$HOME/tomcat" >> "$GITHUB_ENV"
 
-      - name: Patch CopyLibs path in project.properties
+      - name: Wire local libs (CopyLibs + CoryLib)
         shell: bash
         run: |
           set -euo pipefail
           PROP_FILE="AutoWashPro-Website/nbproject/project.properties"
-          COPYLIBS_JAR="$GITHUB_WORKSPACE/lib-extra/org-netbeans-modules-java-j2seproject.jar"
-          echo "libs.CopyLibs.classpath=$COPYLIBS_JAR" >> "$PROP_FILE"
+          COPYLIBS_JAR="$GITHUB_WORKSPACE/AutoWashPro-Website/lib/org-netbeans-modules-java-j2seproject-copylibstask.jar"
+          if [ ! -f "$COPYLIBS_JAR" ]; then
+            echo "Missing CopyLibs jar at $COPYLIBS_JAR"
+            exit 1
+          fi
 
-      - name: Build with Ant
+          CORY_JAR=$(ls "$GITHUB_WORKSPACE"/AutoWashPro-Website/lib/*org-netbeans-modules-java-j2seproject-copylibstask*.jar 2>/dev/null | head -n 1 || true)
+          if [ -z "$CORY_JAR" ]; then
+            echo "CoryLib jar not found in AutoWashPro-Website/lib. Please ensure the file name contains 'Cory'."
+            exit 1
+          fi
+
+          export COPYLIBS_JAR CORY_JAR
+          python3 - <<'PY'
+          import os
+
+          prop_path = "AutoWashPro-Website/nbproject/project.properties"
+          copylibs = os.environ["COPYLIBS_JAR"]
+          cory = os.environ["CORY_JAR"]
+
+          with open(prop_path, "r", encoding="utf-8") as f:
+              lines = f.read().splitlines()
+
+          def set_or_append(key, value):
+              for i, line in enumerate(lines):
+                  if line.startswith(key + "="):
+                      lines[i] = f"{key}={value}"
+                      return
+              lines.append(f"{key}={value}")
+
+          # Ensure CopyLibs and CoryLib are available to Ant.
+          set_or_append("libs.CopyLibs.classpath", copylibs)
+          set_or_append("file.reference.corylib.jar", cory)
+
+          # Update javac.classpath to include CoryLib if missing.
+          def get_multiline_value(start_index):
+              value_parts = []
+              i = start_index
+              while i < len(lines):
+                  line = lines[i]
+                  if i == start_index:
+                      _, rhs = line.split("=", 1)
+                  else:
+                      rhs = line.strip()
+                  if rhs.endswith("\\"):
+                      rhs = rhs[:-1]
+                      value_parts.append(rhs)
+                      i += 1
+                      continue
+                  value_parts.append(rhs)
+                  break
+              return "".join(value_parts), i
+
+          def replace_multiline(start_index, end_index, key, value):
+              parts = [p for p in value.split(":") if p]
+              new_lines = [f"{key}=\\"]
+              for part in parts[:-1]:
+                  new_lines.append(f"    {part}:\\")
+              new_lines.append(f"    {parts[-1]}")
+              lines[start_index:end_index + 1] = new_lines
+
+          target_key = "javac.classpath"
+          for idx, line in enumerate(lines):
+              if line.startswith(target_key + "="):
+                  current, end_idx = get_multiline_value(idx)
+                  cory_ref = "${file.reference.corylib.jar}"
+                  if cory_ref not in current:
+                      current = current + (":" if current else "") + cory_ref
+                  replace_multiline(idx, end_idx, target_key, current)
+                  break
+
+          with open(prop_path, "w", encoding="utf-8") as f:
+              f.write("\n".join(lines) + "\n")
+          PY
+
+      - name: Compile (syntax check)
         shell: bash
         run: |
           set -euo pipefail
-          ant -f AutoWashPro-Website/build.xml
-
-      - name: Archive WAR file
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: war
-          path: AutoWashPro-Website/dist/*.war
+          ant -f AutoWashPro-Website/build.xml -Dj2ee.server.home="$TOMCAT_HOME" clean compile

@@ -1,0 +1,18 @@
+name: ci (deprecated - use ant.yml)
+
+on:
+  workflow_call:
+
+permissions: read-all
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  noop:
+    name: Deprecated
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deprecated workflow
+        run: echo "This workflow is deprecated. Use .github/workflows/ant.yml"
