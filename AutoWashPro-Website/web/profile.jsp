@@ -150,7 +150,7 @@
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-5 py-8 md:py-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+    <main class="max-w-7xl mx-auto px-5 py-8 md:py-10 mt-16 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
         <section class="lg:col-span-4 flex flex-col gap-6">
             <div class="glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-glow">
                 <div class="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/10 pointer-events-none"></div>
