@@ -202,7 +202,7 @@
 <%
     }
 %>
-<form action="login" method="post" class="space-y-lg">
+<form action="<%= request.getContextPath() %>/login" method="post" class="space-y-lg">
 <!-- Email Field -->
 <div>
 <label class="block font-label-bold text-label-bold text-on-surface-variant mb-sm uppercase" for="email">Email</label>

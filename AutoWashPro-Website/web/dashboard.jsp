@@ -138,7 +138,7 @@
 <a class="text-primary dark:text-primary border-b-2 border-primary pb-1 font-headline-lg text-headline-lg transition-colors duration-300" href="home.jsp">Home</a>
 <a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary font-headline-lg text-headline-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-300 rounded px-2 py-1" href="#">Services</a>
 <a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary font-headline-lg text-headline-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-300 rounded px-2 py-1" href="#">Locations</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary font-headline-lg text-headline-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-300 rounded px-2 py-1" href="#">Membership</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary font-headline-lg text-headline-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-300 rounded px-2 py-1" href="rewards">Membership</a>
 </nav>
 <div class="hidden md:flex gap-md items-center">
 <a href="logout" class="text-on-surface-variant hover:text-primary font-body-lg text-body-lg transition-colors duration-300 px-4 py-2 rounded-lg hover:bg-surface-bright">Logout</a>
@@ -152,7 +152,7 @@
 <!-- Hero Section -->
 <section class="relative w-full h-[70vh] min-h-[600px] flex items-center justify-center overflow-hidden px-container-margin">
 <div class="absolute inset-0 z-0">
-<img alt="Hero Car" class="w-full h-full object-cover object-center opacity-70" src="https://lh3.googleusercontent.com/aida/ADBb0uh3tJilapulWTjkRUY-1nnAQqZM98BSWfgbzfbgTk5EH_CGIoJeItVyLP1nccqG5pNFY0As39JVa8OZJsAzg4f5LyLvy8rKmyck8-mjjNAPjKMkxx1fVu6jiOsW9baD3EU9-Hv-BwDWKox2JP2q7qdKCm6x6LWoh96t8SCLrt_zxMdWR7VA-q7V6pQbbIHk36a8O_v3K67KOzSqHqYc6fUcmjfU2oY9MOgp4Q5o4Ur3_8iVevGD8k5kuqwp"/>
+<img alt="Hero Car" class="w-full h-full object-cover object-center opacity-70" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%230b1220'/%3E%3Cstop offset='55%25' stop-color='%2313171f'/%3E%3Cstop offset='100%25' stop-color='%23060810'/%3E%3C/linearGradient%3E%3CradialGradient id='r' cx='50%25' cy='45%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%23adc6ff' stop-opacity='0.18'/%3E%3Cstop offset='55%25' stop-color='%2313171f' stop-opacity='0.06'/%3E%3Cstop offset='100%25' stop-color='%23060810' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='1600' height='900' fill='url(%23g)'/%3E%3Crect width='1600' height='900' fill='url(%23r)'/%3E%3Cpath d='M260 610 C340 530, 470 500, 620 500 H920 C1080 500, 1210 540, 1320 610 L1385 638 C1415 650, 1435 680, 1435 714 V742 H165 C165 694, 181 656, 215 638 Z' fill='%23171d28'/%3E%3Cpath d='M520 505 L605 430 C650 390, 705 372, 770 372 H980 C1050 372, 1115 395, 1160 440 L1230 510' fill='none' stroke='%23263242' stroke-width='28' stroke-linecap='round'/%3E%3Ccircle cx='520' cy='720' r='78' fill='%23050912'/%3E%3Ccircle cx='520' cy='720' r='44' fill='%231b2330'/%3E%3Ccircle cx='1188' cy='720' r='78' fill='%23050912'/%3E%3Ccircle cx='1188' cy='720' r='44' fill='%231b2330'/%3E%3Cpath d='M668 505 H1045' stroke='%23d8e2ff' stroke-opacity='0.18' stroke-width='10' stroke-linecap='round'/%3E%3Cpath d='M420 610 H1260' stroke='%238b90a0' stroke-opacity='0.18' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M340 560 L420 520' stroke='%23adc6ff' stroke-opacity='0.25' stroke-width='10' stroke-linecap='round'/%3E%3Cpath d='M1240 520 L1340 560' stroke='%23e9c349' stroke-opacity='0.18' stroke-width='10' stroke-linecap='round'/%3E%3Cpath d='M760 300 C860 270, 980 270, 1080 300' stroke='%23e5e2e3' stroke-opacity='0.09' stroke-width='30' stroke-linecap='round'/%3E%3C/svg%3E"/>
 <div class="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background"></div>
 </div>
 <div class="relative z-10 max-w-7xl mx-auto w-full flex flex-col md:flex-row items-center justify-between gap-xl">
@@ -168,9 +168,9 @@
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
                             Đặt lịch ngay
                         </button>
-<button class="glass-panel text-on-surface font-label-bold text-label-bold px-8 py-4 rounded-lg hover:bg-surface-bright transition-all border border-outline-variant">
+<a class="glass-panel text-on-surface font-label-bold text-label-bold px-8 py-4 rounded-lg hover:bg-surface-bright transition-all border border-outline-variant inline-flex items-center justify-center" href="rewards">
                             Tìm hiểu về Membership
-                        </button>
+</a>
 </div>
 </div>
 <!-- Floating Stats Card -->

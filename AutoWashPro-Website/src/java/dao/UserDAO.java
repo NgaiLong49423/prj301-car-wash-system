@@ -3,6 +3,7 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.math.BigDecimal;
 
 import dto.User;
 import java.sql.SQLException;
@@ -16,8 +17,8 @@ public class UserDAO {
 
     public User login(String email, String password) {
 
-        String query = "SELECT * FROM Customer "
-                + "WHERE email = ? AND password = ?";
+        String query = "SELECT customer_id, full_name, email, password, total_spent_money, total_points "
+            + "FROM Customer WHERE email = ? AND password = ?";
 
         try {
 
@@ -34,8 +35,11 @@ public class UserDAO {
 
                 return new User(
                         rs.getInt("customer_id"),
+                        rs.getString("full_name"),
                         rs.getString("email"),
-                        rs.getString("password")
+                        rs.getString("password"),
+                        rs.getBigDecimal("total_spent_money"),
+                        rs.getInt("total_points")
                 );
             }
 

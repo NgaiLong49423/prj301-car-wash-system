@@ -1,18 +1,26 @@
 package dto;
 
+import java.math.BigDecimal;
+
 public class User {
 
     private int id;
-    private String username;
+    private String fullName;
+    private String email;
     private String password;
+    private BigDecimal totalSpentMoney;
+    private int totalPoints;
 
     public User() {
     }
 
-    public User(int id, String username, String password) {
+    public User(int id, String fullName, String email, String password, BigDecimal totalSpentMoney, int totalPoints) {
         this.id = id;
-        this.username = username;
+        this.fullName = fullName;
+        this.email = email;
         this.password = password;
+        this.totalSpentMoney = totalSpentMoney;
+        this.totalPoints = totalPoints;
     }
 
 
@@ -24,12 +32,20 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -38,5 +54,29 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public BigDecimal getTotalSpentMoney() {
+        return totalSpentMoney;
+    }
+
+    public void setTotalSpentMoney(BigDecimal totalSpentMoney) {
+        this.totalSpentMoney = totalSpentMoney;
+    }
+
+    public int getTotalPoints() {
+        return totalPoints;
+    }
+
+    public void setTotalPoints(int totalPoints) {
+        this.totalPoints = totalPoints;
+    }
+
+    public String getUsername() {
+        return email;
+    }
+
+    public void setUsername(String username) {
+        this.email = username;
     }
 }

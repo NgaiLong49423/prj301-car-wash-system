@@ -2,6 +2,7 @@ package controller;
 
 import dao.RewardDAO;
 import dto.RewardDTO;
+import dto.User;
 
 // Đổi toàn bộ jakarta thành javax
 import javax.servlet.ServletException;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import mylib.AppKeys;
 
 @WebServlet(name = "RewardServlet", urlPatterns = {"/rewards"})
 public class RewardServlet extends HttpServlet {
@@ -25,17 +27,33 @@ public class RewardServlet extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Kiểm tra login
-        if (session.getAttribute("userName") == null) {
+        User account = (User) session.getAttribute(AppKeys.SESSION_ACCOUNT);
+        if (account == null) {
             response.sendRedirect("login.jsp");
             return;
         }
 
-        // ✅ Lấy tiền chi tiêu từ Session (từ LoginServlet)
-        BigDecimal totalSpentMoneyObj = (BigDecimal) session.getAttribute("totalSpentMoney");
+        String displayName = (String) session.getAttribute(AppKeys.REQ_USER_DISPLAY_NAME);
+        if (displayName == null || displayName.trim().isEmpty()) {
+            displayName = account.getFullName();
+        }
+        if (displayName == null || displayName.trim().isEmpty()) {
+            displayName = account.getEmail();
+        }
+
+        // ✅ Lấy tiền chi tiêu từ Session (từ LoginServlet) hoặc từ object account
+        BigDecimal totalSpentMoneyObj = (BigDecimal) session.getAttribute(AppKeys.REQ_TOTAL_SPENT_MONEY);
+        if (totalSpentMoneyObj == null) {
+            totalSpentMoneyObj = account.getTotalSpentMoney();
+        }
         long totalSpentMoney = totalSpentMoneyObj != null ? totalSpentMoneyObj.longValue() : 0L;
         
-        // ✅ Tính điểm quy từ tiền: 1000 VND = 1 điểm
-        int userPoints = (int) (totalSpentMoney / 1000);
+        // ✅ Lấy điểm từ Session hoặc từ object account, fallback sang quy đổi từ tiền
+        Integer userPointsObj = (Integer) session.getAttribute(AppKeys.REQ_USER_POINTS);
+        int userPoints = userPointsObj != null ? userPointsObj : account.getTotalPoints();
+        if (userPoints <= 0 && totalSpentMoney > 0) {
+            userPoints = (int) (totalSpentMoney / 1000);
+        }
         
         // ✅ Lấy danh sách phần thưởng từ Database
         RewardDAO dao = new RewardDAO();
@@ -137,6 +155,7 @@ public class RewardServlet extends HttpServlet {
         }
 
         // ✅ Gắn tất cả data vào Request (FE chỉ hiển thị, không tính toán)
+        request.setAttribute(AppKeys.REQ_USER_DISPLAY_NAME, displayName);
         request.setAttribute("TOTAL_SPENT_MONEY", totalSpentMoney);  // ✅ Hiển thị tiền chi tiêu
         request.setAttribute("USER_POINTS", userPoints);             // ✅ Hiển thị điểm quy từ tiền
         request.setAttribute("REWARD_LIST", rewardList);
