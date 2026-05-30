@@ -201,7 +201,7 @@
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;" >home</span>
                 Home
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="profile.jsp">
+                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= request.getContextPath() %>/ProfileServlet">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
                 Profile
             </a>
@@ -499,7 +499,7 @@
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">home</span>
             <span class="font-label-bold text-[10px]">Home</span>
         </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="profile">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="<%= request.getContextPath() %>/ProfileServlet">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
             <span class="font-label-bold text-[10px]">Profile</span>
         </a>
