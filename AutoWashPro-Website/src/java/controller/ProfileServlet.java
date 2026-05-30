@@ -4,6 +4,7 @@ import dao.CustomerDAO;
 import dao.VehicleDAO;
 import dto.Customer;
 import dto.Vehicle;
+import dto.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.servlet.ServletException;
@@ -11,6 +12,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import mylib.AppKeys;
 
 @WebServlet(name = "ProfileServlet", urlPatterns = {"/ProfileServlet"})
 public class ProfileServlet extends HttpServlet {
@@ -20,26 +23,33 @@ public class ProfileServlet extends HttpServlet {
             throws ServletException, IOException {
         
         response.setContentType("text/html;charset=UTF-8");
+
+        HttpSession session = request.getSession(false);
+        User account = session != null ? (User) session.getAttribute(AppKeys.SESSION_ACCOUNT) : null;
+
+        if (account == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
         
         try {
-            // Giả lập ID đang login là 1 (Sau này đổi thành lấy từ Session)
-            int currentCustomerId = 1; 
+            int currentCustomerId = account.getId();
 
-            // 1. Gọi CustomerDAO để lấy Profile + Tên Hạng (Tier)
             CustomerDAO cDao = new CustomerDAO();
             Customer profile = cDao.getCustomerProfile(currentCustomerId);
+
+            if (profile != null && (account.getPhone() == null || account.getPhone().trim().isEmpty())) {
+                account.setPhone(profile.getPhone());
+                session.setAttribute(AppKeys.SESSION_ACCOUNT, account);
+            }
             
-            // 2. Gọi VehicleDAO để lấy danh sách xe
             VehicleDAO vDao = new VehicleDAO();
             ArrayList<Vehicle> listCars = vDao.getCars(currentCustomerId);
             
-            if (profile != null) {
-                request.setAttribute("USER_PROFILE", profile);
-                request.setAttribute("LIST_CARS", listCars);
-                request.getRequestDispatcher("profile.jsp").forward(request, response);
-            } else {
-                response.getWriter().print("<h1>Không tìm thấy thông tin khách hàng!</h1>");
-            }
+            request.setAttribute("USER_PROFILE", profile);
+            request.setAttribute("USER_PHONE", profile != null ? profile.getPhone() : null);
+            request.setAttribute("LIST_CARS", listCars != null ? listCars : new ArrayList<Vehicle>());
+            request.getRequestDispatcher("profile.jsp").forward(request, response);
             
         } catch (Exception e) {
             e.printStackTrace();

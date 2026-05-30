@@ -17,7 +17,7 @@ public class UserDAO {
 
     public User login(String email, String password) {
 
-        String query = "SELECT customer_id, full_name, email, password, total_spent_money, total_points "
+        String query = "SELECT customer_id, full_name, phone, email, password, total_spent_money, total_points "
             + "FROM Customer WHERE email = ? AND password = ?";
 
         try {
@@ -36,6 +36,7 @@ public class UserDAO {
                 return new User(
                         rs.getInt("customer_id"),
                         rs.getString("full_name"),
+                    rs.getString("phone"),
                         rs.getString("email"),
                         rs.getString("password"),
                         rs.getBigDecimal("total_spent_money"),

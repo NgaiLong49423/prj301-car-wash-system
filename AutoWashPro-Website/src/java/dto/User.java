@@ -6,6 +6,7 @@ public class User {
 
     private int id;
     private String fullName;
+    private String phone;
     private String email;
     private String password;
     private BigDecimal totalSpentMoney;
@@ -14,9 +15,10 @@ public class User {
     public User() {
     }
 
-    public User(int id, String fullName, String email, String password, BigDecimal totalSpentMoney, int totalPoints) {
+    public User(int id, String fullName, String phone, String email, String password, BigDecimal totalSpentMoney, int totalPoints) {
         this.id = id;
         this.fullName = fullName;
+        this.phone = phone;
         this.email = email;
         this.password = password;
         this.totalSpentMoney = totalSpentMoney;
@@ -38,6 +40,14 @@ public class User {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getEmail() {
