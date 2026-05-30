@@ -48,4 +48,133 @@ public class VehicleDAO {
         }
         return list;
     }
+
+    public boolean insertVehicle(Vehicle v) {
+        Connection cn = null;
+        PreparedStatement st = null;
+        try {
+            cn = DBUtils.getConnection();
+            if (cn != null) {
+                String sql = "INSERT INTO Vehicle(customer_id, license_plate, brand, model, color) VALUES(?,?,?,?,?)";
+                st = cn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
+                st.setInt(1, v.getCustomerId());
+                st.setString(2, v.getLicensePlate());
+                st.setNString(3, v.getBrand());
+                st.setNString(4, v.getModel());
+                st.setNString(5, v.getColor());
+                int affected = st.executeUpdate();
+                if (affected > 0) {
+                    try (ResultSet keys = st.getGeneratedKeys()) {
+                        if (keys != null && keys.next()) {
+                            v.setVehicleId(keys.getInt(1));
+                        }
+                    }
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (st != null) st.close();
+                if (cn != null) cn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    public Vehicle getVehicleById(int vehicleId) {
+        Connection cn = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            cn = DBUtils.getConnection();
+            if (cn != null) {
+                String sql = "SELECT * FROM Vehicle WHERE vehicle_id = ?";
+                st = cn.prepareStatement(sql);
+                st.setInt(1, vehicleId);
+                rs = st.executeQuery();
+                if (rs.next()) {
+                    int customerId = rs.getInt("customer_id");
+                    String licensePlate = rs.getString("license_plate");
+                    String brand = rs.getNString("brand");
+                    String model = rs.getNString("model");
+                    String color = rs.getNString("color");
+                    return new Vehicle(vehicleId, customerId, licensePlate, brand, model, color);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+                if (cn != null) cn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public boolean updateVehicle(Vehicle v) {
+        Connection cn = null;
+        PreparedStatement st = null;
+        try {
+            cn = DBUtils.getConnection();
+            if (cn != null) {
+                String sql = "UPDATE Vehicle SET license_plate = ?, brand = ?, model = ?, color = ? WHERE vehicle_id = ? AND customer_id = ?";
+                st = cn.prepareStatement(sql);
+                st.setString(1, v.getLicensePlate());
+                st.setNString(2, v.getBrand());
+                st.setNString(3, v.getModel());
+                st.setNString(4, v.getColor());
+                st.setInt(5, v.getVehicleId());
+                st.setInt(6, v.getCustomerId());
+                int affected = st.executeUpdate();
+                return affected > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (st != null) st.close();
+                if (cn != null) cn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    public boolean isLicenseTaken(String licensePlate, int excludeVehicleId) {
+        Connection cn = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            cn = DBUtils.getConnection();
+            if (cn != null) {
+                String sql = "SELECT vehicle_id FROM Vehicle WHERE license_plate = ? AND vehicle_id <> ?";
+                st = cn.prepareStatement(sql);
+                st.setString(1, licensePlate);
+                st.setInt(2, excludeVehicleId);
+                rs = st.executeQuery();
+                if (rs.next()) return true;
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+                if (cn != null) cn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
 }
