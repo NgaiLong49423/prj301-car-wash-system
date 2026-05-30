@@ -1,0 +1,25 @@
+/* ===== LUXE WASH Rewards Page Styles ===== */
+
+.glass-card {
+    background: rgba(30, 30, 31, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gold-gradient {
+    background: linear-gradient(135deg, #af8d11 0%, #e9c349 50%, #ffe088 100%);
+}
+
+.gold-text-gradient {
+    background: linear-gradient(135deg, #e9c349 0%, #ffe088 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.glow-accent {
+    box-shadow: 0 0 15px rgba(173, 198, 255, 0.5);
+}
+
+.glow-gold {
+    box-shadow: 0 0 20px rgba(233, 195, 73, 0.3);
+}
