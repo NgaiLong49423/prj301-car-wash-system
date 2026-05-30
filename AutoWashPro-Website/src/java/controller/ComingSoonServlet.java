@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet({"/home", "/profile", "/booking", "/coming-soon"})
+@WebServlet({ "/home", "/profile", "/booking", "/coming-soon"})
 public class ComingSoonServlet extends HttpServlet {
 
     @Override
@@ -20,8 +20,8 @@ public class ComingSoonServlet extends HttpServlet {
         String featureIcon = "";
 
         if (path.contains("/home")) {
-            featureName = "Trang Chủ";
-            featureIcon = "home";
+            request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+            return;
         } else if (path.contains("/profile")) {
             featureName = "Thông tin Cá nhân";
             featureIcon = "person";

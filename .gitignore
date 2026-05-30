@@ -2,26 +2,23 @@
 # JAVA / NETBEANS PROJECT GITIGNORE
 # ==========================================
 
-# NetBeans Build Output
-/target/
-/build/
-*/build/
-/dist/
-*/dist/
-/nbbuild/
-*/nbbuild/
-/nbdist/
-*/nbdist/
+# Build output and generated artifacts
+**/target/
+**/build/
+**/dist/
+**/nbbuild/
+**/nbdist/
+.gradle/
+.mvn/wrapper/maven-wrapper.jar
 
-# NetBeans Private Settings
-/nbproject/private/
-*/nbproject/private/
-/nbproject/
-*/nbproject/
+# NetBeans private settings and local metadata
+**/nbproject/private/
+**/.netbeans_automatic_build
+**/.netbeans_update_resources
+**/.metadata/
 
-# IDE Files
-/.idea/
-*/.idea/
+# IDE files
+**/.idea/
 *.iml
 /*.iml
 *.iws
@@ -30,19 +27,36 @@
 .project
 .classpath
 .settings/
+*.sublime-project
+*.sublime-workspace
 
-# Compiled Java Files
+# Local environment and machine-specific config
+.env
+.env.*
+*.local
+*.local.properties
+*.local.yml
+*.local.yaml
+local.properties
+application-local.properties
+application-local.yml
+application-local.yaml
+secrets.properties
+secret.properties
+*.secret
+*.keystore
+*.jks
+*.p12
+*.pem
+
+# Compiled Java files and packages
 *.class
 *.jar
 !org-netbeans-modules-java-j2seproject-copylibstask.jar
 *.war
 *.ear
 
-# Gradle
-.gradle/
-build/
-
-# Maven
+# Maven metadata
 *.md5
 *.sha1
 
@@ -55,31 +69,22 @@ build/
 ehthumbs.db
 Thumbs.db
 
-# Logs
+# Logs and temp files
 *.log
 logs/
-
-# Temp Files
 *~
 *.tmp
 *.bak
 *.swp
 *.swo
-
-# IDE Specific
-.classpath
-.project
-.settings
-*.sublime-project
-*.sublime-workspace
+*.orig
+*.rej
+*.pid
+*.pid.lock
 
 # Node (if used for frontend)
 node_modules/
 npm-debug.log
 
-# Database backup files (local development only)
-# Database/backup files are OK to commit, but local test data backups shouldn't be
-
 # Generated files
 *.ser
-.metadata/
