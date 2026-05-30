@@ -136,8 +136,8 @@
         </div>
 <nav class="hidden md:flex gap-lg items-center">
 <a class="text-primary dark:text-primary border-b-2 border-primary pb-1 font-headline-lg text-headline-lg transition-colors duration-300" href="home.jsp">Home</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary font-headline-lg text-headline-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-300 rounded px-2 py-1" href="#">Services</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary font-headline-lg text-headline-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-300 rounded px-2 py-1" href="#">Locations</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary font-headline-lg text-headline-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-300 rounded px-2 py-1" href="profile.jsp">Profile</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary font-headline-lg text-headline-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-300 rounded px-2 py-1" href="#">Book Wash</a>
 <a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary font-headline-lg text-headline-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-300 rounded px-2 py-1" href="rewards">Membership</a>
 </nav>
 <div class="hidden md:flex gap-md items-center">
