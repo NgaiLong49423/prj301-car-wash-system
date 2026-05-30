@@ -86,3 +86,7 @@ npm-debug.log
 
 # Generated files
 *.ser
+
+# Explicitly allow tracking the project's NetBeans private folder (requested)
+!AutoWashPro-Website/nbproject/private/
+!AutoWashPro-Website/nbproject/private/**
