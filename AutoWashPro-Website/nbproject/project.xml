@@ -19,7 +19,7 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${libs.CopyLibs.classpath}</file>
+                    <file>${file.reference.org-netbeans-modules-java-j2seproject-copylibstask.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
             </web-module-libraries>
