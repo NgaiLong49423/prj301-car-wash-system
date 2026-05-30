@@ -129,25 +129,46 @@
     </style>
 </head>
 <body class="bg-background text-on-background font-body-lg antialiased min-h-screen flex flex-col">
-<!-- TopAppBar -->
-<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface/80 backdrop-blur-md shadow-md border-b border-white/10 flex justify-between items-center px-container-margin py-md max-w-7xl mx-auto transition-all duration-300">
-<div class="font-display-lg text-display-lg font-bold text-primary dark:text-primary tracking-tighter">
-            Luxe Wash
+    <!-- TopAppBar (Web) -->
+    <header class="hidden md:flex fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-sm justify-between items-center px-container-margin h-16 max-w-7xl mx-auto left-0 right-0">
+        <div class="font-display-lg text-display-lg font-bold text-primary">
+            LUXE WASH
         </div>
-<nav class="hidden md:flex gap-lg items-center">
-<a class="text-primary dark:text-primary border-b-2 border-primary pb-1 font-headline-lg text-headline-lg transition-colors duration-300" href="home.jsp">Home</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary font-headline-lg text-headline-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-300 rounded px-2 py-1" href="profile.jsp">Profile</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary font-headline-lg text-headline-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-300 rounded px-2 py-1" href="#">Book Wash</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary font-headline-lg text-headline-lg hover:bg-surface-bright dark:hover:bg-surface-bright transition-colors duration-300 rounded px-2 py-1" href="rewards">Membership</a>
-</nav>
-<div class="hidden md:flex gap-md items-center">
-<a href="logout" class="text-on-surface-variant hover:text-primary font-body-lg text-body-lg transition-colors duration-300 px-4 py-2 rounded-lg hover:bg-surface-bright">Logout</a>
-<a href="login.jsp" class="bg-primary text-on-primary font-body-lg text-body-lg px-6 py-2 rounded-lg font-medium hover:bg-primary-container transition-colors duration-300 box-glow-primary scale-95 duration-200 active:opacity-80">Book Now</a>
-</div>
-<button class="md:hidden text-on-surface p-2">
-<span class="material-symbols-outlined">menu</span>
-</button>
-</header>
+        <nav class="flex gap-lg">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="dashboard.jsp">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;" >home</span>
+                Home
+            </a>
+                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= request.getContextPath() %>/ProfileServlet">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+                Profile
+            </a>
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="booking">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
+                Book Wash
+            </a>
+            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="rewards">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+                Membership
+            </a>
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="logout">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>
+                Logout
+            </a>
+        </nav>
+        <div class="flex gap-md items-center text-primary">
+            <span class="material-symbols-outlined cursor-pointer hover:text-primary-fixed transition-colors">notifications</span>
+            <span class="material-symbols-outlined cursor-pointer hover:text-primary-fixed transition-colors">settings</span>
+        </div>
+    </header>
+
+    <!-- Mobile Top Brand (Simple) -->
+    <div class="md:hidden fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex items-center justify-center h-16 border-b border-white/10">
+        <div class="font-title-md text-title-md font-bold text-primary">
+            LUXE WASH
+        </div>
+    </div>
+
 <main class="flex-grow pt-24 md:pt-32">
 <!-- Hero Section -->
 <section class="relative w-full h-[70vh] min-h-[600px] flex items-center justify-center overflow-hidden px-container-margin">

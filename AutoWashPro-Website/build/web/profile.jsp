@@ -110,20 +110,47 @@
     </style>
 </head>
 <body class="bg-surface-container-lowest text-on-surface antialiased min-h-screen">
-    <header class="sticky top-0 z-40 border-b border-white/10 glass-panel">
-        <div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between">
-            <a href="<%= request.getContextPath() %>/dashboard.jsp" class="font-display text-2xl font-bold text-primary tracking-tight">Luxe Wash</a>
-            <nav class="hidden md:flex items-center gap-6 text-sm text-on-surface-variant">
-                <a href="<%= request.getContextPath() %>/dashboard.jsp" class="hover:text-primary transition-colors" href="<%= request.getContextPath() %>/dashboard.jsp">Home</a>
-                <a href="<%= request.getContextPath() %>/ProfileServlet" class="text-primary border-b border-primary pb-1">Profile</a>
-                <a href="#vehicles" class="hover:text-primary transition-colors">Book Wash</a>
-                <a href="rewards" class="hover:text-primary transition-colors">Membership</a>
-                <a href="LogoutServlet" class="text-error hover:text-red-200 transition-colors">Đăng xuất</a>
-            </nav>
+    <!-- TopAppBar (Web) -->
+    <header class="hidden md:flex fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-sm justify-between items-center px-container-margin h-16 max-w-7xl mx-auto left-0 right-0">
+        <div class="font-display-lg text-display-lg font-bold text-primary">
+            LUXE WASH
+        </div>
+        <nav class="flex gap-6">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="dashboard.jsp">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;" >home</span>
+                Home
+            </a>
+                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/ProfileServlet">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+                Profile
+            </a>
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="booking">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
+                Book Wash
+            </a>
+            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="rewards">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+                Membership
+            </a>
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="logout">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>
+                Logout
+            </a>
+        </nav>
+        <div class="flex gap-4 items-center text-primary">
+            <span class="material-symbols-outlined cursor-pointer hover:text-primary-fixed transition-colors">notifications</span>
+            <span class="material-symbols-outlined cursor-pointer hover:text-primary-fixed transition-colors">settings</span>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-5 py-8 md:py-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+    <!-- Mobile Top Brand (Simple) -->
+    <div class="md:hidden fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex items-center justify-center h-16 border-b border-white/10">
+        <div class="font-title-md text-title-md font-bold text-primary">
+            LUXE WASH
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-5 py-8 md:py-10 mt-16 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
         <section class="lg:col-span-4 flex flex-col gap-6">
             <div class="glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-glow">
                 <div class="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/10 pointer-events-none"></div>
@@ -184,7 +211,7 @@
                     <span class="material-symbols-outlined text-primary">directions_car</span>
                     Xe của tôi
                 </h2>
-                <a href="#" class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-white transition-colors">
+                <a href="<%= request.getContextPath() %>/addvehicle.jsp" class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-[18px]">add</span>
                     Thêm xe mới
                 </a>
@@ -192,8 +219,9 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <%
-                    if (cars != null && !cars.isEmpty()) {
+                    if (!cars.isEmpty()) {
                         for (Vehicle car : cars) {
+                            String vehicleId = String.valueOf(car.getVehicleId());
                             String plate = car.getLicensePlate() != null ? car.getLicensePlate() : "Chưa có biển số";
                             String brand = car.getBrand() != null ? car.getBrand() : "Xe";
                             String model = car.getModel() != null ? car.getModel() : "đang cập nhật";
@@ -204,10 +232,10 @@
                         <img alt="<%= brand %> <%= model %>" class="w-full h-full object-cover opacity-90" src="https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b?auto=format&fit=crop&w=1200&q=80">
                         <div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
                         <div class="absolute top-3 right-3">
-                            <button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface/70 backdrop-blur-md border border-white/10 text-xs font-semibold text-on-surface hover:bg-surface-bright transition-colors">
+                            <a href="<%= request.getContextPath() %>/EditVehicleServlet?vehicleId=<%= vehicleId %>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface/70 backdrop-blur-md border border-white/10 text-xs font-semibold text-on-surface hover:bg-surface-bright transition-colors">
                                 <span class="material-symbols-outlined text-[14px]">edit</span>
                                 Sửa thông tin
-                            </button>
+                            </a>
                         </div>
                         <div class="absolute bottom-4 left-4">
                             <div class="px-3 py-2 rounded-xl bg-surface/80 border border-white/10 text-sm font-bold tracking-[0.18em] text-on-surface shadow-lg">
@@ -218,6 +246,10 @@
                     <div class="p-5">
                         <h3 class="font-display text-lg font-bold text-on-surface"><%= brand %> <%= model %></h3>
                         <div class="flex flex-wrap gap-4 mt-3 text-sm text-on-surface-variant">
+                            <span class="inline-flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px] text-primary">badge</span>
+                                Mã xe: <%= vehicleId %>
+                            </span>
                             <span class="inline-flex items-center gap-2">
                                 <span class="material-symbols-outlined text-[16px] text-secondary">palette</span>
                                 <%= color %>
