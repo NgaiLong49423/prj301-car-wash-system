@@ -13,6 +13,8 @@
 
 # NetBeans private settings and local metadata
 **/nbproject/private/
+AutoWashPro-Website/nbproject/private/
+AutoWashPro-Website/nbproject/private/**
 **/.netbeans_automatic_build
 **/.netbeans_update_resources
 **/.metadata/
