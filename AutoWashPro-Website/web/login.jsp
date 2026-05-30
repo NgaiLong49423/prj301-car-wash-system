@@ -230,6 +230,10 @@
                     Đăng nhập
                     <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
 </button>
+<a class="w-full mt-sm border border-outline-variant text-on-surface font-title-md text-title-md py-md rounded-lg flex items-center justify-center gap-sm hover:bg-surface-variant transition-colors duration-300" href="<%= request.getContextPath() %>/register">
+                    Đăng ký tài khoản
+                    <span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+</a>
 </form>
 <div class="my-lg flex items-center">
 <div class="flex-grow border-t border-outline-variant/50"></div>
