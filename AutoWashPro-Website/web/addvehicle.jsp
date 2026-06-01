@@ -1,13 +1,5 @@
 ﻿<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
-<%@ page import="dto.User" %>
 <%@ page import="mylib.AppKeys" %>
-<%
-  User account = (User) session.getAttribute(AppKeys.SESSION_ACCOUNT);
-  if (account == null) {
-    response.sendRedirect(request.getContextPath() + "/login.jsp");
-    return;
-  }
-%>
 <!DOCTYPE html><html class="dark" lang="vi"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -154,8 +146,8 @@
   <a class="hover:text-primary cursor-pointer transition-colors" href="<%= request.getContextPath() %>/ProfileServlet">My Garage</a>
   <span class="material-symbols-outlined text-[14px]">chevron_right</span>
   <%
-    Boolean isEdit = request.getAttribute("isEdit") != null ? (Boolean) request.getAttribute("isEdit") : false;
-    dto.Vehicle userVehicle = (dto.Vehicle) request.getAttribute("USER_VEHICLE");
+    Boolean isEdit = request.getAttribute(mylib.AppKeys.REQ_IS_EDIT) != null ? (Boolean) request.getAttribute(mylib.AppKeys.REQ_IS_EDIT) : false;
+    dto.Vehicle userVehicle = (dto.Vehicle) request.getAttribute(mylib.AppKeys.REQ_USER_VEHICLE);
     String licenseVal = request.getParameter("licensePlate") != null ? request.getParameter("licensePlate") : (userVehicle != null && userVehicle.getLicensePlate() != null ? userVehicle.getLicensePlate() : "");
     String brandVal = request.getParameter("brand") != null ? request.getParameter("brand") : (userVehicle != null && userVehicle.getBrand() != null ? userVehicle.getBrand() : "");
     String modelVal = request.getParameter("model") != null ? request.getParameter("model") : (userVehicle != null && userVehicle.getModel() != null ? userVehicle.getModel() : "");
@@ -171,9 +163,9 @@
 <!-- Registration Form -->
 <div class="glass-panel rounded-xl p-6 md:p-8 shadow-2xl">
 <form id="addVehicleForm" class="space-y-6" method="post" action="<%= request.getContextPath() %>/AddVehicleServlet">
-  <% if (request.getAttribute("ERROR_MSG") != null) { %>
+  <% if (request.getAttribute(mylib.AppKeys.REQ_ERROR) != null) { %>
     <div class="text-red-400 bg-red-900/20 rounded-md p-3 font-medium">
-      <%= request.getAttribute("ERROR_MSG") %>
+      <%= request.getAttribute(mylib.AppKeys.REQ_ERROR) %>
     </div>
   <% } %>
 <!-- Image Upload Area -->
@@ -263,43 +255,12 @@
 <script>
 document.getElementById('addVehicleForm').addEventListener('submit', function(e){
   var form = e.target;
-  // license format validation (client-side)
-  var licenseEl = form.elements['licensePlate'];
-  if (licenseEl) {
-    var licVal = (licenseEl.value || '').trim().toUpperCase();
-    var p1 = /^\d{2,3}[A-Z]-\d{3}\.\d{2}$/; // 30A-123.45
-    var p2 = /^[0-9A-Za-z.\-\s]{4,12}$/; // fallback permissive
-    if (licVal.length > 0 && !(p1.test(licVal) || p2.test(licVal))) {
-      e.preventDefault();
-      var msg = 'Biển số không hợp lệ. Ví dụ hợp lệ: 30A-123.45';
-      var b = document.createElement('div');
-      b.textContent = msg;
-      b.style.position = 'fixed'; b.style.top = '72px'; b.style.left = '50%'; b.style.transform = 'translateX(-50%)';
-      b.style.background = '#b91c1c'; b.style.color = '#fff'; b.style.padding = '10px 16px'; b.style.borderRadius = '6px';
-      b.style.zIndex = 9999; document.body.appendChild(b);
-      setTimeout(function(){ b.remove(); }, 4000);
-      return;
-    }
+  var submitButton = form.querySelector('button[type="submit"]');
+  if (!submitButton) {
+    return;
   }
-  var required = ['licensePlate','brand','model','color'];
-  var missing = [];
-  required.forEach(function(name){
-    var el = form.elements[name];
-    if (!el) return;
-    var val = el.value || '';
-    if (val.trim() === '') missing.push(name);
-  });
-  if (missing.length > 0) {
-    e.preventDefault();
-    var msg = 'Vui lòng điền đầy đủ các trường: ' + missing.join(', ');
-    // show temporary alert banner
-    var b = document.createElement('div');
-    b.textContent = msg;
-    b.style.position = 'fixed'; b.style.top = '72px'; b.style.left = '50%'; b.style.transform = 'translateX(-50%)';
-    b.style.background = '#b91c1c'; b.style.color = '#fff'; b.style.padding = '10px 16px'; b.style.borderRadius = '6px';
-    b.style.zIndex = 9999; document.body.appendChild(b);
-    setTimeout(function(){ b.remove(); }, 4000);
-  }
+  submitButton.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>';
+  submitButton.disabled = true;
 });
 </script>
 </main>

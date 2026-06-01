@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="mylib.AppKeys"%>
 <!DOCTYPE html>
 
 <html class="dark" lang="vi"><head>
@@ -193,7 +194,7 @@
 <div class="glass-panel rounded-xl p-lg md:p-xl shadow-2xl">
 <h2 class="font-title-md text-title-md text-on-surface mb-lg">Đăng nhập</h2>
 <%
-    String error = (String) request.getAttribute("error");
+        String error = (String) request.getAttribute(AppKeys.REQ_ERROR);
     if (error != null) {
 %>
 <div class="mb-lg rounded-lg border border-red-500 bg-red-500/10 p-md text-red-500">
@@ -215,7 +216,7 @@
 <div>
 <div class="flex justify-between items-center mb-sm">
 <label class="block font-label-bold text-label-bold text-on-surface-variant uppercase" for="password">Mật khẩu</label>
-<a class="font-body-sm text-body-sm text-primary hover:text-primary-fixed-dim transition-colors" href="#">Quên mật khẩu?</a>
+<a class="font-body-sm text-body-sm text-primary hover:text-primary-fixed-dim transition-colors" href="<%= request.getContextPath() %>/coming-soon">Quên mật khẩu?</a>
 </div>
 <div class="relative">
 <span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline-variant" data-icon="lock">lock</span>
@@ -256,7 +257,7 @@
 <div class="mt-lg text-center">
 <p class="font-body-sm text-body-sm text-on-surface-variant">
                 Người mới tại Luxe Wash? 
-                <a class="text-secondary font-bold hover:text-secondary-fixed-dim transition-colors ml-xs" href="#">Tham gia Elite Pass</a>
+                <a class="text-secondary font-bold hover:text-secondary-fixed-dim transition-colors ml-xs" href="<%= request.getContextPath() %>/rewards">Tham gia Elite Pass</a>
 </p>
 <p class="mt-sm font-body-sm text-body-sm text-on-surface-variant">
                 Quay lại <a class="text-primary hover:text-primary-fixed-dim" href="home.jsp">trang chủ</a>.

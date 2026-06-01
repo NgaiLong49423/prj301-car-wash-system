@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="dto.RewardDTO" %>
+<%@ page import="mylib.AppKeys" %>
 <!DOCTYPE html>
 <html class="dark" lang="vi">
 <head>
@@ -107,88 +108,45 @@
 </head>
 <body class="bg-background text-on-background antialiased pb-24 md:pb-0 pt-16 md:pt-20">
 
-    <% 
-        String errorMessage = "";
-        String userName = "Guest";
-        long totalSpentMoney = 0L;
-        int userPoints = 0;
-        String memberTier = "MEMBER";
-        String tierBenefit = "";
-        List<RewardDTO> rewardList = null;
-        java.util.Map<Integer, String> rewardIcons = new java.util.HashMap<>();
-        String nextRewardName = "";
-        long nextRewardPoints = 0L;
-        double progressPercent = 0.0;
-        long pointsNeeded = 0L;
-        String nextTierName = "MEMBER";
-        long nextTierPoints = 0L;
-        double tierProgressPercent = 0.0;
-        long moneyToNextTier = 0L;
-        
-        try {
-            // Kiểm tra login
-            Object sessionAccount = session.getAttribute("account");
-            if (sessionAccount == null) {
-                response.sendRedirect("login.jsp");
-                return;
-            }
-            
-            // ✅ Lấy tất cả data từ Request (BE đã tính toán hết) - với null-safety
-            String displayName = (String) request.getAttribute("USER_DISPLAY_NAME");
-            if (displayName == null) {
-                displayName = (String) session.getAttribute("userName");
-            }
-            userName = displayName;
-            if (userName == null) userName = "Guest";
-            
-            Long totalSpentMoneyObj = (Long) request.getAttribute("TOTAL_SPENT_MONEY");
-            totalSpentMoney = totalSpentMoneyObj != null ? totalSpentMoneyObj : 0L;
-            
-            Integer userPointsObj = (Integer) request.getAttribute("USER_POINTS");
-            userPoints = userPointsObj != null ? userPointsObj : 0;
-            
-            memberTier = (String) request.getAttribute("MEMBER_TIER");
-            if (memberTier == null) memberTier = "MEMBER";
-            
-            tierBenefit = (String) request.getAttribute("TIER_BENEFIT");
-            if (tierBenefit == null) tierBenefit = "";
-            
-            rewardList = (List<RewardDTO>) request.getAttribute("REWARD_LIST");
-            rewardIcons = (java.util.Map<Integer, String>) request.getAttribute("REWARD_ICONS");
-            if (rewardIcons == null) {
-                rewardIcons = new java.util.HashMap<>();
-            }
-            
-            // Dữ liệu tier progress (lên hạng dựa tiền chi tiêu)
-            nextRewardName = (String) request.getAttribute("NEXT_REWARD_NAME");
-            if (nextRewardName == null) nextRewardName = "";
-            
-            Long nextRewardPointsObj = (Long) request.getAttribute("NEXT_REWARD_POINTS");
-            nextRewardPoints = nextRewardPointsObj != null ? nextRewardPointsObj : 0L;
-            
-            Double progressPercentObj = (Double) request.getAttribute("PROGRESS_PERCENT");
-            progressPercent = progressPercentObj != null ? progressPercentObj : 0.0;
-            
-            Long pointsNeededObj = (Long) request.getAttribute("POINTS_NEEDED");
-            pointsNeeded = pointsNeededObj != null ? pointsNeededObj : 0L;
-            
-            // Dữ liệu tier progress (được tính ở BE)
-            nextTierName = (String) request.getAttribute("NEXT_TIER_NAME");
-            if (nextTierName == null) nextTierName = "MEMBER";
-            
-            Long nextTierPointsObj = (Long) request.getAttribute("NEXT_TIER_POINTS");
-            nextTierPoints = nextTierPointsObj != null ? nextTierPointsObj : 0L;
-            
-            Double tierProgressPercentObj = (Double) request.getAttribute("TIER_PROGRESS_PERCENT");
-            tierProgressPercent = tierProgressPercentObj != null ? tierProgressPercentObj : 0.0;
-            
-            Long moneyToNextTierObj = (Long) request.getAttribute("MONEY_TO_NEXT_TIER");
-            moneyToNextTier = moneyToNextTierObj != null ? moneyToNextTierObj : 0L;
-            
-        } catch (Exception e) {
-            errorMessage = "❌ LỖI LOAD DATA: " + e.getMessage() + "<br/>Stack: " + e.getClass().getName();
-            e.printStackTrace();
+    <%
+        String errorMessage = (String) request.getAttribute(AppKeys.REQ_ERROR);
+        if (errorMessage == null) {
+            errorMessage = "";
         }
+        String userName = (String) request.getAttribute(AppKeys.REQ_USER_DISPLAY_NAME);
+        if (userName == null || userName.trim().isEmpty()) {
+            userName = "Guest";
+        }
+        Long totalSpentMoneyObj = (Long) request.getAttribute(AppKeys.REQ_TOTAL_SPENT_MONEY);
+        long totalSpentMoney = totalSpentMoneyObj != null ? totalSpentMoneyObj : 0L;
+        Integer userPointsObj = (Integer) request.getAttribute(AppKeys.REQ_USER_POINTS);
+        int userPoints = userPointsObj != null ? userPointsObj : 0;
+        String memberTier = (String) request.getAttribute(AppKeys.REQ_MEMBER_TIER);
+        if (memberTier == null) memberTier = "MEMBER";
+        String tierBenefit = (String) request.getAttribute(AppKeys.REQ_TIER_BENEFIT);
+        if (tierBenefit == null) tierBenefit = "";
+        List<RewardDTO> rewardList = (List<RewardDTO>) request.getAttribute(AppKeys.REQ_REWARD_LIST);
+        java.util.Map<Integer, String> rewardIcons = (java.util.Map<Integer, String>) request.getAttribute(AppKeys.REQ_REWARD_ICONS);
+        if (rewardIcons == null) {
+            rewardIcons = new java.util.HashMap<>();
+        }
+        String nextRewardName = (String) request.getAttribute(AppKeys.REQ_NEXT_REWARD_NAME);
+        if (nextRewardName == null) nextRewardName = "";
+        Long nextRewardPointsObj = (Long) request.getAttribute(AppKeys.REQ_NEXT_REWARD_POINTS);
+        long nextRewardPoints = nextRewardPointsObj != null ? nextRewardPointsObj : 0L;
+        Double progressPercentObj = (Double) request.getAttribute(AppKeys.REQ_PROGRESS_PERCENT);
+        double progressPercent = progressPercentObj != null ? progressPercentObj : 0.0;
+        Long pointsNeededObj = (Long) request.getAttribute(AppKeys.REQ_POINTS_NEEDED);
+        long pointsNeeded = pointsNeededObj != null ? pointsNeededObj : 0L;
+        String nextTierName = (String) request.getAttribute(AppKeys.REQ_NEXT_TIER_NAME);
+        if (nextTierName == null) nextTierName = "MEMBER";
+        Long nextTierPointsObj = (Long) request.getAttribute(AppKeys.REQ_NEXT_TIER_POINTS);
+        long nextTierPoints = nextTierPointsObj != null ? nextTierPointsObj : 0L;
+        Double tierProgressPercentObj = (Double) request.getAttribute(AppKeys.REQ_TIER_PROGRESS_PERCENT);
+        double tierProgressPercent = tierProgressPercentObj != null ? tierProgressPercentObj : 0.0;
+        Long moneyToNextTierObj = (Long) request.getAttribute(AppKeys.REQ_MONEY_TO_NEXT_TIER);
+        long moneyToNextTier = moneyToNextTierObj != null ? moneyToNextTierObj : 0L;
+        String displayPath = request.getContextPath();
     %>
 
     <!-- TopAppBar (Web) -->
@@ -197,23 +155,23 @@
             LUXE WASH
         </div>
         <nav class="flex gap-lg">
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="dashboard.jsp">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/home">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;" >home</span>
                 Home
             </a>
-                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= request.getContextPath() %>/ProfileServlet">
+                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/ProfileServlet">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
                 Profile
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="booking">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/booking">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
                 Book Wash
             </a>
-            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="rewards">
+            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/rewards">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">military_tech</span>
                 Membership
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="logout">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/logout">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>
                 Logout
             </a>
