@@ -3,184 +3,228 @@ package controller;
 import dao.RewardDAO;
 import dto.RewardDTO;
 import dto.User;
-
-// Đổi toàn bộ jakarta thành javax
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.List;
 import mylib.AppKeys;
 
 @WebServlet(name = "RewardServlet", urlPatterns = {"/rewards"})
 public class RewardServlet extends HttpServlet {
 
+    private static final long SILVER_THRESHOLD = 2_000_000L;
+    private static final long GOLD_THRESHOLD = 6_000_000L;
+    private static final long PLATINUM_THRESHOLD = 15_000_000L;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession();
-
-        // Kiểm tra login
-        User account = (User) session.getAttribute(AppKeys.SESSION_ACCOUNT);
+        HttpSession session = request.getSession(false);
+        User account = session != null ? (User) session.getAttribute(AppKeys.SESSION_ACCOUNT) : null;
         if (account == null) {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
 
-        String displayName = (String) session.getAttribute(AppKeys.REQ_USER_DISPLAY_NAME);
-        if (displayName == null || displayName.trim().isEmpty()) {
+        String displayName = resolveDisplayName(session, account);
+        long totalSpentMoney = resolveTotalSpentMoney(session, account);
+        int userPoints = resolveUserPoints(session, account, totalSpentMoney);
+
+        RewardDAO dao = new RewardDAO();
+        List<RewardDTO> rewardList = dao.getAllRewards();
+
+        String memberTier = resolveMemberTier(totalSpentMoney);
+        String tierBenefit = resolveTierBenefit(memberTier);
+        TierProgress tierProgress = resolveTierProgress(memberTier, totalSpentMoney);
+        RewardProgress rewardProgress = resolveRewardProgress(rewardList, userPoints);
+        Map<Integer, String> rewardIcons = buildRewardIcons(rewardList);
+
+        request.setAttribute(AppKeys.REQ_USER_DISPLAY_NAME, displayName);
+        request.setAttribute(AppKeys.REQ_TOTAL_SPENT_MONEY, totalSpentMoney);
+        request.setAttribute(AppKeys.REQ_USER_POINTS, userPoints);
+        request.setAttribute(AppKeys.REQ_REWARD_LIST, rewardList);
+        request.setAttribute(AppKeys.REQ_REWARD_ICONS, rewardIcons);
+        request.setAttribute(AppKeys.REQ_MEMBER_TIER, memberTier);
+        request.setAttribute(AppKeys.REQ_TIER_BENEFIT, tierBenefit);
+        request.setAttribute(AppKeys.REQ_NEXT_REWARD_NAME, tierProgress.nextTierName);
+        request.setAttribute(AppKeys.REQ_NEXT_REWARD_POINTS, tierProgress.nextTierThreshold);
+        request.setAttribute(AppKeys.REQ_PROGRESS_PERCENT, tierProgress.progressPercent);
+        request.setAttribute(AppKeys.REQ_POINTS_NEEDED, tierProgress.moneyToNextTier);
+        request.setAttribute(AppKeys.REQ_NEXT_REWARD_NAME_ALT, rewardProgress.nextRewardName);
+        request.setAttribute(AppKeys.REQ_NEXT_REWARD_POINTS_ALT, rewardProgress.nextRewardPoints);
+        request.setAttribute(AppKeys.REQ_REWARD_PROGRESS_PERCENT, rewardProgress.progressPercent);
+        request.setAttribute(AppKeys.REQ_POINTS_NEEDED_FOR_REWARD, rewardProgress.pointsNeeded);
+        request.setAttribute(AppKeys.REQ_NEXT_TIER_NAME, tierProgress.nextTierName);
+        request.setAttribute(AppKeys.REQ_NEXT_TIER_POINTS, tierProgress.nextTierThreshold);
+        request.setAttribute(AppKeys.REQ_TIER_PROGRESS_PERCENT, tierProgress.progressPercent);
+        request.setAttribute(AppKeys.REQ_MONEY_TO_NEXT_TIER, tierProgress.moneyToNextTier);
+
+        request.getRequestDispatcher("/rewards.jsp").forward(request, response);
+    }
+
+    private String resolveDisplayName(HttpSession session, User account) {
+        String displayName = session != null ? (String) session.getAttribute(AppKeys.SESSION_USER_DISPLAY_NAME) : null;
+        if (isBlank(displayName)) {
             displayName = account.getFullName();
         }
-        if (displayName == null || displayName.trim().isEmpty()) {
+        if (isBlank(displayName)) {
             displayName = account.getEmail();
         }
+        return displayName;
+    }
 
-        // ✅ Lấy tiền chi tiêu từ Session (từ LoginServlet) hoặc từ object account
-        BigDecimal totalSpentMoneyObj = (BigDecimal) session.getAttribute(AppKeys.REQ_TOTAL_SPENT_MONEY);
+    private long resolveTotalSpentMoney(HttpSession session, User account) {
+        BigDecimal totalSpentMoneyObj = session != null ? (BigDecimal) session.getAttribute(AppKeys.SESSION_TOTAL_SPENT_MONEY) : null;
         if (totalSpentMoneyObj == null) {
             totalSpentMoneyObj = account.getTotalSpentMoney();
         }
-        long totalSpentMoney = totalSpentMoneyObj != null ? totalSpentMoneyObj.longValue() : 0L;
-        
-        // ✅ Lấy điểm từ Session hoặc từ object account, fallback sang quy đổi từ tiền
-        Integer userPointsObj = (Integer) session.getAttribute(AppKeys.REQ_USER_POINTS);
+        return totalSpentMoneyObj != null ? totalSpentMoneyObj.longValue() : 0L;
+    }
+
+    private int resolveUserPoints(HttpSession session, User account, long totalSpentMoney) {
+        Integer userPointsObj = session != null ? (Integer) session.getAttribute(AppKeys.SESSION_USER_POINTS) : null;
         int userPoints = userPointsObj != null ? userPointsObj : account.getTotalPoints();
         if (userPoints <= 0 && totalSpentMoney > 0) {
             userPoints = (int) (totalSpentMoney / 1000);
         }
-        
-        // ✅ Lấy danh sách phần thưởng từ Database
-        RewardDAO dao = new RewardDAO();
-        List<RewardDTO> rewardList = dao.getAllRewards();
-        
-        // ✅ BE tính toán memberTier dựa trên TIỀN CHI TIÊU (không phải điểm)
-        // Ngưỡng: Member(0), Silver(2M), Gold(6M), Platinum(15M)
-        String memberTier = "MEMBER";
-        if (totalSpentMoney >= 15000000) {  // 15M VND
-            memberTier = "PLATINUM";
-        } else if (totalSpentMoney >= 6000000) {  // 6M VND
-            memberTier = "GOLD";
-        } else if (totalSpentMoney >= 2000000) {  // 2M VND
-            memberTier = "SILVER";
+        return userPoints;
+    }
+
+    private String resolveMemberTier(long totalSpentMoney) {
+        if (totalSpentMoney >= PLATINUM_THRESHOLD) {
+            return "PLATINUM";
         }
-        
-        // ✅ BE tính tierBenefit dựa trên memberTier
-        String tierBenefit = "";
-        switch(memberTier) {
+        if (totalSpentMoney >= GOLD_THRESHOLD) {
+            return "GOLD";
+        }
+        if (totalSpentMoney >= SILVER_THRESHOLD) {
+            return "SILVER";
+        }
+        return "MEMBER";
+    }
+
+    private String resolveTierBenefit(String memberTier) {
+        switch (memberTier) {
             case "PLATINUM":
-                tierBenefit = "(Được +30% điểm, miễn phí 1 lần rửa hàng tháng)";
-                break;
+                return "(Được +30% điểm, miễn phí 1 lần rửa hàng tháng)";
             case "GOLD":
-                tierBenefit = "(Được +20% điểm, Priority Slot)";
-                break;
+                return "(Được +20% điểm, Priority Slot)";
             case "SILVER":
-                tierBenefit = "(Được +10% điểm, ưu tiên chọn slot)";
-                break;
+                return "(Được +10% điểm, ưu tiên chọn slot)";
             default:
-                tierBenefit = "(Được 1 điểm = 1,000 VND)";
+                return "(Được 1 điểm = 1,000 VND)";
         }
-        
-        
-        // ✅ BE tính next TIER (cấp hạng) - ĐẠY LÀ THANH PROGRESS CHÍNH - dựa TIỀN
-        String nextTierName = "";
-        long nextTierMoneyNeeded = 0;  // Tiền cần để lên tier kế tiếp
-        double tierProgressPercent = 100;
-        long moneyToNextTier = 0;
-        
-        switch(memberTier) {
+    }
+
+    private TierProgress resolveTierProgress(String memberTier, long totalSpentMoney) {
+        String nextTierName;
+        long nextTierThreshold;
+
+        switch (memberTier) {
             case "MEMBER":
                 nextTierName = "SILVER";
-                nextTierMoneyNeeded = 2000000;  // 2M VND
+                nextTierThreshold = SILVER_THRESHOLD;
                 break;
             case "SILVER":
                 nextTierName = "GOLD";
-                nextTierMoneyNeeded = 6000000;  // 6M VND
+                nextTierThreshold = GOLD_THRESHOLD;
                 break;
             case "GOLD":
                 nextTierName = "PLATINUM";
-                nextTierMoneyNeeded = 15000000;  // 15M VND
+                nextTierThreshold = PLATINUM_THRESHOLD;
                 break;
-            case "PLATINUM":
+            default:
                 nextTierName = "MAX";
-                nextTierMoneyNeeded = 15000000;
+                nextTierThreshold = PLATINUM_THRESHOLD;
                 break;
         }
-        
-        if (!nextTierName.equals("MAX")) {
-            tierProgressPercent = Math.min((double) totalSpentMoney / nextTierMoneyNeeded * 100, 100);
-            moneyToNextTier = Math.max(nextTierMoneyNeeded - totalSpentMoney, 0);
+
+        double progressPercent = 100.0;
+        long moneyToNextTier = 0L;
+        if (!"MAX".equals(nextTierName)) {
+            progressPercent = Math.min((double) totalSpentMoney / nextTierThreshold * 100.0, 100.0);
+            moneyToNextTier = Math.max(nextTierThreshold - totalSpentMoney, 0L);
         }
-        
-        // ✅ BE tính next REWARD (để reference sau này) - dựa ĐIỂM
-        int nextRewardPoints = 0;
-        String nextRewardName = "";
-        double rewardProgressPercent = 100;
-        int pointsNeededForReward = 0;
-        
-        if (rewardList != null && !rewardList.isEmpty()) {
-            for (RewardDTO r : rewardList) {
-                if (userPoints < r.getPointsRequired()) {
-                    nextRewardPoints = r.getPointsRequired();
-                    nextRewardName = r.getRewardName();
-                    pointsNeededForReward = nextRewardPoints - userPoints;
-                    rewardProgressPercent = (double) userPoints / nextRewardPoints * 100;
-                    break;
-                }
-            }
+
+        return new TierProgress(nextTierName, nextTierThreshold, progressPercent, moneyToNextTier);
+    }
+
+    private RewardProgress resolveRewardProgress(List<RewardDTO> rewardList, int userPoints) {
+        if (rewardList == null || rewardList.isEmpty()) {
+            return new RewardProgress("", 0, 100.0, 0);
         }
-        
-        // ✅ BE xác định icon dựa trên reward name
-        java.util.Map<Integer, String> rewardIcons = new java.util.HashMap<>();
-        if (rewardList != null) {
-            int index = 0;
-            for (RewardDTO r : rewardList) {
-                String icon = "payments";
-                String name = r.getRewardName();
-                if (name.contains("Ceramic") || name.contains("Wax") || name.contains("Phủ")) {
-                    icon = "format_paint";
-                } else if (name.contains("nội thất")) {
-                    icon = "cleaning_services";
-                } else if (name.contains("rửa xe") || name.contains("Basic")) {
-                    icon = "local_car_wash";
-                }
-                rewardIcons.put(index, icon);
-                index++;
+
+        for (RewardDTO reward : rewardList) {
+            if (userPoints < reward.getPointsRequired()) {
+                int nextRewardPoints = reward.getPointsRequired();
+                return new RewardProgress(reward.getRewardName(), nextRewardPoints,
+                        (double) userPoints / nextRewardPoints * 100.0,
+                        nextRewardPoints - userPoints);
             }
         }
 
-        // ✅ Gắn tất cả data vào Request (FE chỉ hiển thị, không tính toán)
-        request.setAttribute(AppKeys.REQ_USER_DISPLAY_NAME, displayName);
-        request.setAttribute("TOTAL_SPENT_MONEY", totalSpentMoney);  // ✅ Hiển thị tiền chi tiêu
-        request.setAttribute("USER_POINTS", userPoints);             // ✅ Hiển thị điểm quy từ tiền
-        request.setAttribute("REWARD_LIST", rewardList);
-        request.setAttribute("REWARD_ICONS", rewardIcons);
-        request.setAttribute("MEMBER_TIER", memberTier);
-        request.setAttribute("TIER_BENEFIT", tierBenefit);
-        
-        // 🎯 THANH TIẾN TRÌNH CHÍNH = TIER PROGRESS (lên hạng dựa TIỀN CHI TIÊU)
-        request.setAttribute("NEXT_REWARD_NAME", nextTierName);        // Hiển thị: "Lên hạng SILVER"
-        request.setAttribute("NEXT_REWARD_POINTS", nextTierMoneyNeeded);    // Hiển thị: Tiền cần
-        request.setAttribute("PROGRESS_PERCENT", tierProgressPercent); // Hiển thị: thanh progress %
-        request.setAttribute("POINTS_NEEDED", moneyToNextTier);       // Hiển thị: "Còn X VND"
-        
-        // 📋 REWARD INFO (để reference hoặc sử dụng sau - dựa ĐIỂM)
-        request.setAttribute("NEXT_REWARD_NAME_ALT", nextRewardName);
-        request.setAttribute("NEXT_REWARD_POINTS_ALT", nextRewardPoints);
-        request.setAttribute("REWARD_PROGRESS_PERCENT", rewardProgressPercent);
-        request.setAttribute("POINTS_NEEDED_FOR_REWARD", pointsNeededForReward);
-        
-        request.setAttribute("NEXT_TIER_NAME", nextTierName);
-        request.setAttribute("NEXT_TIER_POINTS", nextTierMoneyNeeded);
-        request.setAttribute("TIER_PROGRESS_PERCENT", tierProgressPercent);
-        request.setAttribute("MONEY_TO_NEXT_TIER", moneyToNextTier);
+        return new RewardProgress("", 0, 100.0, 0);
+    }
 
-        // Forward sang rewards.jsp
-        request.getRequestDispatcher("rewards.jsp").forward(request, response);
+    private Map<Integer, String> buildRewardIcons(List<RewardDTO> rewardList) {
+        Map<Integer, String> rewardIcons = new HashMap<>();
+        if (rewardList == null) {
+            return rewardIcons;
+        }
+
+        for (int index = 0; index < rewardList.size(); index++) {
+            RewardDTO reward = rewardList.get(index);
+            String icon = "payments";
+            String name = reward.getRewardName() != null ? reward.getRewardName() : "";
+            if (name.contains("Ceramic") || name.contains("Wax") || name.contains("Phủ")) {
+                icon = "format_paint";
+            } else if (name.contains("nội thất")) {
+                icon = "cleaning_services";
+            } else if (name.contains("rửa xe") || name.contains("Basic")) {
+                icon = "local_car_wash";
+            }
+            rewardIcons.put(index, icon);
+        }
+        return rewardIcons;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    private static final class TierProgress {
+        private final String nextTierName;
+        private final long nextTierThreshold;
+        private final double progressPercent;
+        private final long moneyToNextTier;
+
+        private TierProgress(String nextTierName, long nextTierThreshold, double progressPercent, long moneyToNextTier) {
+            this.nextTierName = nextTierName;
+            this.nextTierThreshold = nextTierThreshold;
+            this.progressPercent = progressPercent;
+            this.moneyToNextTier = moneyToNextTier;
+        }
+    }
+
+    private static final class RewardProgress {
+        private final String nextRewardName;
+        private final int nextRewardPoints;
+        private final double progressPercent;
+        private final int pointsNeeded;
+
+        private RewardProgress(String nextRewardName, int nextRewardPoints, double progressPercent, int pointsNeeded) {
+            this.nextRewardName = nextRewardName;
+            this.nextRewardPoints = nextRewardPoints;
+            this.progressPercent = progressPercent;
+            this.pointsNeeded = pointsNeeded;
+        }
     }
 }
