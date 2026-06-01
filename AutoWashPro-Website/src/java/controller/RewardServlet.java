@@ -30,7 +30,7 @@ public class RewardServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         User account = session != null ? (User) session.getAttribute(AppKeys.SESSION_ACCOUNT) : null;
         if (account == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/MainController?action=Login");
             return;
         }
 

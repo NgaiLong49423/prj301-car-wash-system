@@ -28,7 +28,7 @@ public class AuthFilter implements Filter {
         Object account = session != null ? session.getAttribute(AppKeys.SESSION_ACCOUNT) : null;
 
         if (account == null) {
-            res.sendRedirect(req.getContextPath() + "/login.jsp");
+            res.sendRedirect(req.getContextPath() + "/MainController?action=Login");
             return;
         }
 

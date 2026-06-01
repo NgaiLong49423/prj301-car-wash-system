@@ -72,7 +72,7 @@
             </div>
 
             <!-- Back Button -->
-            <a href="rewards" class="inline-block w-full bg-gradient-to-r from-[#adc6ff] to-[#4b8eff] hover:from-[#d8e2ff] hover:to-[#7aa3ff] text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 active:scale-95">
+            <a href="<%= request.getContextPath() %>/MainController?action=Rewards" class="inline-block w-full bg-gradient-to-r from-[#adc6ff] to-[#4b8eff] hover:from-[#d8e2ff] hover:to-[#7aa3ff] text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 active:scale-95">
                 ← Quay Lại Rewards
             </a>
         </div>

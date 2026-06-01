@@ -103,23 +103,23 @@
             LUXE WASH
         </div>
         <nav class="flex gap-6">
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/home">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/MainController?action=Home">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;" >home</span>
                 Home
             </a>
-                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/ProfileServlet">
+                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/MainController?action=Profile">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
                 Profile
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/booking">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/MainController?action=Booking">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
                 Book Wash
             </a>
-            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/rewards">
+            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/MainController?action=Rewards">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">military_tech</span>
                 Membership
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/logout">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/MainController?action=Logout">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>
                 Logout
             </a>
@@ -198,7 +198,7 @@
                     <span class="material-symbols-outlined text-primary">directions_car</span>
                     Xe của tôi
                 </h2>
-                <a href="<%= request.getContextPath() %>/addvehicle.jsp" class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-white transition-colors">
+                <a href="<%= request.getContextPath() %>/MainController?action=AddVehiclePage" class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-[18px]">add</span>
                     Thêm xe mới
                 </a>
@@ -219,7 +219,7 @@
                         <img alt="<%= brand %> <%= model %>" class="w-full h-full object-cover opacity-90" src="https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b?auto=format&fit=crop&w=1200&q=80">
                         <div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
                         <div class="absolute top-3 right-3">
-                            <a href="<%= request.getContextPath() %>/EditVehicleServlet?vehicleId=<%= vehicleId %>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface/70 backdrop-blur-md border border-white/10 text-xs font-semibold text-on-surface hover:bg-surface-bright transition-colors">
+                            <a href="<%= request.getContextPath() %>/MainController?action=EditVehicle&vehicleId=<%= vehicleId %>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface/70 backdrop-blur-md border border-white/10 text-xs font-semibold text-on-surface hover:bg-surface-bright transition-colors">
                                 <span class="material-symbols-outlined text-[14px]">edit</span>
                                 Sửa thông tin
                             </a>
@@ -243,7 +243,7 @@
                             </span>
                         </div>
                         <div class="mt-5 flex gap-3">
-                            <a href="<%= request.getContextPath() %>/booking" class="flex-1 inline-flex items-center justify-center px-4 py-3 rounded-2xl border border-outline-variant text-sm font-semibold text-on-surface hover:bg-surface-bright transition-colors">Đặt lịch rửa xe này</a>
+                            <a href="<%= request.getContextPath() %>/MainController?action=Booking" class="flex-1 inline-flex items-center justify-center px-4 py-3 rounded-2xl border border-outline-variant text-sm font-semibold text-on-surface hover:bg-surface-bright transition-colors">Đặt lịch rửa xe này</a>
                         </div>
                     </div>
                 </article>
@@ -288,14 +288,14 @@
                     <h2 class="font-display text-xl font-bold text-on-surface">Cài đặt tài khoản</h2>
                 </div>
                 <div class="divide-y divide-white/10">
-                    <a href="<%= request.getContextPath() %>/coming-soon" class="flex items-center justify-between px-5 py-4 hover:bg-surface-bright transition-colors group">
+                    <a href="<%= request.getContextPath() %>/MainController?action=ComingSoon" class="flex items-center justify-between px-5 py-4 hover:bg-surface-bright transition-colors group">
                         <div class="flex items-center gap-3 text-on-surface">
                             <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">person</span>
                             <span class="font-medium">Thông tin cá nhân</span>
                         </div>
                         <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
                     </a>
-                    <a href="<%= request.getContextPath() %>/coming-soon" class="flex items-center justify-between px-5 py-4 hover:bg-surface-bright transition-colors group">
+                    <a href="<%= request.getContextPath() %>/MainController?action=ComingSoon" class="flex items-center justify-between px-5 py-4 hover:bg-surface-bright transition-colors group">
                         <div class="flex items-center gap-3 text-on-surface">
                             <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">history</span>
                             <span class="font-medium">Lịch sử dịch vụ</span>
@@ -309,3 +309,8 @@
     </main>
 </body>
 </html>
+
+
+
+
+
