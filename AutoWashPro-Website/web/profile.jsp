@@ -1,47 +1,34 @@
 <%@page import="java.math.BigDecimal"%>
-<%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
-<%@page import="dto.User"%>
 <%@page import="mylib.AppKeys"%>
 <%@page import="dto.Vehicle"%>
 <%@page import="dto.Customer"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
-    User account = (User) session.getAttribute(AppKeys.SESSION_ACCOUNT);
-    if (account == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
-
-    Customer profile = (Customer) request.getAttribute("USER_PROFILE");
-    List<Vehicle> cars = (List<Vehicle>) request.getAttribute("LIST_CARS");
+    Customer profile = (Customer) request.getAttribute(AppKeys.REQ_USER_PROFILE);
+    List<Vehicle> cars = (List<Vehicle>) request.getAttribute(AppKeys.REQ_LIST_CARS);
     if (cars == null) {
         cars = new ArrayList<Vehicle>();
     }
-        String requestPhone = (String) request.getAttribute("USER_PHONE");
-
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    String fullName = profile != null && profile.getFullName() != null && !profile.getFullName().trim().isEmpty()
-            ? profile.getFullName()
-            : (account.getFullName() != null && !account.getFullName().trim().isEmpty() ? account.getFullName() : "Chưa cập nhật tên");
-        String phone = requestPhone != null && !requestPhone.trim().isEmpty()
-            ? requestPhone
-            : (profile != null && profile.getPhone() != null && !profile.getPhone().trim().isEmpty()
-                ? profile.getPhone()
-                : (account.getPhone() != null && !account.getPhone().trim().isEmpty() ? account.getPhone() : "Chưa có SĐT"));
-    String email = profile != null && profile.getEmail() != null && !profile.getEmail().trim().isEmpty()
-            ? profile.getEmail()
-            : (account.getEmail() != null ? account.getEmail() : "Chưa có email");
-    String tierName = profile != null && profile.getTierName() != null && !profile.getTierName().trim().isEmpty()
-            ? profile.getTierName()
-            : "Thành viên mới";
-    String joinDate = profile != null && profile.getJoinDate() != null ? dateFormat.format(profile.getJoinDate()) : "Chưa có";
-    int totalPoints = profile != null ? profile.getTotalPoints() : account.getTotalPoints();
-    BigDecimal totalSpentMoney = account.getTotalSpentMoney() != null ? account.getTotalSpentMoney() : BigDecimal.ZERO;
+    String fullName = (String) request.getAttribute(AppKeys.REQ_PROFILE_FULL_NAME);
+    String phone = (String) request.getAttribute(AppKeys.REQ_PROFILE_PHONE);
+    String email = (String) request.getAttribute(AppKeys.REQ_PROFILE_EMAIL);
+    String tierName = (String) request.getAttribute(AppKeys.REQ_PROFILE_TIER_NAME);
+    String joinDate = (String) request.getAttribute(AppKeys.REQ_PROFILE_JOIN_DATE);
+    Integer totalPointsObj = (Integer) request.getAttribute(AppKeys.REQ_PROFILE_TOTAL_POINTS);
+    int totalPoints = totalPointsObj != null ? totalPointsObj : 0;
+    BigDecimal totalSpentMoney = (BigDecimal) request.getAttribute(AppKeys.REQ_PROFILE_TOTAL_SPENT_MONEY);
+    if (totalSpentMoney == null) {
+        totalSpentMoney = BigDecimal.ZERO;
+    }
     String spentDisplay = String.format("%,.0f", totalSpentMoney.doubleValue());
-    String avatarInitial = fullName != null && !fullName.trim().isEmpty() ? fullName.substring(0, 1).toUpperCase() : "L";
-    int totalCars = cars.size();
+    String avatarInitial = (String) request.getAttribute(AppKeys.REQ_PROFILE_AVATAR_INITIAL);
+    if (avatarInitial == null || avatarInitial.trim().isEmpty()) {
+        avatarInitial = fullName != null && !fullName.trim().isEmpty() ? fullName.substring(0, 1).toUpperCase() : "L";
+    }
+    Integer totalCarsObj = (Integer) request.getAttribute(AppKeys.REQ_PROFILE_TOTAL_CARS);
+    int totalCars = totalCarsObj != null ? totalCarsObj : cars.size();
 %>
 <!DOCTYPE html>
 <html class="dark" lang="vi">
@@ -116,7 +103,7 @@
             LUXE WASH
         </div>
         <nav class="flex gap-6">
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="dashboard.jsp">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/home">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;" >home</span>
                 Home
             </a>
@@ -124,15 +111,15 @@
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
                 Profile
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="booking">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/booking">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
                 Book Wash
             </a>
-            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="rewards">
+            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/rewards">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">military_tech</span>
                 Membership
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="logout">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/logout">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>
                 Logout
             </a>
@@ -256,7 +243,7 @@
                             </span>
                         </div>
                         <div class="mt-5 flex gap-3">
-                            <a href="#" class="flex-1 inline-flex items-center justify-center px-4 py-3 rounded-2xl border border-outline-variant text-sm font-semibold text-on-surface hover:bg-surface-bright transition-colors">Đặt lịch rửa xe này</a>
+                            <a href="<%= request.getContextPath() %>/booking" class="flex-1 inline-flex items-center justify-center px-4 py-3 rounded-2xl border border-outline-variant text-sm font-semibold text-on-surface hover:bg-surface-bright transition-colors">Đặt lịch rửa xe này</a>
                         </div>
                     </div>
                 </article>
@@ -301,14 +288,14 @@
                     <h2 class="font-display text-xl font-bold text-on-surface">Cài đặt tài khoản</h2>
                 </div>
                 <div class="divide-y divide-white/10">
-                    <a href="#" class="flex items-center justify-between px-5 py-4 hover:bg-surface-bright transition-colors group">
+                    <a href="<%= request.getContextPath() %>/coming-soon" class="flex items-center justify-between px-5 py-4 hover:bg-surface-bright transition-colors group">
                         <div class="flex items-center gap-3 text-on-surface">
                             <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">person</span>
                             <span class="font-medium">Thông tin cá nhân</span>
                         </div>
                         <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
                     </a>
-                    <a href="#" class="flex items-center justify-between px-5 py-4 hover:bg-surface-bright transition-colors group">
+                    <a href="<%= request.getContextPath() %>/coming-soon" class="flex items-center justify-between px-5 py-4 hover:bg-surface-bright transition-colors group">
                         <div class="flex items-center gap-3 text-on-surface">
                             <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">history</span>
                             <span class="font-medium">Lịch sử dịch vụ</span>

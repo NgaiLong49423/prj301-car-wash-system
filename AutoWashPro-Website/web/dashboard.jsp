@@ -1,14 +1,4 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="dto.User"%>
-
-<%
-    User c = (User) session.getAttribute("account");
-
-    if(c == null){
-        response.sendRedirect("login.jsp");
-        return;
-    }
-%>
 
 
 <!DOCTYPE html>
@@ -135,7 +125,7 @@
             LUXE WASH
         </div>
         <nav class="flex gap-lg">
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="dashboard.jsp">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= request.getContextPath() %>/home">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;" >home</span>
                 Home
             </a>
@@ -143,15 +133,15 @@
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
                 Profile
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="booking">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= request.getContextPath() %>/booking">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
                 Book Wash
             </a>
-            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="rewards">
+            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= request.getContextPath() %>/rewards">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">military_tech</span>
                 Membership
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="logout">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= request.getContextPath() %>/logout">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>
                 Logout
             </a>
@@ -223,7 +213,7 @@
 </div>
 <h3 class="font-title-md text-title-md text-on-surface mb-sm">Rửa xe cao cấp</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant mb-lg flex-grow">Quy trình rửa xe chi tiết với các hóa chất chuyên dụng, an toàn tuyệt đối cho bề mặt sơn và các chi tiết kim loại.</p>
-<a class="inline-flex items-center gap-xs font-label-bold text-label-bold text-primary hover:text-primary-container transition-colors mt-auto" href="#">
+<a class="inline-flex items-center gap-xs font-label-bold text-label-bold text-primary hover:text-primary-container transition-colors mt-auto" href="<%= request.getContextPath() %>/booking">
                         Chi tiết <span class="material-symbols-outlined text-sm">arrow_forward</span>
 </a>
 </div>
@@ -235,7 +225,7 @@
 </div>
 <h3 class="font-title-md text-title-md text-on-surface mb-sm relative z-10">Phủ Ceramic</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant mb-lg relative z-10 flex-grow">Tạo lớp khiên bảo vệ sơn xe khỏi các tác nhân môi trường, tăng độ bóng sâu và khả năng chống bám nước vượt trội.</p>
-<a class="inline-flex items-center gap-xs font-label-bold text-label-bold text-primary hover:text-primary-container transition-colors relative z-10 mt-auto" href="#">
+<a class="inline-flex items-center gap-xs font-label-bold text-label-bold text-primary hover:text-primary-container transition-colors relative z-10 mt-auto" href="<%= request.getContextPath() %>/booking">
                         Chi tiết <span class="material-symbols-outlined text-sm">arrow_forward</span>
 </a>
 <!-- Subtle background glow -->
@@ -248,7 +238,7 @@
 </div>
 <h3 class="font-title-md text-title-md text-on-surface mb-sm">Vệ sinh nội thất</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant mb-lg flex-grow">Phục hồi và làm sạch sâu các chi tiết da, nỉ, nhựa trong xe. Khử mùi và diệt khuẩn bằng công nghệ hơi nước nóng.</p>
-<a class="inline-flex items-center gap-xs font-label-bold text-label-bold text-primary hover:text-primary-container transition-colors mt-auto" href="#">
+<a class="inline-flex items-center gap-xs font-label-bold text-label-bold text-primary hover:text-primary-container transition-colors mt-auto" href="<%= request.getContextPath() %>/coming-soon">
                         Chi tiết <span class="material-symbols-outlined text-sm">arrow_forward</span>
 </a>
 </div>
@@ -320,15 +310,15 @@
 <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
             Home
         </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary font-label-bold text-label-bold" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary font-label-bold text-label-bold" href="<%= request.getContextPath() %>/home">
 <span class="material-symbols-outlined mb-1">calendar_month</span>
             Booking
         </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary font-label-bold text-label-bold" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary font-label-bold text-label-bold" href="<%= request.getContextPath() %>/booking">
 <span class="material-symbols-outlined mb-1">star</span>
             Rewards
         </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary font-label-bold text-label-bold" href="#">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary font-label-bold text-label-bold" href="<%= request.getContextPath() %>/rewards">
 <span class="material-symbols-outlined mb-1">person</span>
             Profile
         </a>
@@ -339,10 +329,10 @@
             Luxe Wash
         </div>
 <div class="flex flex-wrap justify-center gap-md font-body-sm text-body-sm">
-<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy Policy</a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Terms of Service</a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Contact Support</a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors" href="#">Careers</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="<%= request.getContextPath() %>/coming-soon">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="<%= request.getContextPath() %>/coming-soon">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="<%= request.getContextPath() %>/coming-soon">Contact Support</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="<%= request.getContextPath() %>/coming-soon">Careers</a>
 </div>
 <div class="font-body-sm text-body-sm text-primary dark:text-primary">
             © 2024 Luxe Wash Detailing. All rights reserved.

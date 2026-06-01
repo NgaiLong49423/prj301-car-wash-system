@@ -81,12 +81,4 @@ public class User {
     public void setTotalPoints(int totalPoints) {
         this.totalPoints = totalPoints;
     }
-
-    public String getUsername() {
-        return email;
-    }
-
-    public void setUsername(String username) {
-        this.email = username;
-    }
 }

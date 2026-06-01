@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="mylib.AppKeys"%>
 <!DOCTYPE html>
 <html class="dark" lang="vi"><head>
 <meta charset="utf-8"/>
@@ -143,10 +144,10 @@
 <p class="text-on-surface-variant font-body-sm">Tham gia cộng đồng chăm sóc xe chuyên nghiệp</p>
 </div>
 <%
-    String msgError = (String) request.getAttribute("error");
-    String fullNameValue = (String) request.getAttribute("fullName");
-    String emailValue = (String) request.getAttribute("email");
-    String phoneValue = (String) request.getAttribute("phone");
+    String msgError = (String) request.getAttribute(AppKeys.REQ_ERROR);
+    String fullNameValue = (String) request.getAttribute(AppKeys.REQ_FULL_NAME);
+    String emailValue = (String) request.getAttribute(AppKeys.REQ_EMAIL);
+    String phoneValue = (String) request.getAttribute(AppKeys.REQ_PHONE);
     String contextPath = request.getContextPath();
 %>
 <% if (msgError != null) { %>
@@ -196,7 +197,7 @@
 </div>
 </div>
 <!-- Primary CTA -->
-<button class="w-full bg-primary-container text-on-primary-container font-title-md text-title-md py-md rounded-lg glow-primary hover:bg-primary-container/90 active:scale-95 transition-all duration-300 mt-lg" type="submit" href="login.jsp">
+<button class="w-full bg-primary-container text-on-primary-container font-title-md text-title-md py-md rounded-lg glow-primary hover:bg-primary-container/90 active:scale-95 transition-all duration-300 mt-lg" type="submit">
                         Đăng ký ngay
                     </button>
 </form>

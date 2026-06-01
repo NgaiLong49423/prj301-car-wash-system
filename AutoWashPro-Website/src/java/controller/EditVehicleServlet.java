@@ -41,8 +41,8 @@ public class EditVehicleServlet extends HttpServlet {
             return;
         }
 
-        request.setAttribute("isEdit", true);
-        request.setAttribute("USER_VEHICLE", v);
-        request.getRequestDispatcher("addvehicle.jsp").forward(request, response);
+        request.setAttribute(AppKeys.REQ_IS_EDIT, true);
+        request.setAttribute(AppKeys.REQ_USER_VEHICLE, v);
+        request.getRequestDispatcher("/addvehicle.jsp").forward(request, response);
     }
 }
