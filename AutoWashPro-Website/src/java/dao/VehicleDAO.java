@@ -5,9 +5,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mylib.DBUtils;
 
 public class VehicleDAO {
+
+    private static final Logger LOGGER = Logger.getLogger(VehicleDAO.class.getName());
     
     public ArrayList<Vehicle> getCars(int customerId) {
         ArrayList<Vehicle> list = new ArrayList<>();
@@ -18,7 +22,7 @@ public class VehicleDAO {
         try {
             cn = DBUtils.getConnection();
             if (cn != null) {
-                String sql = "SELECT * FROM Vehicle WHERE customer_id = ?";
+                String sql = "SELECT vehicle_id, customer_id, license_plate, brand, model, color FROM Vehicle WHERE customer_id = ?";
                 st = cn.prepareStatement(sql);
                 st.setInt(1, customerId);
                 table = st.executeQuery();
@@ -36,14 +40,14 @@ public class VehicleDAO {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to load vehicles for customerId=" + customerId, e);
         } finally {
             try {
                 if (table != null) table.close();
                 if (st != null) st.close();
                 if (cn != null) cn.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Failed to close resources when loading vehicles for customerId=" + customerId, e);
             }
         }
         return list;
@@ -73,13 +77,13 @@ public class VehicleDAO {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to insert vehicle for customerId=" + v.getCustomerId(), e);
         } finally {
             try {
                 if (st != null) st.close();
                 if (cn != null) cn.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Failed to close resources when inserting vehicle", e);
             }
         }
         return false;
@@ -92,7 +96,7 @@ public class VehicleDAO {
         try {
             cn = DBUtils.getConnection();
             if (cn != null) {
-                String sql = "SELECT * FROM Vehicle WHERE vehicle_id = ?";
+                String sql = "SELECT vehicle_id, customer_id, license_plate, brand, model, color FROM Vehicle WHERE vehicle_id = ?";
                 st = cn.prepareStatement(sql);
                 st.setInt(1, vehicleId);
                 rs = st.executeQuery();
@@ -106,14 +110,14 @@ public class VehicleDAO {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to load vehicle id=" + vehicleId, e);
         } finally {
             try {
                 if (rs != null) rs.close();
                 if (st != null) st.close();
                 if (cn != null) cn.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Failed to close resources when loading vehicle id=" + vehicleId, e);
             }
         }
         return null;
@@ -137,13 +141,13 @@ public class VehicleDAO {
                 return affected > 0;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to update vehicle id=" + v.getVehicleId(), e);
         } finally {
             try {
                 if (st != null) st.close();
                 if (cn != null) cn.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Failed to close resources when updating vehicle id=" + v.getVehicleId(), e);
             }
         }
         return false;
@@ -165,14 +169,14 @@ public class VehicleDAO {
                 return false;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to check duplicate license plate: " + licensePlate, e);
         } finally {
             try {
                 if (rs != null) rs.close();
                 if (st != null) st.close();
                 if (cn != null) cn.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Failed to close resources when checking license plate", e);
             }
         }
         return false;

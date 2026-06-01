@@ -8,8 +8,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class RewardDAO {
+
+    private static final Logger LOGGER = Logger.getLogger(RewardDAO.class.getName());
 
     // 1. Hàm lấy danh sách tất cả phần thưởng
     public List<RewardDTO> getAllRewards() {
@@ -32,7 +36,7 @@ public class RewardDAO {
                 list.add(reward); // Nhét từng cái hộp vào danh sách
             }
         } catch (Exception e) {
-            e.printStackTrace(); // Bắn lỗi ra console để debug (gỡ lỗi)
+            LOGGER.log(Level.SEVERE, "Failed to load rewards", e);
         }
         return list;
     }
@@ -62,7 +66,7 @@ public class RewardDAO {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to calculate points for customerId=" + customerId, e);
         }
         return totalPoints; // Trả về con số thực tế
     }

@@ -6,9 +6,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mylib.DBUtils;
 
 public class CustomerDAO {
+
+    private static final Logger LOGGER = Logger.getLogger(CustomerDAO.class.getName());
     
     // Hàm kéo thông tin cá nhân và hạng thành viên
     public Customer getCustomerProfile(int customerId) {
@@ -43,14 +47,14 @@ public class CustomerDAO {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to load customer profile for customerId=" + customerId, e);
         } finally {
             try {
                 if (table != null) table.close();
                 if (st != null) st.close();
                 if (cn != null) cn.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Failed to close resources when loading customer profile", e);
             }
         }
         return cus;
