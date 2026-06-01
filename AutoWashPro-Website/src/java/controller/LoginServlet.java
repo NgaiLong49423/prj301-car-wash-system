@@ -3,6 +3,8 @@ package controller;
 import dao.UserDAO;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -14,6 +16,8 @@ import mylib.AppKeys;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
+
+    private static final Logger LOGGER = Logger.getLogger(LoginServlet.class.getName());
 
     protected void processRequest(HttpServletRequest request,
             HttpServletResponse response)
@@ -31,19 +35,21 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession();
 
             session.setAttribute(AppKeys.SESSION_ACCOUNT, user);
-            session.setAttribute(AppKeys.SESSION_USER_EMAIL, user.getFullName());
+            session.setAttribute(AppKeys.SESSION_USER_DISPLAY_NAME, user.getFullName());
+            session.setAttribute(AppKeys.SESSION_USER_EMAIL, user.getEmail());
+            session.setAttribute(AppKeys.SESSION_TOTAL_SPENT_MONEY, user.getTotalSpentMoney() != null ? user.getTotalSpentMoney() : BigDecimal.ZERO);
+            session.setAttribute(AppKeys.SESSION_USER_POINTS, user.getTotalPoints());
             session.setAttribute(AppKeys.REQ_USER_DISPLAY_NAME, user.getFullName());
             session.setAttribute(AppKeys.REQ_TOTAL_SPENT_MONEY, user.getTotalSpentMoney() != null ? user.getTotalSpentMoney() : BigDecimal.ZERO);
             session.setAttribute(AppKeys.REQ_USER_POINTS, user.getTotalPoints());
-            session.setAttribute("userEmail", user.getEmail());
 
             response.sendRedirect(request.getContextPath() + "/dashboard.jsp");
 
         } else {
 
-            request.setAttribute("error", "Wrong username or password");
+            request.setAttribute(AppKeys.REQ_ERROR, "Wrong username or password");
 
-            request.getRequestDispatcher("login.jsp")
+            request.getRequestDispatcher("/login.jsp")
                     .forward(request, response);
         }
     }
@@ -53,7 +59,7 @@ public class LoginServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        processRequest(request, response);
+        request.getRequestDispatcher("/login.jsp").forward(request, response);
     }
 
     @Override
@@ -61,6 +67,11 @@ public class LoginServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unexpected login error", e);
+            throw e;
+        }
     }
 }
