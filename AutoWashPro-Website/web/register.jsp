@@ -155,7 +155,8 @@
     <%= msgError %>
 </div>
 <% } %>
-<form action="<%= contextPath %>/register" method="post" class="space-y-md">
+<form action="<%= contextPath %>/MainController" method="post" class="space-y-md">
+<input type="hidden" name="action" value="Register"/>
 <!-- Full Name -->
 <div class="space-y-xs">
 <label class="font-label-bold text-label-bold text-outline ml-1" for="fullName">Họ và tên</label>
@@ -229,7 +230,7 @@
 <div class="mt-xl text-center">
 <p class="text-body-sm font-body-sm text-on-surface-variant">
                         Đã có tài khoản? 
-                        <a class="text-secondary font-bold hover:underline ml-xs transition-all" href="<%= contextPath %>/login">Đăng nhập</a>
+                        <a class="text-secondary font-bold hover:underline ml-xs transition-all" href="<%= contextPath %>/MainController?action=Login">Đăng nhập</a>
 </p>
 </div>
 </div>

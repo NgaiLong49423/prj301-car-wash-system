@@ -33,7 +33,7 @@ public class ProfileServlet extends HttpServlet {
         User account = session != null ? (User) session.getAttribute(AppKeys.SESSION_ACCOUNT) : null;
 
         if (account == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/MainController?action=Login");
             return;
         }
 
@@ -80,7 +80,7 @@ public class ProfileServlet extends HttpServlet {
 
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to load profile for customerId=" + account.getId(), e);
-            response.sendRedirect(request.getContextPath() + "/coming-soon");
+            response.sendRedirect(request.getContextPath() + "/MainController?action=ComingSoon");
         }
     }
 

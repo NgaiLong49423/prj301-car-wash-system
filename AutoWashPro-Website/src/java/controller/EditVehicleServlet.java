@@ -22,7 +22,7 @@ public class EditVehicleServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         User account = session != null ? (User) session.getAttribute(AppKeys.SESSION_ACCOUNT) : null;
         if (account == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/MainController?action=Login");
             return;
         }
 
@@ -30,14 +30,14 @@ public class EditVehicleServlet extends HttpServlet {
         int vid = 0;
         try { vid = Integer.parseInt(idStr); } catch (Exception e) { vid = 0; }
         if (vid <= 0) {
-            response.sendRedirect(request.getContextPath() + "/ProfileServlet");
+            response.sendRedirect(request.getContextPath() + "/MainController?action=Profile");
             return;
         }
 
         VehicleDAO vDao = new VehicleDAO();
         Vehicle v = vDao.getVehicleById(vid);
         if (v == null || v.getCustomerId() != account.getId()) {
-            response.sendRedirect(request.getContextPath() + "/ProfileServlet");
+            response.sendRedirect(request.getContextPath() + "/MainController?action=Profile");
             return;
         }
 

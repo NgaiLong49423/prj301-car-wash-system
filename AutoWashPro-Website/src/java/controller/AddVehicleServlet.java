@@ -30,7 +30,7 @@ public class AddVehicleServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         User account = session != null ? (User) session.getAttribute(AppKeys.SESSION_ACCOUNT) : null;
         if (account == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/MainController?action=Login");
             return;
         }
 
@@ -97,7 +97,7 @@ public class AddVehicleServlet extends HttpServlet {
             }
 
             if (ok) {
-                response.sendRedirect(request.getContextPath() + "/ProfileServlet");
+                response.sendRedirect(request.getContextPath() + "/MainController?action=Profile");
                 return;
             } else {
                 request.setAttribute(AppKeys.REQ_ERROR, "Không thể lưu xe. Vui lòng thử lại.");

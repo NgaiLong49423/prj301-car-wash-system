@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 import dto.User;
 import mylib.AppKeys;
 
-@WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
+@WebServlet(name = "LoginServlet", urlPatterns = { "/LoginServlet" })
 public class LoginServlet extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(LoginServlet.class.getName());
@@ -37,20 +37,22 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute(AppKeys.SESSION_ACCOUNT, user);
             session.setAttribute(AppKeys.SESSION_USER_DISPLAY_NAME, user.getFullName());
             session.setAttribute(AppKeys.SESSION_USER_EMAIL, user.getEmail());
-            session.setAttribute(AppKeys.SESSION_TOTAL_SPENT_MONEY, user.getTotalSpentMoney() != null ? user.getTotalSpentMoney() : BigDecimal.ZERO);
+            session.setAttribute(AppKeys.SESSION_TOTAL_SPENT_MONEY,
+                    user.getTotalSpentMoney() != null ? user.getTotalSpentMoney() : BigDecimal.ZERO);
             session.setAttribute(AppKeys.SESSION_USER_POINTS, user.getTotalPoints());
             session.setAttribute(AppKeys.REQ_USER_DISPLAY_NAME, user.getFullName());
-            session.setAttribute(AppKeys.REQ_TOTAL_SPENT_MONEY, user.getTotalSpentMoney() != null ? user.getTotalSpentMoney() : BigDecimal.ZERO);
+            session.setAttribute(AppKeys.REQ_TOTAL_SPENT_MONEY,
+                    user.getTotalSpentMoney() != null ? user.getTotalSpentMoney() : BigDecimal.ZERO);
             session.setAttribute(AppKeys.REQ_USER_POINTS, user.getTotalPoints());
 
-            response.sendRedirect(request.getContextPath() + "/dashboard.jsp");
+            // Báo cho MainController biết là hãy mở trang Dashboard
+            response.sendRedirect(request.getContextPath() + "/MainController?action=Dashboard");
 
         } else {
 
             request.setAttribute(AppKeys.REQ_ERROR, "Wrong username or password");
 
-            request.getRequestDispatcher("/login.jsp")
-                    .forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/MainController?action=Login");
         }
     }
 

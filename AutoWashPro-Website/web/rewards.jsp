@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="dto.RewardDTO" %>
 <%@ page import="mylib.AppKeys" %>
@@ -155,23 +155,23 @@
             LUXE WASH
         </div>
         <nav class="flex gap-lg">
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/home">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/MainController?action=Home">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;" >home</span>
                 Home
             </a>
-                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/ProfileServlet">
+                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/MainController?action=Profile">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
                 Profile
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/booking">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/MainController?action=Booking">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
                 Book Wash
             </a>
-            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/rewards">
+            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/MainController?action=Rewards">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">military_tech</span>
                 Membership
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/logout">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/MainController?action=Logout">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>
                 Logout
             </a>
@@ -453,23 +453,23 @@
 
     <!-- BottomNavBar (Mobile) -->
     <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface-container/80 backdrop-blur-2xl border-t border-white/5 shadow-2xl rounded-t-xl">
-        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="dashboard.jsp">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="<%= request.getContextPath() %>/MainController?action=Home">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">home</span>
             <span class="font-label-bold text-[10px]">Home</span>
         </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="<%= request.getContextPath() %>/ProfileServlet">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="<%= request.getContextPath() %>/MainController?action=Profile">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
             <span class="font-label-bold text-[10px]">Profile</span>
         </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="booking">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="<%= request.getContextPath() %>/MainController?action=Booking">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
             <span class="font-label-bold text-[10px]">Book Wash</span>
         </a>
-        <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl p-2 min-w-[64px] active:scale-90 transition-all duration-200" href="rewards">
+        <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl p-2 min-w-[64px] active:scale-90 transition-all duration-200" href="<%= request.getContextPath() %>/MainController?action=Rewards">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">military_tech</span>
             <span class="font-label-bold text-[10px]">Rewards</span>
         </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="logout">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="<%= request.getContextPath() %>/MainController?action=Logout">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">logout</span>
             <span class="font-label-bold text-[10px]">Logout</span>
         </a>
@@ -477,3 +477,13 @@
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+

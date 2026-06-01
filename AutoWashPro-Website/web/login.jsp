@@ -203,7 +203,8 @@
 <%
     }
 %>
-<form action="<%= request.getContextPath() %>/login" method="post" class="space-y-lg">
+<form action="<%= request.getContextPath() %>/MainController" method="post" class="space-y-lg">
+    <input type="hidden" name="action" value="Login">
 <!-- Email Field -->
 <div>
 <label class="block font-label-bold text-label-bold text-on-surface-variant mb-sm uppercase" for="email">Email</label>
@@ -216,7 +217,7 @@
 <div>
 <div class="flex justify-between items-center mb-sm">
 <label class="block font-label-bold text-label-bold text-on-surface-variant uppercase" for="password">Mật khẩu</label>
-<a class="font-body-sm text-body-sm text-primary hover:text-primary-fixed-dim transition-colors" href="<%= request.getContextPath() %>/coming-soon">Quên mật khẩu?</a>
+<a class="font-body-sm text-body-sm text-primary hover:text-primary-fixed-dim transition-colors" href="<%= request.getContextPath() %>/MainController?action=ComingSoon">Quên mật khẩu?</a>
 </div>
 <div class="relative">
 <span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline-variant" data-icon="lock">lock</span>
@@ -231,7 +232,7 @@
                     Đăng nhập
                     <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
 </button>
-<a class="w-full mt-sm border border-outline-variant text-on-surface font-title-md text-title-md py-md rounded-lg flex items-center justify-center gap-sm hover:bg-surface-variant transition-colors duration-300" href="<%= request.getContextPath() %>/register">
+<a class="w-full mt-sm border border-outline-variant text-on-surface font-title-md text-title-md py-md rounded-lg flex items-center justify-center gap-sm hover:bg-surface-variant transition-colors duration-300" href="<%= request.getContextPath() %>/MainController?action=RegisterPage">
                     Đăng ký tài khoản
                     <span class="material-symbols-outlined" data-icon="person_add">person_add</span>
 </a>
@@ -257,10 +258,10 @@
 <div class="mt-lg text-center">
 <p class="font-body-sm text-body-sm text-on-surface-variant">
                 Người mới tại Luxe Wash? 
-                <a class="text-secondary font-bold hover:text-secondary-fixed-dim transition-colors ml-xs" href="<%= request.getContextPath() %>/rewards">Tham gia Elite Pass</a>
+                <a class="text-secondary font-bold hover:text-secondary-fixed-dim transition-colors ml-xs" href="<%= request.getContextPath() %>/MainController?action=Rewards">Tham gia Elite Pass</a>
 </p>
 <p class="mt-sm font-body-sm text-body-sm text-on-surface-variant">
-                Quay lại <a class="text-primary hover:text-primary-fixed-dim" href="home.jsp">trang chủ</a>.
+                Quay lại <a class="text-primary hover:text-primary-fixed-dim" href="<%= request.getContextPath() %>/MainController?action=Home">trang chủ</a>.
 </p>
 </div>
 </div>
