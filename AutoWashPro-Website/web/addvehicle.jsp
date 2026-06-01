@@ -133,7 +133,7 @@
 <span class="material-symbols-outlined">settings</span>
 </button>
 <div class="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
-<img alt="Ng� Gia Long" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6i1fdzy0MJdcCzmmSZ2hJB16jts2npPqCzCIsNZHUBGg12IfZxNtmhuhTRFZYDaezASmqYBgkCW7Dj-3oaerxxdQS9-cmfiJBa6MK2qIQUVJm5II7WHSFuQNcykF5_6-W-krA-ZLTJtDQiXsu41asSunCQCPQzdfOUXB8MQCLi0397GfFp5YOaS981R0E7fIpWVc0frCFMGsvKpMPf1DsD6wxh4Y8ZCFlJwmkyX73Zq0QW0Va6dH6HSbk7vZbBDnc4aw35pwuI2Rb">
+<img alt="Ngô Gia Long" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6i1fdzy0MJdcCzmmSZ2hJB16jts2npPqCzCIsNZHUBGg12IfZxNtmhuhTRFZYDaezASmqYBgkCW7Dj-3oaerxxdQS9-cmfiJBa6MK2qIQUVJm5II7WHSFuQNcykF5_6-W-krA-ZLTJtDQiXsu41asSunCQCPQzdfOUXB8MQCLi0397GfFp5YOaS981R0E7fIpWVc0frCFMGsvKpMPf1DsD6wxh4Y8ZCFlJwmkyX73Zq0QW0Va6dH6HSbk7vZbBDnc4aw35pwuI2Rb">
 </div>
 </div>
 </div>
@@ -153,12 +153,12 @@
     String modelVal = request.getParameter("model") != null ? request.getParameter("model") : (userVehicle != null && userVehicle.getModel() != null ? userVehicle.getModel() : "");
     String colorVal = request.getParameter("color") != null ? request.getParameter("color") : (userVehicle != null && userVehicle.getColor() != null ? userVehicle.getColor() : "");
   %>
-  <span class="text-primary"><%= isEdit ? "S?a th�ng tin" : "Add New Car" %></span>
+  <span class="text-primary"><%= isEdit ? "Sửa thông tin" : "Add New Car" %></span>
 </nav>
 <section class="max-w-2xl mx-auto mb-12">
 <header class="mb-8 text-center">
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2"><%= isEdit ? "S?a th�ng tin" : "�ang k� xe m?i" %></h2>
-<p class="font-body-sm text-body-sm text-on-surface-variant"><%= isEdit ? "C?p nh?t th�ng tin phuong ti?n c?a b?n." : "Th�m phuong ti?n c?a b?n v�o Garage d? nh?n uu d�i cham s�c t?t nh?t." %></p>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2"><%= isEdit ? "Sửa thông tin" : "Đăng ký xe mới" %></h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant"><%= isEdit ? "Cập nhật thông tin phương tiện của bạn." : "Thêm phương tiện của bạn vào Garage để nhận ưu đãi chăm sóc tốt nhất." %></p>
 </header>
 <!-- Registration Form -->
 <div class="glass-panel rounded-xl p-6 md:p-8 shadow-2xl">
@@ -176,32 +176,32 @@
 <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
 <span class="material-symbols-outlined text-primary text-3xl">add_a_photo</span>
 </div>
-<p class="font-label-bold text-label-bold text-on-surface">T?i ?nh xe l�n</p>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">PNG, JPG t?i da 5MB</p>
+<p class="font-label-bold text-label-bold text-on-surface">Tải ảnh xe lên</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">PNG, JPG tối đa 5MB</p>
 </div>
 <input class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this)" type="file">
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 <!-- License Plate -->
 <div class="flex flex-col gap-2">
-<label class="font-label-bold text-label-bold text-on-surface-variant">Bi?n s?</label>
+<label class="font-label-bold text-label-bold text-on-surface-variant">Biển số</label>
 <input name="licensePlate" required value="<%= licenseVal %>" class="bg-surface-container border border-outline-variant rounded-lg p-3 font-body-lg text-body-lg text-on-surface outline-none input-glow transition-all" placeholder="30A-123.45" type="text">
 </div>
 <!-- Brand & Model -->
 <div class="flex flex-col gap-2">
-<label class="font-label-bold text-label-bold text-on-surface-variant">H�ng xe</label>
+<label class="font-label-bold text-label-bold text-on-surface-variant">Hãng xe</label>
 <input name="brand" required value="<%= brandVal %>" class="bg-surface-container border border-outline-variant rounded-lg p-3 font-body-lg text-body-lg text-on-surface outline-none input-glow transition-all" placeholder="Mercedes-Benz" type="text">
 </div>
 <!-- Color -->
 <div class="flex flex-col gap-2">
-<label class="font-label-bold text-label-bold text-on-surface-variant">M�u s?c</label>
+<label class="font-label-bold text-label-bold text-on-surface-variant">Màu sắc</label>
 <select name="color" required class="bg-surface-container border border-outline-variant rounded-lg p-3 font-body-lg text-body-lg text-on-surface outline-none input-glow transition-all appearance-none cursor-pointer">
-  <option disabled="" value="">Ch?n m�u s?c</option>
-  <option <%= "�en".equals(colorVal) ? "selected" : "" %>>�en</option>
-  <option <%= "Tr?ng".equals(colorVal) ? "selected" : "" %>>Tr?ng</option>
-  <option <%= "X�m Metallic".equals(colorVal) ? "selected" : "" %>>X�m Metallic</option>
-  <option <%= "Xanh Duong".equals(colorVal) ? "selected" : "" %>>Xanh Duong</option>
-  <option <%= "�?".equals(colorVal) ? "selected" : "" %>>�?</option>
+  <option disabled="" value="">Chọn màu sắc</option>
+  <option <%= "Đen".equals(colorVal) ? "selected" : "" %>>Đen</option>
+  <option <%= "Trắng".equals(colorVal) ? "selected" : "" %>>Trắng</option>
+  <option <%= "Xám Metallic".equals(colorVal) ? "selected" : "" %>>Xám Metallic</option>
+  <option <%= "Xanh Dương".equals(colorVal) ? "selected" : "" %>>Xanh Dương</option>
+  <option <%= "Đỏ".equals(colorVal) ? "selected" : "" %>>Đỏ</option>
 </select>
 </div>
 <!-- Year -->
@@ -215,7 +215,7 @@
 <% if (isEdit) { %>
   <input type="hidden" name="vehicleId" value="<%= userVehicle != null ? userVehicle.getVehicleId() : request.getParameter("vehicleId") %>" />
   <button class="flex-1 bg-primary text-on-primary font-title-md text-title-md py-4 rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-primary/20" type="submit">
-    C?p nh?t th�ng tin
+    Cập nhật thông tin
   </button>
 <% } else { %>
   <button class="flex-1 bg-primary text-on-primary font-title-md text-title-md py-4 rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-primary/20" type="submit">
@@ -234,22 +234,22 @@
 <div class="glass-panel p-6 rounded-xl flex items-start gap-4">
 <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">military_tech</span>
 <div>
-<h4 class="font-title-md text-title-md text-secondary">T�ch di?m Rewards</h4>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Nh?n ngay 100 di?m khi dang k� xe m?i th�nh c�ng.</p>
+<h4 class="font-title-md text-title-md text-secondary">Tích điểm Rewards</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Nhận ngay 100 điểm khi đăng ký xe mới thành công.</p>
 </div>
 </div>
 <div class="glass-panel p-6 rounded-xl flex items-start gap-4">
 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
 <div>
-<h4 class="font-title-md text-title-md text-primary">�?t l?ch nhanh</h4>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">T? d?ng di?n th�ng tin khi d?t d?ch v? r?a xe cao c?p.</p>
+<h4 class="font-title-md text-title-md text-primary">Đặt lịch nhanh</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Tự động điền thông tin khi đặt dịch vụ rửa xe cao cấp.</p>
 </div>
 </div>
 <div class="glass-panel p-6 rounded-xl flex items-start gap-4">
 <span class="material-symbols-outlined text-outline" style="font-variation-settings: 'FILL' 1;">history</span>
 <div>
-<h4 class="font-title-md text-title-md text-outline">L?ch s? cham s�c</h4>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Theo d�i qu� tr�nh detailing ri�ng bi?t cho t?ng xe.</p>
+<h4 class="font-title-md text-title-md text-outline">Lịch sử chăm sóc</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Theo dõi quá trình detailing riêng biệt cho từng xe.</p>
 </div>
 </div>
 </section>
