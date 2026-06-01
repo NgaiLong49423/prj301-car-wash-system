@@ -5,6 +5,8 @@ import dto.User;
 import dto.Vehicle;
 import java.io.IOException;
 import java.util.regex.Pattern;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -15,6 +17,8 @@ import mylib.AppKeys;
 
 @WebServlet(name = "AddVehicleServlet", urlPatterns = {"/AddVehicleServlet"})
 public class AddVehicleServlet extends HttpServlet {
+
+    private static final Logger LOGGER = Logger.getLogger(AddVehicleServlet.class.getName());
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -50,8 +54,8 @@ public class AddVehicleServlet extends HttpServlet {
             err.append("Màu sắc không được để trống. ");
         }
         if (err.length() > 0) {
-            request.setAttribute("ERROR_MSG", err.toString());
-            request.getRequestDispatcher("addvehicle.jsp").forward(request, response);
+            request.setAttribute(AppKeys.REQ_ERROR, err.toString());
+            request.getRequestDispatcher("/addvehicle.jsp").forward(request, response);
             return;
         }
 
@@ -60,8 +64,8 @@ public class AddVehicleServlet extends HttpServlet {
         Pattern p1 = Pattern.compile("^[0-9]{2,3}[A-Z]-[0-9]{3}\\.[0-9]{2}$"); // e.g. 30A-123.45
         Pattern p2 = Pattern.compile("^[0-9A-Z .\\-]{4,12}$"); // fallback permissive pattern
         if (! (p1.matcher(lic).matches() || p2.matcher(lic).matches())) {
-            request.setAttribute("ERROR_MSG", err.length() > 0 ? err.toString() + "Biển số không hợp lệ." : "Biển số không hợp lệ. Ví dụ hợp lệ: 30A-123.45");
-            request.getRequestDispatcher("addvehicle.jsp").forward(request, response);
+            request.setAttribute(AppKeys.REQ_ERROR, err.length() > 0 ? err.toString() + "Biển số không hợp lệ." : "Biển số không hợp lệ. Ví dụ hợp lệ: 30A-123.45");
+            request.getRequestDispatcher("/addvehicle.jsp").forward(request, response);
             return;
         }
 
@@ -78,10 +82,10 @@ public class AddVehicleServlet extends HttpServlet {
 
             // check duplicate license (exclude current vehicle for edit)
             if (vDao.isLicenseTaken(lic, vehicleId)) {
-                request.setAttribute("ERROR_MSG", "Biển số đã tồn tại. Vui lòng kiểm tra lại.");
-                request.setAttribute("isEdit", vehicleId > 0);
-                request.setAttribute("USER_VEHICLE", vDao.getVehicleById(vehicleId));
-                request.getRequestDispatcher("addvehicle.jsp").forward(request, response);
+                request.setAttribute(AppKeys.REQ_ERROR, "Biển số đã tồn tại. Vui lòng kiểm tra lại.");
+                request.setAttribute(AppKeys.REQ_IS_EDIT, vehicleId > 0);
+                request.setAttribute(AppKeys.REQ_USER_VEHICLE, vDao.getVehicleById(vehicleId));
+                request.getRequestDispatcher("/addvehicle.jsp").forward(request, response);
                 return;
             }
 
@@ -96,16 +100,16 @@ public class AddVehicleServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/ProfileServlet");
                 return;
             } else {
-                request.setAttribute("ERROR_MSG", "Không thể lưu xe. Vui lòng thử lại.");
-                request.setAttribute("isEdit", vehicleId > 0);
-                request.setAttribute("USER_VEHICLE", vehicleId > 0 ? vDao.getVehicleById(vehicleId) : v);
-                request.getRequestDispatcher("addvehicle.jsp").forward(request, response);
+                request.setAttribute(AppKeys.REQ_ERROR, "Không thể lưu xe. Vui lòng thử lại.");
+                request.setAttribute(AppKeys.REQ_IS_EDIT, vehicleId > 0);
+                request.setAttribute(AppKeys.REQ_USER_VEHICLE, vehicleId > 0 ? vDao.getVehicleById(vehicleId) : v);
+                request.getRequestDispatcher("/addvehicle.jsp").forward(request, response);
                 return;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("ERROR_MSG", "Lỗi server: " + e.getMessage());
-            request.getRequestDispatcher("addvehicle.jsp").forward(request, response);
+            LOGGER.log(Level.SEVERE, "Failed to add/update vehicle", e);
+            request.setAttribute(AppKeys.REQ_ERROR, "Lỗi server: " + e.getMessage());
+            request.getRequestDispatcher("/addvehicle.jsp").forward(request, response);
         }
     }
 }
