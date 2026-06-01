@@ -1,4 +1,5 @@
 ﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="mylib.AppKeys"%>
 
 
 <!DOCTYPE html>
@@ -163,7 +164,7 @@
 <!-- Hero Section -->
 <section class="relative w-full h-[70vh] min-h-[600px] flex items-center justify-center overflow-hidden px-container-margin">
 <div class="absolute inset-0 z-0">
-<img alt="Hero Car" class="w-full h-full object-cover object-center opacity-70" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%230b1220'/%3E%3Cstop offset='55%25' stop-color='%2313171f'/%3E%3Cstop offset='100%25' stop-color='%23060810'/%3E%3C/linearGradient%3E%3CradialGradient id='r' cx='50%25' cy='45%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%23adc6ff' stop-opacity='0.18'/%3E%3Cstop offset='55%25' stop-color='%2313171f' stop-opacity='0.06'/%3E%3Cstop offset='100%25' stop-color='%23060810' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='1600' height='900' fill='url(%23g)'/%3E%3Crect width='1600' height='900' fill='url(%23r)'/%3E%3Cpath d='M260 610 C340 530, 470 500, 620 500 H920 C1080 500, 1210 540, 1320 610 L1385 638 C1415 650, 1435 680, 1435 714 V742 H165 C165 694, 181 656, 215 638 Z' fill='%23171d28'/%3E%3Cpath d='M520 505 L605 430 C650 390, 705 372, 770 372 H980 C1050 372, 1115 395, 1160 440 L1230 510' fill='none' stroke='%23263242' stroke-width='28' stroke-linecap='round'/%3E%3Ccircle cx='520' cy='720' r='78' fill='%23050912'/%3E%3Ccircle cx='520' cy='720' r='44' fill='%231b2330'/%3E%3Ccircle cx='1188' cy='720' r='78' fill='%23050912'/%3E%3Ccircle cx='1188' cy='720' r='44' fill='%231b2330'/%3E%3Cpath d='M668 505 H1045' stroke='%23d8e2ff' stroke-opacity='0.18' stroke-width='10' stroke-linecap='round'/%3E%3Cpath d='M420 610 H1260' stroke='%238b90a0' stroke-opacity='0.18' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M340 560 L420 520' stroke='%23adc6ff' stroke-opacity='0.25' stroke-width='10' stroke-linecap='round'/%3E%3Cpath d='M1240 520 L1340 560' stroke='%23e9c349' stroke-opacity='0.18' stroke-width='10' stroke-linecap='round'/%3E%3Cpath d='M760 300 C860 270, 980 270, 1080 300' stroke='%23e5e2e3' stroke-opacity='0.09' stroke-width='30' stroke-linecap='round'/%3E%3C/svg%3E"/>
+<img alt="Hero Car" class="w-full h-full object-cover object-center opacity-70" src="https://lh3.googleusercontent.com/aida/AP1WRLskjNQKW3Tu-bs0XSsEYNDDN8qiMN4AJ1u9ZwviXUBcxG4d1eWYUrRJ3xjG39WALy4x08izP6r1nNRHzGbugx0w4JdbUZKHs8MHh8ZPWk__2BdqzQFPILpwHYshNkiL74dKYzNBEE0Ug8045lbOtgd-k26OnUp3lqTXr73ETP0k1rrf9NTULQUaWJwezZoYTld7hQNDVvFYnwqwX_eAE8vyPB3uQ4lSzZqVfWtCHtQvDK8goAwp8QZTLaYp=s1600"/>
 <div class="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background"></div>
 </div>
 <div class="relative z-10 max-w-7xl mx-auto w-full flex flex-col md:flex-row items-center justify-between gap-xl">
@@ -199,6 +200,14 @@
 </div>
 </div>
 </section>
+<%
+    String chatSupportFeature = (String) request.getAttribute(AppKeys.REQ_CHAT_SUPPORT_FEATURE);
+    String chatSupportResponse = (String) request.getAttribute(AppKeys.REQ_CHAT_SUPPORT_RESPONSE);
+    Boolean chatSupportHasCookie = (Boolean) request.getAttribute(AppKeys.REQ_CHAT_SUPPORT_HAS_COOKIE);
+    String chatSupportError = (String) request.getAttribute(AppKeys.REQ_CHAT_SUPPORT_ERROR);
+    boolean chatPanelOpen = (Boolean.TRUE.equals(chatSupportHasCookie) && chatSupportResponse != null)
+            || (chatSupportError != null && !chatSupportError.trim().isEmpty());
+%>
 <!-- Services Section -->
 <section class="py-24 px-container-margin max-w-7xl mx-auto">
 <div class="text-center mb-16">
@@ -338,6 +347,84 @@
             © 2024 Luxe Wash Detailing. All rights reserved.
         </div>
 </footer>
+
+<!-- Support Chat Widget -->
+<div class="fixed bottom-24 right-5 md:bottom-6 md:right-6 z-50">
+    <button id="chatToggleBtn" type="button" class="flex items-center gap-2 rounded-full bg-primary text-on-primary px-4 py-3 shadow-2xl shadow-black/30 hover:bg-primary-container transition-colors active:scale-95">
+        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">chat</span>
+        <span class="font-label-bold text-label-bold">Hỗ trợ</span>
+    </button>
+
+    <div id="chatPanel" class="<%= chatPanelOpen ? "" : "hidden" %> mt-3 w-[360px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-3xl border border-white/10 bg-surface/95 backdrop-blur-xl shadow-2xl shadow-black/40">
+        <div class="flex items-center justify-between border-b border-white/10 px-4 py-3 bg-surface-container/80">
+            <div>
+                <div class="font-title-md text-title-md text-on-surface">Chat hỗ trợ khách hàng</div>
+                <div class="text-xs text-on-surface-variant">Gửi đề xuất tính năng để hệ thống lưu bằng cookie 7 ngày</div>
+            </div>
+            <button id="chatCloseBtn" type="button" class="text-on-surface-variant hover:text-on-surface transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="px-4 py-4 bg-gradient-to-b from-surface to-surface-container-low space-y-3">
+            <div class="space-y-3 max-h-72 overflow-y-auto pr-1">
+                <div class="flex justify-start">
+                    <div class="max-w-[88%] rounded-2xl rounded-tl-md bg-surface-container-high px-3 py-2 text-sm text-on-surface leading-6 shadow-sm">
+                        Luxe Wash Detailing Studio hiện đang được hoàn thiện liên tục để nâng cao trải nghiệm. Hãy giúp chúng tôi xây dựng ứng dụng tốt hơn bằng cách đề xuất tính năng bạn mong muốn theo cú pháp: <strong>[Tính năng đề xuất]</strong>. Hệ thống sẽ tự động lưu lại để xử lý.
+                    </div>
+                </div>
+                <% if (Boolean.TRUE.equals(chatSupportHasCookie) && chatSupportFeature != null && chatSupportResponse != null) { %>
+                <div class="flex justify-end">
+                    <div class="max-w-[88%] rounded-2xl rounded-tr-md bg-primary text-on-primary px-3 py-2 text-sm leading-6 shadow-sm">
+                        <%= chatSupportFeature %>
+                    </div>
+                </div>
+                <div class="flex justify-start">
+                    <div class="max-w-[88%] rounded-2xl rounded-tl-md bg-surface-container-high px-3 py-2 text-sm text-on-surface leading-6 shadow-sm">
+                        <%= chatSupportResponse %>
+                    </div>
+                </div>
+                <% } %>
+                <% if (chatSupportError != null && !chatSupportError.trim().isEmpty()) { %>
+                <div class="flex justify-start">
+                    <div class="max-w-[88%] rounded-2xl rounded-tl-md bg-error-container/30 border border-error/30 px-3 py-2 text-sm text-on-surface leading-6 shadow-sm">
+                        <%= chatSupportError %>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-surface-container-high px-4 py-3 text-sm text-on-surface leading-6">
+                Gợi ý: ví dụ <strong>[Đặt lịch rửa xe bằng giờ]</strong> hoặc <strong>[Theo dõi trạng thái xe]</strong>.
+            </div>
+            <form action="<%= request.getContextPath() %>/MainController" method="post" class="space-y-3">
+                <input type="hidden" name="action" value="SupportChat"/>
+                <textarea name="supportFeature" rows="3" class="w-full resize-none rounded-2xl border border-outline-variant bg-surface-container-low px-3 py-2 text-sm text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:outline-none" placeholder="[Tính năng đề xuất]" required="required"><%= chatSupportFeature != null ? chatSupportFeature : "" %></textarea>
+                <div class="flex items-center justify-between gap-2">
+                    <div class="text-[11px] text-on-surface-variant">Cookie chatCookie sẽ lưu tối đa 7 ngày trên trình duyệt khách.</div>
+                    <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-secondary px-4 py-2 text-sm font-semibold text-on-secondary hover:bg-secondary-container transition-colors active:scale-95">
+                        Gửi yêu cầu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var toggleBtn = document.getElementById('chatToggleBtn');
+    var closeBtn = document.getElementById('chatCloseBtn');
+    var panel = document.getElementById('chatPanel');
+
+    toggleBtn.addEventListener('click', function () {
+        panel.classList.toggle('hidden');
+    });
+
+    closeBtn.addEventListener('click', function () {
+        panel.classList.add('hidden');
+    });
+})();
+</script>
 </body></html>
 
 

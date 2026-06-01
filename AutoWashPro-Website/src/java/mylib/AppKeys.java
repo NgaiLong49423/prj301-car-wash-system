@@ -50,4 +50,9 @@ public final class AppKeys {
     public static final String REQ_NEXT_TIER_POINTS = "NEXT_TIER_POINTS";
     public static final String REQ_TIER_PROGRESS_PERCENT = "TIER_PROGRESS_PERCENT";
     public static final String REQ_MONEY_TO_NEXT_TIER = "MONEY_TO_NEXT_TIER";
+
+    public static final String REQ_CHAT_SUPPORT_FEATURE = "CHAT_SUPPORT_FEATURE";
+    public static final String REQ_CHAT_SUPPORT_RESPONSE = "CHAT_SUPPORT_RESPONSE";
+    public static final String REQ_CHAT_SUPPORT_HAS_COOKIE = "CHAT_SUPPORT_HAS_COOKIE";
+    public static final String REQ_CHAT_SUPPORT_ERROR = "CHAT_SUPPORT_ERROR";
 }

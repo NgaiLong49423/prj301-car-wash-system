@@ -1,5 +1,4 @@
-﻿<%@page import="java.math.BigDecimal"%>
-<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.math.BigDecimal"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 <%@page import="mylib.AppKeys"%>
