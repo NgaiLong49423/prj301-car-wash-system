@@ -90,3 +90,5 @@ npm-debug.log
 # Explicitly allow tracking the project's NetBeans private folder (requested)
 !AutoWashPro-Website/nbproject/private/
 !AutoWashPro-Website/nbproject/private/**
+
+/agent
