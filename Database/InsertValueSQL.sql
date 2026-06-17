@@ -39,8 +39,7 @@ INSERT INTO Service (service_name, price, duration) VALUES
 
 -- Tạo nhiều phương tiện
 INSERT INTO Vehicle (customer_id, license_plate, brand, model, color) VALUES
-(1, '61B1-123.45', 'Honda', 'SH', N'Trắng'),
-(1, '61B1-789.01', 'Yamaha', 'Exciter', N'Đen'),
+(1, '61B1-123.45', 'Honda', 'Civic', N'Trắng'),
 (2, '29A1-234.56', 'Toyota', 'Vios', N'Bạc'),
 (2, '29A1-345.67', 'Toyota', 'Camry', N'Đỏ'),
 (3, '36A1-456.78', 'Honda', 'City', N'Xanh'),
