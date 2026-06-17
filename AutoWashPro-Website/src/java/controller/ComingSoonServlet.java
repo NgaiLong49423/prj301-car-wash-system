@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet({ "/home", "/profile", "/booking", "/coming-soon"})
+@WebServlet({ "/home", "/profile", "/coming-soon"})
 public class ComingSoonServlet extends HttpServlet {
 
     @Override

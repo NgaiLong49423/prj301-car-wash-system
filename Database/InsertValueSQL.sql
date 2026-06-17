@@ -3,11 +3,11 @@ GO
 
 -- 1. Insert MembershipTier (Bám sát 100% logic của cô)
 -- Quy đổi: 1 point = 1,000 VND[cite: 10]. Vậy: 2M VND = 2000 points, 6M VND = 6000 points, 15M VND = 15000 points.
-INSERT INTO MembershipTier (tier_name, min_points, discount_percent, benefits) VALUES
-('Member', 0, 0.00, '1 point = 1,000 VND spent'),
-('Silver', 2000, 0.00, '+10% points, priority slot'),
-('Gold', 6000, 0.00, '+20% points, free upgrade monthly'),
-('Platinum', 15000, 0.00, '+30% points, free wash monthly');
+INSERT INTO MembershipTier (tier_name, min_points, discount_percent, benefits, priority_score, advance_booking_days, reserved_slot_eligible) VALUES
+('Member', 0, 0.00, '1 point = 1,000 VND spent', 10, 3, 0),
+('Silver', 2000, 0.00, '+10% points, priority slot', 20, 5, 0),
+('Gold', 6000, 0.00, '+20% points, free upgrade monthly', 30, 7, 1),
+('Platinum', 15000, 0.00, '+30% points, free wash monthly', 40, 14, 1);
 
 -- 2. Insert Customer (Tạo nhiều khách hàng ở các hạng khác nhau để test giao diện)
 INSERT INTO Customer (full_name, phone, email, [password], total_spent_money, total_points, tier_id) VALUES

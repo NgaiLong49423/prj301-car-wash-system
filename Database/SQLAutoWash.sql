@@ -23,7 +23,10 @@ CREATE TABLE MembershipTier (
     tier_name VARCHAR(50) NOT NULL,
     min_points INT DEFAULT 0,
     discount_percent DECIMAL(5,2),
-    benefits NVARCHAR(MAX)
+    benefits NVARCHAR(MAX),
+    priority_score INT DEFAULT 10,
+    advance_booking_days INT DEFAULT 3,
+    reserved_slot_eligible BIT DEFAULT 0
 );
 
 -- 3. Tạo bảng Customer (Khách hàng)
@@ -70,8 +73,33 @@ CREATE TABLE Booking (
     booking_time TIME,
     status NVARCHAR(50),
     total_price DECIMAL(18,2),
+    requested_at DATETIME DEFAULT GETDATE(),
+    priority_score INT DEFAULT 10,
+    queue_position INT NULL,
+    estimated_start_time TIME NULL,
+    cancel_reason NVARCHAR(255) NULL,
     CONSTRAINT FK_Booking_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
     CONSTRAINT FK_Booking_Vehicle FOREIGN KEY (vehicle_id) REFERENCES Vehicle(vehicle_id)
+);
+
+CREATE TABLE BookingSlot (
+    slot_id INT PRIMARY KEY IDENTITY(1,1),
+    slot_date DATE NOT NULL,
+    slot_time TIME NOT NULL,
+    max_capacity INT NOT NULL DEFAULT 3,
+    reserved_vip_capacity INT DEFAULT 1,
+    current_confirmed INT DEFAULT 0,
+    CONSTRAINT UQ_BookingSlot UNIQUE (slot_date, slot_time)
+);
+
+CREATE TABLE BookingQueueLog (
+    log_id INT PRIMARY KEY IDENTITY(1,1),
+    booking_id INT NOT NULL,
+    old_status NVARCHAR(50),
+    new_status NVARCHAR(50),
+    reason NVARCHAR(255),
+    created_at DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_BookingQueueLog_Booking FOREIGN KEY (booking_id) REFERENCES Booking(booking_id)
 );
 
 -- 7. Tạo bảng BookingService (Bảng trung gian Dịch vụ trong Booking)
