@@ -1,4 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.util.List"%>
+<%@page import="dto.Vehicle"%>
 <!DOCTYPE html>
 <html class="dark" lang="vi">
 <head>
@@ -9,7 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
     <script>
-        // Hệ màu chuẩn Luxe Wash của dự án
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -42,7 +43,6 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        /* Style cho input và select ở Dark mode */
         input[type="date"], input[type="time"], select {
             color-scheme: dark;
         }
@@ -89,8 +89,24 @@
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">directions_car</span>
                     <select id="vehicle" name="vehicleId" required class="w-full bg-surface border border-outline-variant text-on-surface rounded-lg focus:ring-primary focus:border-primary block pl-10 p-3 outline-none transition-colors appearance-none">
                         <option value="">-- Vui lòng chọn xe --</option>
-                        <option value="1">61B1-123.45 (Honda SH)</option>
-                        <option value="2">29A1-234.56 (Toyota Vios)</option>
+                        
+                        <%-- Vòng lặp bằng Java thuần thay cho JSTL --%>
+                        <%
+                            List<Vehicle> listVehicles = (List<Vehicle>) request.getAttribute("listVehicles");
+                            String selectedVehicleId = (String) request.getAttribute("selectedVehicleId");
+                            
+                            if (listVehicles != null) {
+                                for (Vehicle v : listVehicles) {
+                                    String isSelected = (selectedVehicleId != null && selectedVehicleId.equals(String.valueOf(v.getVehicleId()))) ? "selected" : "";
+                        %>
+                                    <option value="<%= v.getVehicleId() %>" <%= isSelected %>>
+                                        <%= v.getLicensePlate() %> (<%= v.getBrand() %> <%= v.getModel() %>)
+                                    </option>
+                        <%
+                                }
+                            }
+                        %>
+                        
                     </select>
                 </div>
             </div>

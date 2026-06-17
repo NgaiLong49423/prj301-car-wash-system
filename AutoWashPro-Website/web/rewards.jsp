@@ -185,10 +185,10 @@
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
                 Profile
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/MainController?action=Booking">
-                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
-                Book Wash
-            </a>
+                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= request.getContextPath()%>/CreateBookingServlet">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
+                    Book Wash
+                </a>
             <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= displayPath %>/MainController?action=Rewards">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">military_tech</span>
                 Membership
