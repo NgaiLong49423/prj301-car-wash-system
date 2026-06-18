@@ -1,4 +1,4 @@
-﻿<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
 <%@ page import="mylib.AppKeys" %>
 <!DOCTYPE html><html class="dark" lang="vi"><head>
 <meta charset="utf-8">
@@ -146,18 +146,68 @@
   <a class="hover:text-primary cursor-pointer transition-colors" href="<%= request.getContextPath() %>/MainController?action=Profile">My Garage</a>
   <span class="material-symbols-outlined text-[14px]">chevron_right</span>
   <%
+    // TOÁN TỬ BA NGÔI xác định xem trang đang ở chế độ SỬA XE hay THÊM XE MỚI:
+    // - Điều kiện: request.getAttribute(mylib.AppKeys.REQ_IS_EDIT) != null (Kiểm tra xem request attribute REQ_IS_EDIT có tồn tại hay không).
+    // - Đúng (Khác null): Ép kiểu giá trị đó sang kiểu Boolean để xác định chế độ hiện tại.
+    // - Sai (Bằng null): Gán giá trị mặc định là false (Chế độ thêm xe mới).
     Boolean isEdit = request.getAttribute(mylib.AppKeys.REQ_IS_EDIT) != null ? (Boolean) request.getAttribute(mylib.AppKeys.REQ_IS_EDIT) : false;
+    
+    // Đọc thông tin đối tượng xe (UserVehicle) được gửi từ Controller sang (dùng khi sửa xe hoặc lưu xe lỗi để điền lại dữ liệu).
     dto.Vehicle userVehicle = (dto.Vehicle) request.getAttribute(mylib.AppKeys.REQ_USER_VEHICLE);
+    
+    // TOÁN TỬ BA NGÔI LỒNG NHAU lấy giá trị hiển thị lại cho trường "Biển số xe" (licenseVal):
+    // - Cấp 1 (Điều kiện): request.getParameter("licensePlate") != null (Kiểm tra xem người dùng vừa nhấn Submit biểu mẫu bị lỗi và gửi parameter lên không).
+    // - Cấp 1 (Đúng): Trả về chính giá trị parameter "licensePlate" vừa nhập để giữ lại dữ liệu trên form.
+    // - Cấp 1 (Sai) (Người dùng mới tải trang lần đầu): Xét Cấp 2:
+    //   + Cấp 2 (Điều kiện): userVehicle != null && userVehicle.getLicensePlate() != null (Kiểm tra xem xe cần sửa và biển số của xe đó có tồn tại trong CSDL không).
+    //   + Cấp 2 (Đúng): Lấy biển số xe gốc từ database điền vào form để chuẩn bị sửa.
+    //   + Cấp 2 (Sai): Trả về chuỗi rỗng "" (Bắt đầu nhập mới hoàn toàn).
     String licenseVal = request.getParameter("licensePlate") != null ? request.getParameter("licensePlate") : (userVehicle != null && userVehicle.getLicensePlate() != null ? userVehicle.getLicensePlate() : "");
+    
+    // TOÁN TỬ BA NGÔI LỒNG NHAU lấy giá trị hiển thị lại cho trường "Hãng xe" (brandVal):
+    // - Cấp 1 (Điều kiện): request.getParameter("brand") != null (Kiểm tra xem có parameter "brand" gửi lên do submit form lỗi không).
+    // - Cấp 1 (Đúng): Trả về chính giá trị parameter "brand" vừa gõ.
+    // - Cấp 1 (Sai): Xét Cấp 2:
+    //   + Cấp 2 (Điều kiện): userVehicle != null && userVehicle.getBrand() != null (Kiểm tra xem có xe truyền sang để sửa và hãng xe có dữ liệu không).
+    //   + Cấp 2 (Đúng): Lấy tên hãng xe từ DB điền vào form.
+    //   + Cấp 2 (Sai): Trả về chuỗi rỗng "".
     String brandVal = request.getParameter("brand") != null ? request.getParameter("brand") : (userVehicle != null && userVehicle.getBrand() != null ? userVehicle.getBrand() : "");
+    
+    // TOÁN TỬ BA NGÔI LỒNG NHAU lấy giá trị hiển thị lại cho trường "Model xe" (modelVal):
+    // - Cấp 1 (Điều kiện): request.getParameter("model") != null (Kiểm tra xem có parameter "model" gửi lên khi form lỗi không).
+    // - Cấp 1 (Đúng): Trả về giá trị parameter "model" vừa gõ.
+    // - Cấp 1 (Sai): Xét Cấp 2:
+    //   + Cấp 2 (Điều kiện): userVehicle != null && userVehicle.getModel() != null (Kiểm tra xem có xe truyền sang để sửa và dòng xe có dữ liệu không).
+    //   + Cấp 2 (Đúng): Lấy tên dòng xe (model) từ DB điền vào form.
+    //   + Cấp 2 (Sai): Trả về chuỗi rỗng "".
     String modelVal = request.getParameter("model") != null ? request.getParameter("model") : (userVehicle != null && userVehicle.getModel() != null ? userVehicle.getModel() : "");
+    
+    // TOÁN TỬ BA NGÔI LỒNG NHAU lấy giá trị hiển thị lại cho trường "Màu xe" (colorVal):
+    // - Cấp 1 (Điều kiện): request.getParameter("color") != null (Kiểm tra xem có parameter "color" được gửi lên khi form lỗi không).
+    // - Cấp 1 (Đúng): Trả về màu xe vừa được chọn trong thẻ select-option.
+    // - Cấp 1 (Sai): Xét Cấp 2:
+    //   + Cấp 2 (Điều kiện): userVehicle != null && userVehicle.getColor() != null (Kiểm tra xem có xe truyền sang để sửa và màu xe có dữ liệu không).
+    //   + Cấp 2 (Đúng): Lấy màu xe gốc từ DB điền vào form.
+    //   + Cấp 2 (Sai): Trả về chuỗi rỗng "".
     String colorVal = request.getParameter("color") != null ? request.getParameter("color") : (userVehicle != null && userVehicle.getColor() != null ? userVehicle.getColor() : "");
   %>
+  <%-- TOÁN TỬ BA NGÔI hiển thị nhãn của breadcrumb:
+       - Nếu isEdit là true (đang sửa thông tin xe): in ra chuỗi tiếng Việt "Sửa thông tin".
+       - Nếu isEdit là false (đang thêm mới xe): in ra chuỗi tiếng Anh mặc định "Add New Car". --%>
   <span class="text-primary"><%= isEdit ? "Sửa thông tin" : "Add New Car" %></span>
 </nav>
 <section class="max-w-2xl mx-auto mb-12">
 <header class="mb-8 text-center">
+<%-- TOÁN TỬ BA NGÔI hiển thị tiêu đề chính của biểu mẫu:
+     - Điều kiện: isEdit (Biến boolean xác định đang sửa xe hay thêm xe mới).
+     - Đúng (isEdit = true): Hiển thị chuỗi chữ "Sửa thông tin".
+     - Sai (isEdit = false): Hiển thị chuỗi chữ "Đăng ký xe mới". --%>
 <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2"><%= isEdit ? "Sửa thông tin" : "Đăng ký xe mới" %></h2>
+
+<%-- TOÁN TỬ BA NGÔI hiển thị mô tả phụ của biểu mẫu:
+     - Điều kiện: isEdit (Biến boolean xác định đang sửa hay thêm mới).
+     - Đúng (isEdit = true): Hiển thị hướng dẫn "Cập nhật thông tin phương tiện của bạn.".
+     - Sai (isEdit = false): Hiển thị hướng dẫn "Thêm phương tiện của bạn vào Garage để nhận ưu đãi chăm sóc tốt nhất.". --%>
 <p class="font-body-sm text-body-sm text-on-surface-variant"><%= isEdit ? "Cập nhật thông tin phương tiện của bạn." : "Thêm phương tiện của bạn vào Garage để nhận ưu đãi chăm sóc tốt nhất." %></p>
 </header>
 <!-- Registration Form -->
@@ -197,6 +247,10 @@
 <label class="font-label-bold text-label-bold text-on-surface-variant">Màu sắc</label>
 <select name="color" required class="bg-surface-container border border-outline-variant rounded-lg p-3 font-body-lg text-body-lg text-on-surface outline-none input-glow transition-all appearance-none cursor-pointer">
   <option disabled="" value="">Chọn màu sắc</option>
+  <%-- TOÁN TỬ BA NGÔI tự động chọn màu sắc cũ:
+       - Điều kiện: "Màu_Sắc".equals(colorVal) (So sánh màu đang duyệt với màu của xe được lưu hoặc nhập trước đó).
+       - Đúng: In ra chuỗi "selected" để trình duyệt tự động chọn sẵn option này làm mặc định.
+       - Sai: In ra chuỗi rỗng "" để hiển thị bình thường. --%>
   <option <%= "Đen".equals(colorVal) ? "selected" : "" %>>Đen</option>
   <option <%= "Trắng".equals(colorVal) ? "selected" : "" %>>Trắng</option>
   <option <%= "Xám Metallic".equals(colorVal) ? "selected" : "" %>>Xám Metallic</option>
@@ -213,6 +267,10 @@
 <!-- Action Buttons -->
 <div class="flex flex-col md:flex-row gap-4 pt-4">
 <% if (isEdit) { %>
+  <%-- TOÁN TỬ BA NGÔI truyền ẩn ID xe lên Server khi sửa đổi (dùng để định danh bản ghi nào cần update):
+       - Điều kiện: userVehicle != null (Đối tượng xe truyền từ Servlet sang có tồn tại không).
+       - Đúng (Chế độ edit hợp lệ): Lấy trực tiếp ID xe qua hàm getVehicleId().
+       - Sai (Form bị lỗi submit quay lại): Lấy ID từ parameter vehicleId trên request để bảo toàn thông tin. --%>
   <input type="hidden" name="vehicleId" value="<%= userVehicle != null ? userVehicle.getVehicleId() : request.getParameter("vehicleId") %>" />
   <button class="flex-1 bg-primary text-on-primary font-title-md text-title-md py-4 rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-primary/20" type="submit">
     Cập nhật thông tin
@@ -254,6 +312,11 @@
 </div>
 </section>
 <script>
+// BỘ LẮNG NGHE SỰ KIỆN SUBMIT của biểu mẫu addVehicleForm:
+// - Khi người dùng nhấn nút Gửi (Submit), hàm này sẽ chạy để:
+//   1. Thay thế chữ hiển thị trên nút submit thành biểu tượng icon loading xoay tròn.
+//   2. Thiết lập thuộc tính disabled = true cho nút để khóa nút, ngăn người dùng click đúp liên tục (Double Submit),
+//      tránh việc hệ thống gửi nhiều yêu cầu trùng lặp lên máy chủ gây tạo nhiều bản ghi rác.
 document.getElementById('addVehicleForm').addEventListener('submit', function(e){
   var form = e.target;
   var submitButton = form.querySelector('button[type="submit"]');
@@ -289,6 +352,12 @@ document.getElementById('addVehicleForm').addEventListener('submit', function(e)
 </div>
 </nav>
 <script>
+        // HÀM HIỂN THỊ TRƯỚC ẢNH XE (Preview Image) khi người dùng chọn một file ảnh từ máy tính:
+        // - Tham số input: Thẻ input file chứa tập tin ảnh người dùng chọn.
+        // - Luồng xử lý: 
+        //   1. Kiểm tra xem người dùng có chọn file thực sự không (input.files && input.files[0]).
+        //   2. Sử dụng đối tượng FileReader để đọc tệp tin dưới dạng URL dữ liệu mã hóa Base64 (readAsDataURL).
+        //   3. Khi đọc file hoàn tất (onload), cập nhật thuộc tính src của thẻ ảnh `#car-preview` và gỡ bỏ class ẩn để hiển thị ảnh lên giao diện ngay lập tức mà không cần upload lên server trước.
         function previewImage(input) {
             const preview = document.getElementById('car-preview');
             const placeholder = preview.nextElementSibling;
@@ -304,14 +373,16 @@ document.getElementById('addVehicleForm').addEventListener('submit', function(e)
             }
         }
 
-        // Form submission micro-interaction: show spinner but allow normal submit
+        // BỘ LẮNG NGHE SỰ KIỆN SUBMIT CHUNG của thẻ form (Micro-interaction):
+        // - Khi form được submit, tự động chuyển nội dung nút submit sang trạng thái spinner loading xoay tròn 
+        //   và khóa nút bấm (disabled) để đảm bảo trình duyệt thực hiện chuyển tiếp dữ liệu một cách an toàn và nhất quán.
         document.querySelector('form').addEventListener('submit', (e) => {
           const btn = e.target.querySelector('button[type="submit"]');
           if (!btn) return;
           btn.__originalText = btn.__originalText || btn.innerText;
           btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>';
           btn.disabled = true;
-          // allow the form to submit normally so the server can persist the vehicle
+          // Cho phép biểu mẫu tiếp tục gửi dữ liệu lên server bình thường
         });
     </script>
 

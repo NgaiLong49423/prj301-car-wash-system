@@ -6,28 +6,61 @@
 <%@page import="dto.Customer"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
+    // Đọc thông tin đối tượng Customer từ request attribute được servlet gửi sang
     Customer profile = (Customer) request.getAttribute(AppKeys.REQ_USER_PROFILE);
+    
+    // Đọc danh sách các xe (Vehicle) của khách hàng hiện tại
     List<Vehicle> cars = (List<Vehicle>) request.getAttribute(AppKeys.REQ_LIST_CARS);
+    // Kiểm tra nếu danh sách xe null, khởi tạo một ArrayList rỗng để tránh lỗi NullPointerException khi duyệt danh sách
     if (cars == null) {
         cars = new ArrayList<Vehicle>();
     }
+    
+    // Trích xuất các trường thông tin cá nhân của khách hàng
     String fullName = (String) request.getAttribute(AppKeys.REQ_PROFILE_FULL_NAME);
     String phone = (String) request.getAttribute(AppKeys.REQ_PROFILE_PHONE);
     String email = (String) request.getAttribute(AppKeys.REQ_PROFILE_EMAIL);
     String tierName = (String) request.getAttribute(AppKeys.REQ_PROFILE_TIER_NAME);
     String joinDate = (String) request.getAttribute(AppKeys.REQ_PROFILE_JOIN_DATE);
+    
+    // Lấy tổng số điểm tích lũy của khách hàng dưới dạng đối tượng Integer
     Integer totalPointsObj = (Integer) request.getAttribute(AppKeys.REQ_PROFILE_TOTAL_POINTS);
+    
+    // TOÁN TỬ BA NGÔI gán giá trị điểm tích lũy mặc định:
+    // - Điều kiện: totalPointsObj != null (Kiểm tra xem dữ liệu điểm lấy từ database có tồn tại hay không).
+    // - Đúng: Lấy giá trị điểm int tương ứng.
+    // - Sai: Trả về giá trị 0 (Chưa có điểm tích lũy).
     int totalPoints = totalPointsObj != null ? totalPointsObj : 0;
+    
+    // Lấy tổng số tiền đã chi tiêu
     BigDecimal totalSpentMoney = (BigDecimal) request.getAttribute(AppKeys.REQ_PROFILE_TOTAL_SPENT_MONEY);
+    // Nếu tổng tiền chi tiêu null (chưa từng thanh toán dịch vụ nào), gán mặc định bằng 0
     if (totalSpentMoney == null) {
         totalSpentMoney = BigDecimal.ZERO;
     }
+    
+    // Định dạng số tiền chi tiêu:
+    // Sử dụng String.format("%,.0f") để định dạng tiền tệ (phân tách hàng nghìn bằng dấu phẩy và làm tròn phần thập phân) ví dụ: 1,500,000
     String spentDisplay = String.format("%,.0f", totalSpentMoney.doubleValue());
+    
+    // Lấy ký tự đại diện cho ảnh đại diện (avatar)
     String avatarInitial = (String) request.getAttribute(AppKeys.REQ_PROFILE_AVATAR_INITIAL);
+    // Nếu ký tự avatar trống
     if (avatarInitial == null || avatarInitial.trim().isEmpty()) {
+        // TOÁN TỬ BA NGÔI xác định ký tự chữ cái đầu tiên của Tên Khách Hàng để làm avatar mặc định:
+        // - Điều kiện: fullName != null && !fullName.trim().isEmpty() (Kiểm tra xem họ tên của khách hàng có hợp lệ không).
+        // - Đúng: Cắt ký tự chữ cái đầu tiên bằng hàm substring(0, 1) và chuyển thành chữ in hoa bằng toUpperCase().
+        // - Sai: Trả về chữ cái mặc định là "L" (Viết tắt của Luxe Wash).
         avatarInitial = fullName != null && !fullName.trim().isEmpty() ? fullName.substring(0, 1).toUpperCase() : "L";
     }
+    
+    // Đọc số lượng xe trong garage
     Integer totalCarsObj = (Integer) request.getAttribute(AppKeys.REQ_PROFILE_TOTAL_CARS);
+    
+    // TOÁN TỬ BA NGÔI lấy tổng số xe của khách hàng:
+    // - Điều kiện: totalCarsObj != null (Kiểm tra xem biến đếm số xe gửi từ Servlet sang có khác null không).
+    // - Đúng: Trả về số lượng xe đã đếm.
+    // - Sai: Đếm trực tiếp dựa trên kích thước danh sách xe lấy được qua cars.size().
     int totalCars = totalCarsObj != null ? totalCarsObj : cars.size();
 %>
 <!DOCTYPE html>
@@ -206,12 +239,35 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <%
+                    // Kiểm tra xem danh sách xe của khách hàng có dữ liệu hay không
                     if (!cars.isEmpty()) {
+                        // Lặp qua từng đối tượng Vehicle trong danh sách cars
                         for (Vehicle car : cars) {
+                            // Chuyển đổi mã ID xe từ kiểu int sang chuỗi String để truyền làm tham số URL
                             String vehicleId = String.valueOf(car.getVehicleId());
+                            
+                            // TOÁN TỬ BA NGÔI chuẩn hóa hiển thị Biển số xe:
+                            // - Điều kiện: car.getLicensePlate() != null (Kiểm tra biển số xe trong CSDL có hợp lệ không).
+                            // - Đúng: Trả về biển số xe để hiển thị.
+                            // - Sai: Trả về nhãn mặc định "Chưa có biển số".
                             String plate = car.getLicensePlate() != null ? car.getLicensePlate() : "Chưa có biển số";
+                            
+                            // TOÁN TỬ BA NGÔI chuẩn hóa hiển thị Hãng xe:
+                            // - Điều kiện: car.getBrand() != null (Kiểm tra tên hãng xe trong CSDL có tồn tại không).
+                            // - Đúng: Trả về tên hãng xe.
+                            // - Sai: Trả về nhãn mặc định "Xe".
                             String brand = car.getBrand() != null ? car.getBrand() : "Xe";
+                            
+                            // TOÁN TỬ BA NGÔI chuẩn hóa hiển thị Model (dòng xe):
+                            // - Điều kiện: car.getModel() != null (Kiểm tra tên dòng xe trong CSDL có tồn tại không).
+                            // - Đúng: Trả về tên dòng xe.
+                            // - Sai: Trả về nhãn mặc định "đang cập nhật".
                             String model = car.getModel() != null ? car.getModel() : "đang cập nhật";
+                            
+                            // TOÁN TỬ BA NGÔI chuẩn hóa hiển thị Màu xe:
+                            // - Điều kiện: car.getColor() != null (Kiểm tra thuộc tính màu xe trong CSDL có tồn tại không).
+                            // - Đúng: Trả về màu xe.
+                            // - Sai: Trả về nhãn mặc định "Chưa rõ".
                             String color = car.getColor() != null ? car.getColor() : "Chưa rõ";
                 %>
                 <article class="glass-panel rounded-3xl overflow-hidden border border-white/10 hover:border-primary/30 transition-all duration-300">

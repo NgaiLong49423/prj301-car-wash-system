@@ -109,27 +109,43 @@
 <body class="bg-background text-on-background antialiased pb-24 md:pb-0 pt-16 md:pt-20">
 
     <%
+        /* ========== SECTION KHỞI TẠO DỮ LIỆU TỪ REQUEST ==========
+           Mục đích: Lấy toàn bộ dữ liệu từ controller (RewardServlet) để render trang rewards.
+           Dữ liệu lấy từ request.getAttribute() với key định nghĩa trong AppKeys.
+           Nếu attribute không tồn tại hoặc null, dùng giá trị fallback mặc định.
+           
+           Input: từ RewardServlet.doGet() sau khi xử lý logic tính điểm, hạng, tiến độ.
+           Output: các variable để JSP render theo từng section (error, welcome, points, tiers, rewards).
+        */
         String errorMessage = (String) request.getAttribute(AppKeys.REQ_ERROR);
         if (errorMessage == null) {
             errorMessage = "";
         }
+        // Tên hiển thị người dùng - fallback sang "Guest" nếu không có
         String userName = (String) request.getAttribute(AppKeys.REQ_USER_DISPLAY_NAME);
         if (userName == null || userName.trim().isEmpty()) {
             userName = "Guest";
         }
+        // Tổng tiền đã chi tiêu (VND) - dùng cho hiển thị và tính tiến độ lên hạng
         Long totalSpentMoneyObj = (Long) request.getAttribute(AppKeys.REQ_TOTAL_SPENT_MONEY);
         long totalSpentMoney = totalSpentMoneyObj != null ? totalSpentMoneyObj : 0L;
+        // Điểm tích lũy hiện tại - dùng để check xem người dùng có đủ điểm đổi quà không
         Integer userPointsObj = (Integer) request.getAttribute(AppKeys.REQ_USER_POINTS);
         int userPoints = userPointsObj != null ? userPointsObj : 0;
+        // Hạng thành viên hiện tại (MEMBER|SILVER|GOLD|PLATINUM) - để highlight card tương ứng
         String memberTier = (String) request.getAttribute(AppKeys.REQ_MEMBER_TIER);
         if (memberTier == null) memberTier = "MEMBER";
+        // Mô tả quyền lợi của hạng hiện tại - để hiển thị dưới tên hạng
         String tierBenefit = (String) request.getAttribute(AppKeys.REQ_TIER_BENEFIT);
         if (tierBenefit == null) tierBenefit = "";
+        // Danh sách phần thưởng từ DB (đã sort theo điểm tăng dần)
         List<RewardDTO> rewardList = (List<RewardDTO>) request.getAttribute(AppKeys.REQ_REWARD_LIST);
+        // Map gán icon Material cho từng phần thưởng (index -> icon name)
         java.util.Map<Integer, String> rewardIcons = (java.util.Map<Integer, String>) request.getAttribute(AppKeys.REQ_REWARD_ICONS);
         if (rewardIcons == null) {
             rewardIcons = new java.util.HashMap<>();
         }
+        // Tên phần thưởng gần nhất chưa đạt và info tiến độ đổi quà
         String nextRewardName = (String) request.getAttribute(AppKeys.REQ_NEXT_REWARD_NAME);
         if (nextRewardName == null) nextRewardName = "";
         Long nextRewardPointsObj = (Long) request.getAttribute(AppKeys.REQ_NEXT_REWARD_POINTS);
@@ -138,6 +154,7 @@
         double progressPercent = progressPercentObj != null ? progressPercentObj : 0.0;
         Long pointsNeededObj = (Long) request.getAttribute(AppKeys.REQ_POINTS_NEEDED);
         long pointsNeeded = pointsNeededObj != null ? pointsNeededObj : 0L;
+        // Info tiến độ lên hạng tiếp theo
         String nextTierName = (String) request.getAttribute(AppKeys.REQ_NEXT_TIER_NAME);
         if (nextTierName == null) nextTierName = "MEMBER";
         Long nextTierPointsObj = (Long) request.getAttribute(AppKeys.REQ_NEXT_TIER_POINTS);
@@ -149,6 +166,11 @@
         String displayPath = request.getContextPath();
     %>
 
+    <!-- ========== TopAppBar (Web - Hien thi tu tablet/desktop tro len) ==========
+         Thanh navigation co dinh phia tren, gom logo brand, menu dieu huong, va icons action.
+         Input: request.getContextPath() de build URL dong.
+         Output: render header bar voi navigation links sang cac trang khac.
+    -->
     <!-- TopAppBar (Web) -->
     <header class="hidden md:flex fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-sm justify-between items-center px-container-margin h-16 max-w-7xl mx-auto left-0 right-0">
         <div class="font-display-lg text-display-lg font-bold text-primary">
@@ -182,17 +204,26 @@
         </div>
     </header>
 
-    <!-- Mobile Top Brand (Simple) -->
+    <!-- ========== Mobile Top Brand (Hien thi tren mobile/tablet nho) ==========
+         Thanh don gian chi show logo brand o giua, thanh duoi dung BottomNavBar.
+    -->
     <div class="md:hidden fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex items-center justify-center h-16 border-b border-white/10">
         <div class="font-title-md text-title-md font-bold text-primary">
             LUXE WASH
         </div>
     </div>
 
-    <!-- Main Content Canvas -->
+    <!-- ========== Main Content Canvas ==========
+         Grid layout responsive: 4 cot mobile, 12 cot desktop.
+         Chua cac section: error display, welcome, points balance, tiers, reward list, bottom nav.
+    -->
     <main class="max-w-7xl mx-auto px-container-margin grid grid-cols-4 md:grid-cols-12 gap-gutter mt-lg">
         
-        <!-- ERROR DISPLAY SECTION -->
+        <!-- ========== SECTION: ERROR DISPLAY ==========
+             Hien thi thong bao loi tu controller (neu validation hoac DB fail).
+             Input: errorMessage tu request scope.
+             Output: alert box do voi error details (neu errorMessage khong rong).
+        -->
         <% if (!errorMessage.isEmpty()) { %>
             <section class="col-span-4 md:col-span-12 mb-lg">
                 <div class="glass-card rounded-xl p-lg bg-error-container border-2 border-error">
@@ -204,7 +235,12 @@
             </section>
         <% } %>
         
-        <!-- Welcome & Status Area -->
+        <!-- ========== SECTION: WELCOME & STATUS AREA ==========
+             Hien thi loi chao nguoi dung, hang hien tai, va quyen loi.
+             Input: userName, memberTier, tierBenefit, totalSpentMoney, userPoints tu request.
+             Output: card info voi avatar, ten, hang, quyen loi.
+             Try-catch: bat loi neu co issue khi render section nay.
+        -->
         <section class="col-span-4 md:col-span-12 mb-lg">
             <% try { %>
             <div class="glass-card rounded-xl p-md md:p-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
@@ -234,7 +270,12 @@
             <% } %>
         </section>
 
-        <!-- Points Balance Block -->
+        <!-- ========== SECTION: POINTS BALANCE BLOCK ==========
+             Hien thi thong ke: tong tien chi tieu, diem tich luy, va tien do len hang.
+             Input: totalSpentMoney, userPoints, nextTierName, nextRewardPoints, tierProgressPercent, moneyToNextTier tu request.
+             Output: 2 card hien thi so lieu (tien + diem), progress bar len hang tiep theo.
+             Cong thuc progress bar: width = min(totalSpentMoney / nextTierPoints * 100, 100)%.
+        -->
         <section class="col-span-4 md:col-span-12 flex flex-col gap-md mb-md">
             <% try { %>
             <div class="glass-card rounded-xl p-lg relative overflow-hidden h-full flex flex-col justify-center">
@@ -298,11 +339,16 @@
             <% } %>
         </section>
 
-        <!-- Membership Tiers Section -->
+        <!-- ========== SECTION: MEMBERSHIP TIERS ==========
+             Hien thi 4 card hang: MEMBER, SILVER, GOLD, PLATINUM.
+             Input: memberTier tu request (dung de highlight card tuong ung voi scale-105 + glow).
+             Output: 4 card grid hien thi dieu kien (VND), uu dai cua tung hang.
+             Logic: Card cua hang hien tai duoc highlight (bg-surface-container-high, glow-gold, scale-105, z-10).
+        -->
         <section class="col-span-4 md:col-span-12 mb-lg flex flex-col gap-md">
             <h3 class="font-title-md text-title-md text-on-surface flex items-center gap-sm">
                 <span class="material-symbols-outlined text-secondary">workspace_premium</span>
-                Hệ thống hạng thành viên
+                He thong hang thanh vien
             </h3>
             <% try { %>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md">
@@ -383,7 +429,19 @@
             <% } %>
         </section>
 
-        <!-- Reward Redemption Grid -->
+        <!-- ========== SECTION: REWARD REDEMPTION GRID ==========
+             Display list of rewards from database as a grid of cards.
+             Input: rewardList (List<RewardDTO>), userPoints, rewardIcons (Map) from request.
+             Output: grid displaying each reward card with icon, name, description, redeem button.
+             
+             Data flow logic:
+             1. Check if rewardList is empty -> if yes, show message "No rewards available".
+             2. Loop through each reward in list:
+                - Type check (instanceof RewardDTO), if not, log error and skip to avoid ClassCastException.
+                - Calculate canRedeem = (userPoints >= reward.getPointsRequired()) to check button enable/disable.
+                - Get icon from rewardIcons map by index, fallback = "payments".
+                - Render card: if canRedeem=true -> blue button (enable), if false -> gray button + lock icon (disable).
+        -->
         <section class="col-span-4 md:col-span-12 flex flex-col gap-md">
             <h3 class="font-title-md text-title-md text-on-surface flex items-center gap-sm">
                 <span class="material-symbols-outlined text-primary">redeem</span>
@@ -396,33 +454,41 @@
                         int rewardIndex = 0;
                         for (Object __r_obj : rewardList) {
                             if (!(__r_obj instanceof RewardDTO)) {
-                                // Unexpected type in list — log to server and skip
+                                // Type check: if element not RewardDTO, log to server stderr and skip to avoid ClassCastException
                                 System.err.println("Unexpected REWARD_LIST element type: " + (__r_obj == null ? "null" : __r_obj.getClass().getName()));
                                 rewardIndex++;
                                 continue;
                             }
                             RewardDTO reward = (RewardDTO) __r_obj;
+                            // Calculate canRedeem: true if userPoints >= reward points threshold, else false for button state
                             boolean canRedeem = userPoints >= reward.getPointsRequired();
+                            // Get icon for this reward from map: if key not found, default to "payments" icon
                             String icon = rewardIcons.get(rewardIndex) != null ? rewardIcons.get(rewardIndex) : "payments";
                 %>
                     <div class="glass-card rounded-xl p-md flex flex-col justify-between border-l-4 border-l-primary <% if (!canRedeem) { %>opacity-60<% } %> hover:bg-surface-container-high transition-colors">
+                        <!-- Icon badge: if canRedeem=true display primary color, else gray variant color -->
                         <div class="flex justify-between items-start mb-md">
                             <div class="<% if (canRedeem) { %>bg-primary/20 text-primary<% } else { %>bg-surface-container text-on-surface-variant<% } %> p-sm rounded-lg">
                                 <span class="material-symbols-outlined">
                                     <%= icon %>
                                 </span>
                             </div>
+                            <!-- Points badge: show reward points required, color changes based on canRedeem -->
                             <span class="<% if (canRedeem) { %>bg-primary-container text-on-primary-container<% } else { %>bg-surface-variant text-on-surface-variant<% } %> font-label-bold text-label-bold px-2 py-1 rounded-full"><%= reward.getPointsRequired() %> Pts</span>
                         </div>
+                        <!-- Reward info: name and description from DTO -->
                         <div>
                             <h4 class="font-body-lg text-body-lg text-on-surface mb-xs"><%= reward.getRewardName() %></h4>
                             <% if (reward.getDescription() != null && !reward.getDescription().isEmpty()) { %>
                                 <p class="font-body-sm text-body-sm text-on-surface-variant mb-md"><%= reward.getDescription() %></p>
                             <% } %>
+                            <!-- Redeem button: if canRedeem=true, button is enabled (blue), else disabled (gray) with lock icon -->
                             <button <% if (!canRedeem) { %>disabled<% } %> class="mt-sm w-full <% if (canRedeem) { %>bg-primary hover:bg-primary-fixed text-on-primary<% } else { %>bg-surface-container border border-outline-variant text-on-surface-variant cursor-not-allowed flex items-center justify-center gap-xs<% } %> font-label-bold text-label-bold py-2 rounded-lg transition-colors active:scale-95">
                                 <% if (canRedeem) { %>
+                                    <!-- If points sufficient: show green button with text "ĐỔI QUÀ" (Redeem) -->
                                     ĐỔI QUÀ
                                 <% } else { %>
+                                    <!-- If points insufficient: show gray disabled button with lock icon and text "KHÓA" (Locked) -->
                                     <span class="material-symbols-outlined text-[16px]">lock</span> KHÓA
                                 <% } %>
                             </button>
@@ -433,6 +499,7 @@
                         }
                     } else {
                 %>
+                    <!-- Empty state: if no rewards in database, show message -->
                     <div class="col-span-4 glass-card rounded-xl p-lg text-center">
                         <p class="font-body-lg text-body-lg text-on-surface-variant">Không tìm thấy phần thưởng nào từ hệ thống.</p>
                     </div>
@@ -441,6 +508,7 @@
                 %>
             </div>
             <% } catch (Exception e) { %>
+                <!-- Exception handler: if any error during reward grid render, display error card with details -->
                 <div class="glass-card rounded-xl p-lg bg-error-container border-2 border-error">
                     <h3 class="font-headline-lg text-error mb-md">❌ Lỗi Reward Redemption Grid</h3>
                     <div class="font-body-sm text-on-error-container bg-on-error/5 p-md rounded whitespace-pre-wrap"><%= e.getMessage() %></div>
@@ -451,25 +519,35 @@
 
     </main>
 
-    <!-- BottomNavBar (Mobile) -->
+    <!-- ========== SECTION: BottomNavBar (Mobile Only) ==========
+         Display mobile navigation bar at bottom with 5 buttons: Home, Profile, Book Wash, Rewards (highlighted), Logout.
+         Input: request.getContextPath() for URL building, current page context to highlight active tab.
+         Output: sticky bottom navigation with icon + label for each action.
+         Logic: Rewards button is highlighted (bg-primary-container + filled icon FILL=1), others are outlined (FILL=0).
+         This nav is hidden on tablets/desktop (hidden by md:hidden class).
+    -->
     <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface-container/80 backdrop-blur-2xl border-t border-white/5 shadow-2xl rounded-t-xl">
+        <!-- Home button -->
         <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="<%= request.getContextPath() %>/MainController?action=Home">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">home</span>
             <span class="font-label-bold text-[10px]">Home</span>
         </a>
+        <!-- Profile button -->
         <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="<%= request.getContextPath() %>/MainController?action=Profile">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
             <span class="font-label-bold text-[10px]">Profile</span>
         </a>
+        <!-- Book Wash button -->
         <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="<%= request.getContextPath() %>/MainController?action=Booking">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
             <span class="font-label-bold text-[10px]">Book Wash</span>
         </a>
+        <!-- Rewards button (highlighted as active page) -->
         <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl p-2 min-w-[64px] active:scale-90 transition-all duration-200" href="<%= request.getContextPath() %>/MainController?action=Rewards">
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">military_tech</span>
             <span class="font-label-bold text-[10px]">Rewards</span>
         </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-container-high transition-all active:scale-90 duration-200 rounded-xl" href="<%= request.getContextPath() %>/MainController?action=Logout">
+        <!-- Logout button -->
             <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">logout</span>
             <span class="font-label-bold text-[10px]">Logout</span>
         </a>

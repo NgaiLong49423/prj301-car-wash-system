@@ -15,17 +15,23 @@ public class RewardDAO {
 
     private static final Logger LOGGER = Logger.getLogger(RewardDAO.class.getName());
 
-    // 1. Hàm lấy danh sách tất cả phần thưởng
+    /**
+     * Lấy toàn bộ danh sách phần thưởng từ database.
+     * Input: không nhận tham số từ ngoài.
+     * Output: List<RewardDTO> đã map từ bảng Reward, sắp xếp tăng dần theo required_points
+     * để thuận tiện cho việc xác định mốc phần thưởng kế tiếp ở tầng controller.
+     * DB: SELECT reward_id, reward_name, required_points, description FROM Reward.
+     */
     public List<RewardDTO> getAllRewards() {
         List<RewardDTO> list = new ArrayList<>();
-        // Query (Câu truy vấn): Sắp xếp theo điểm tăng dần để lát nữa dễ tìm phần thưởng gần nhất
+        // Sắp xếp theo điểm tăng dần để phía trên có thể duyệt và tìm "mốc chưa đạt đầu tiên".
         String sql = "SELECT reward_id, reward_name, required_points, description FROM Reward ORDER BY required_points ASC";
 
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
-            // Loop (Vòng lặp) qua từng dòng data lấy được từ DB
+            // Map từng dòng dữ liệu DB thành RewardDTO và thêm vào danh sách kết quả.
             while (rs.next()) {
                 RewardDTO reward = new RewardDTO(
                         rs.getInt("reward_id"),
@@ -33,21 +39,28 @@ public class RewardDAO {
                         rs.getInt("required_points"),
                         rs.getString("description")
                 );
-                list.add(reward); // Nhét từng cái hộp vào danh sách
+                list.add(reward);
             }
         } catch (Exception e) {
+            // Ghi log lỗi để theo dõi sự cố truy vấn, đồng thời trả list rỗng để tránh crash luồng UI.
             LOGGER.log(Level.SEVERE, "Failed to load rewards", e);
         }
         return list;
     }
 
-    // 2. Hàm tính điểm hiện tại của khách hàng dựa trên lịch sử giao dịch
-    public int getCurrentPoints(int customerId) {
+    /**
+     * Tính số điểm hiện tại của khách hàng dựa trên lịch sử giao dịch loyalty.
+     * Input: customerId lấy từ tầng nghiệp vụ/controller.
+     * Output: tổng điểm thực nhận (có thể bằng 0 nếu chưa có giao dịch).
+     * DB: đọc bảng LoyaltyTransaction theo customer_id, áp dụng công thức:
+     * - Earned  -> cộng points
+     * - Spent   -> trừ points
+     * - Khác loại -> cộng 0
+     * Tổng kết bằng SUM(CASE WHEN ... END).
+     */
+    /*public int getCurrentPoints(int customerId) {
         int totalPoints = 0;
-        /* Logic thực dụng: Theo Workshop, Điểm = Tổng cộng - Tổng tiêu.
-           Trong bảng LoyaltyTransaction của em có cột transaction_type ('Earned', 'Spent').
-           Ta dùng CASE WHEN trong SQL để cộng điểm nếu là 'Earned', và trừ điểm nếu là 'Spent'.
-        */
+        // Điểm cuối = tổng Earned - tổng Spent, tính trực tiếp trên DB để tránh sai lệch khi gom dữ liệu ở Java.
         String sql = "SELECT SUM(CASE WHEN transaction_type = 'Earned' THEN points " +
                 "                WHEN transaction_type = 'Spent' THEN -points " +
                 "                ELSE 0 END) AS Balance " +
@@ -57,17 +70,19 @@ public class RewardDAO {
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            // Set tham số an toàn thay thế cho dấu "?" -> Chống SQL Injection (Tiêm nhiễm mã độc)
+            // Bind tham số cho dấu '?' để lọc đúng khách hàng và tránh SQL Injection.
             ps.setInt(1, customerId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
+                    // Nếu không có dòng dữ liệu, getInt sẽ trả 0 theo mặc định cho cột số.
                     totalPoints = rs.getInt("Balance");
                 }
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to calculate points for customerId=" + customerId, e);
         }
-        return totalPoints; // Trả về con số thực tế
+        return totalPoints;
     }
+*/
 }

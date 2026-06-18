@@ -144,20 +144,39 @@
 <p class="text-on-surface-variant font-body-sm">Tham gia cộng đồng chăm sóc xe chuyên nghiệp</p>
 </div>
 <%
+    /* ========== SECTION 1: Khởi tạo dữ liệu từ request ==========
+       Mục đích: Lấy các giá trị lỗi và dữ liệu form cũ từ request scope (nếu có) 
+       để re-populate form khi validation thất bại hoặc server trả về lỗi.
+       
+       Input: request.getAttribute() từ tầng controller (RegisterServlet)
+       Output: các variable String để JSP render
+       Fallback: nếu attribute không tồn tại thì = null (JSP tự xử lý)
+    */
     String msgError = (String) request.getAttribute(AppKeys.REQ_ERROR);
     String fullNameValue = (String) request.getAttribute(AppKeys.REQ_FULL_NAME);
     String emailValue = (String) request.getAttribute(AppKeys.REQ_EMAIL);
     String phoneValue = (String) request.getAttribute(AppKeys.REQ_PHONE);
     String contextPath = request.getContextPath();
 %>
+<!-- ========== SECTION 2: Hiển thị thông báo lỗi ==========
+     Nếu server trả về msgError (validation fail hoặc email/phone đã tồn tại)
+     thì render alert box đỏ. Nếu msgError = null thì bỏ qua section này. -->
 <% if (msgError != null) { %>
 <div class="mb-lg rounded-lg border border-red-500 bg-red-500/10 p-md text-red-500 text-body-sm">
     <%= msgError %>
 </div>
 <% } %>
+<!-- ========== SECTION 3: Form đăng ký chính ==========
+     Input: lấy dữ liệu từ 5 field (fullName, email, phone, password, confirmPassword)
+     Action: POST đến MainController với action=Register
+     Output: gửi thông tin đến server để tạo tài khoản mới -->
 <form action="<%= contextPath %>/MainController" method="post" class="space-y-md">
 <input type="hidden" name="action" value="Register"/>
-<!-- Full Name -->
+<!-- FIELD 1: Họ và tên
+     - Input: required, text, pattern: bất kỳ ký tự nào (tên tiếng Việt/Anh)
+     - Fallback: nếu form submit lỗi thì re-populate với fullNameValue từ request
+     - Icon: người dùng (person) từ Material Symbols
+ -->
 <div class="space-y-xs">
 <label class="font-label-bold text-label-bold text-outline ml-1" for="fullName">Họ và tên</label>
 <div class="relative group">
@@ -165,7 +184,12 @@
 <input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-md pl-12 pr-md text-on-surface placeholder:text-outline/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="fullName" name="fullName" value="<%= fullNameValue != null ? fullNameValue : "" %>" placeholder="Nguyễn Văn A" type="text" required="required"/>
 </div>
 </div>
-<!-- Email -->
+<!-- FIELD 2: Email
+     - Input: required, type="email" (HTML5 validation)
+     - Fallback: re-populate với emailValue nếu form submit trước đó
+     - Icon: mail từ Material Symbols
+     - Lưu ý: Server sẽ kiểm tra email chưa tồn tại trong DB
+ -->
 <div class="space-y-xs">
 <label class="font-label-bold text-label-bold text-outline ml-1" for="email">Email</label>
 <div class="relative group">
@@ -173,7 +197,12 @@
 <input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-md pl-12 pr-md text-on-surface placeholder:text-outline/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="email" name="email" value="<%= emailValue != null ? emailValue : "" %>" placeholder="example@luxewash.com" type="email" required="required"/>
 </div>
 </div>
-<!-- Phone -->
+<!-- FIELD 3: Số điện thoại
+     - Input: required, type="tel", pattern="[0-9]{9,11}" (HTML5 validation: 9-11 chữ số)
+     - Fallback: re-populate với phoneValue nếu form submit trước đó
+     - Icon: call từ Material Symbols
+     - Lưu ý: Server sẽ kiểm tra số điện thoại chưa tồn tại trong DB
+ -->
 <div class="space-y-xs">
 <label class="font-label-bold text-label-bold text-outline ml-1" for="phone">Số điện thoại</label>
 <div class="relative group">
@@ -181,7 +210,12 @@
 <input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-md pl-12 pr-md text-on-surface placeholder:text-outline/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="phone" name="phone" value="<%= phoneValue != null ? phoneValue : "" %>" placeholder="0901 234 567" type="tel" pattern="[0-9]{9,11}" required="required"/>
 </div>
 </div>
-<!-- Password -->
+<!-- FIELD 4: Mật khẩu
+     - Input: required, type="password" (ẩn ký tự nhập)
+     - Validation: Server sẽ check mật khẩu phải >= 8 ký tự, chứa chữ hoa/thường/số/ký tự đặc biệt
+     - Icon: lock từ Material Symbols
+     - Lưu ý: giá trị password KHÔNG được lưu lại vào form (vì lý do bảo mật)
+ -->
 <div class="space-y-xs">
 <label class="font-label-bold text-label-bold text-outline ml-1" for="password">Mật khẩu</label>
 <div class="relative group">
@@ -189,7 +223,12 @@
 <input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-md pl-12 pr-md text-on-surface placeholder:text-outline/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="password" name="password" placeholder="••••••••" type="password" required="required"/>
 </div>
 </div>
-<!-- Confirm Password -->
+<!-- FIELD 5: Xác nhận mật khẩu
+     - Input: required, type="password"
+     - Validation: Server sẽ check password === confirmPassword
+     - Icon: lock từ Material Symbols
+     - Lưu ý: giá trị confirmPassword KHÔNG được lưu lại vào form (vì lý do bảo mật)
+ -->
 <div class="space-y-xs">
 <label class="font-label-bold text-label-bold text-outline ml-1" for="confirmPassword">Nhập lại mật khẩu</label>
 <div class="relative group transition-all">
@@ -197,18 +236,21 @@
 <input class="w-full bg-surface-container-low border border-outline-variant rounded-lg py-md pl-12 pr-md text-on-surface placeholder:text-outline/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="confirmPassword" name="confirmPassword" placeholder="••••••••" type="password" required="required"/>
 </div>
 </div>
-<!-- Primary CTA -->
+<!-- Nút submit chính: gửi form tới server để validate và tạo tài khoản -->
 <button class="w-full bg-primary-container text-on-primary-container font-title-md text-title-md py-md rounded-lg glow-primary hover:bg-primary-container/90 active:scale-95 transition-all duration-300 mt-lg" type="submit">
                         Đăng ký ngay
                     </button>
 </form>
-<!-- Divider -->
+<!-- Đường phân chia giữa form và phương thức đăng ký xã hội -->
 <div class="flex items-center my-xl gap-md">
 <div class="h-[1px] flex-1 bg-outline-variant"></div>
 <span class="text-label-bold font-label-bold text-outline">HOẶC</span>
 <div class="h-[1px] flex-1 bg-outline-variant"></div>
 </div>
-<!-- Social Logins -->
+<!-- Phương thức đăng ký xã hội (Google, Apple)
+     Lưu ý: Các nút này hiện chỉ là UI placeholder, backend chưa integrate OAuth.
+     Input: người dùng click vào nút Google hoặc Apple
+     Output: (chưa implement) sẽ redirect sang Google/Apple login flow -->
 <div class="grid grid-cols-2 gap-md">
 <button class="flex items-center justify-center gap-sm bg-surface-container-high border border-outline-variant hover:border-outline py-md rounded-lg active:scale-95 transition-all duration-200" type="button">
 <svg class="w-5 h-5" viewbox="0 0 24 24">
@@ -226,7 +268,7 @@
 <span class="font-label-bold text-label-bold">Apple</span>
 </button>
 </div>
-<!-- Footer Link -->
+<!-- Footer link: chuyển hướng tới trang login nếu người dùng đã có tài khoản -->
 <div class="mt-xl text-center">
 <p class="text-body-sm font-body-sm text-on-surface-variant">
                         Đã có tài khoản? 
