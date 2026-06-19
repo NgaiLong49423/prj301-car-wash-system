@@ -25,9 +25,18 @@ public class CreateBookingServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        HttpSession session = request.getSession(false);
+        User account = (session != null) ? (User) session.getAttribute(AppKeys.SESSION_ACCOUNT) : null;
+
+        if (account == null) {
+            request.setAttribute("error", "Bạn chưa đăng nhập, vui lòng đăng nhập để tiếp tục!");
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            return;
+        }
+
         try {
             // 1.ID khách hàng đang đăng nhâp
-            int customerId = 2; 
+            int customerId = account.getId(); 
 
             // 2. Lấy danh sách xe của khách hàng này từ VehicleDAO
             dao.VehicleDAO vehicleDao = new dao.VehicleDAO();
@@ -157,7 +166,7 @@ public class CreateBookingServlet extends HttpServlet {
             double price = (serviceId == 1) ? 100000 : 1500000;
 
             BookingDAO dao = new BookingDAO();
-            boolean isSuccess = dao.createNewBooking(customerId, vehicleId, serviceId, bookingDateStr, bookingTime,
+            boolean isSuccess = dao.createNewBooking(customerId, vehicleId, serviceId, bookingDateStr, bookingTimeStr,
                     price);
 
             if (isSuccess) {
