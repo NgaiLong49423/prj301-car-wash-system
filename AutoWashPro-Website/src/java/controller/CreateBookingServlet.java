@@ -23,7 +23,6 @@ public class CreateBookingServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-<<<<<<< HEAD
         
         HttpSession session = request.getSession(false);
         User account = (session != null) ? (User) session.getAttribute(AppKeys.SESSION_ACCOUNT) : null;
@@ -56,8 +55,6 @@ public class CreateBookingServlet extends HttpServlet {
         }
 
         // 5. Mở cánh cửa sang trang giao diện
-=======
->>>>>>> a752e45d23792ddd3fe88a08f9ea65b57e65648b
         request.getRequestDispatcher("booking.jsp").forward(request, response);
     }
 
@@ -159,7 +156,7 @@ public class CreateBookingServlet extends HttpServlet {
             double price = (serviceId == 1) ? 100000 : 1500000;
 
             BookingDAO dao = new BookingDAO();
-            boolean isSuccess = dao.createNewBooking(customerId, vehicleId, serviceId, bookingDateStr, bookingTimeStr,
+            boolean isSuccess = dao.createNewBooking(customerId, vehicleId, serviceId, bookingDateStr, bookingTime,
                     price);
 
             if (isSuccess) {
