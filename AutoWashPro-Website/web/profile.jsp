@@ -144,11 +144,11 @@
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
                 Profile
             </a>
-                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= request.getContextPath()%>/CreateBookingServlet">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
-                    Book Wash
-                </a>
-                <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/MainController?action=Rewards">
+            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/MainController?action=Booking">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
+                Book Wash
+            </a>
+            <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-2 px-2" href="<%= request.getContextPath() %>/MainController?action=Rewards">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">military_tech</span>
                 Membership
             </a>
@@ -299,7 +299,7 @@
                             </span>
                         </div>
                         <div class="mt-5 flex gap-3">
-                            <a href="<%= request.getContextPath() %>/CreateBookingServlet?selectedVehicleId=${v.vehicleId}" class="flex-1 inline-flex items-center justify-center px-4 py-3 rounded-2xl border border-outline-variant text-sm font-semibold text-on-surface hover:bg-surface-bright transition-colors">Đặt lịch rửa xe này</a>
+                            <a href="<%= request.getContextPath() %>/MainController?action=Booking" class="flex-1 inline-flex items-center justify-center px-4 py-3 rounded-2xl border border-outline-variant text-sm font-semibold text-on-surface hover:bg-surface-bright transition-colors">Đặt lịch rửa xe này</a>
                         </div>
                     </div>
                 </article>

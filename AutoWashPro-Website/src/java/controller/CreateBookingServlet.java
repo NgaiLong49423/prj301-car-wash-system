@@ -3,7 +3,6 @@ package controller;
 import dao.BookingDAO;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,29 +23,6 @@ public class CreateBookingServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        try {
-            // 1.ID khách hàng đang đăng nhâp
-            int customerId = 2; 
-
-            // 2. Lấy danh sách xe của khách hàng này từ VehicleDAO
-            dao.VehicleDAO vehicleDao = new dao.VehicleDAO();
-            java.util.List<dto.Vehicle> listVehicles = vehicleDao.getCars(customerId);
-            
-            // 3. Truyền danh sách xe sang JSP để vòng lặp JSTL in ra
-            request.setAttribute("listVehicles", listVehicles);
-
-            // 4. Bắt ID xe được truyền từ trang Profile (nếu khách bấm nút "Đặt lịch rửa xe này")
-            String selectedVehicleId = request.getParameter("selectedVehicleId");
-            if (selectedVehicleId != null) {
-                request.setAttribute("selectedVehicleId", selectedVehicleId);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // 5. Mở cánh cửa sang trang giao diện
         request.getRequestDispatcher("booking.jsp").forward(request, response);
     }
 
@@ -60,7 +36,7 @@ public class CreateBookingServlet extends HttpServlet {
         String vehicleIdStr = request.getParameter("vehicleId");
         String serviceIdStr = request.getParameter("serviceId");
         String bookingDateStr = request.getParameter("bookingDate");
-        String bookingTimeStr = request.getParameter("bookingTime");
+        String bookingTime = request.getParameter("bookingTime");
 
         // Ngô Gia Long {
         // lấy session hiện có của người dùng
@@ -96,28 +72,18 @@ public class CreateBookingServlet extends HttpServlet {
 
         try {
             LocalDate bookingDate = LocalDate.parse(bookingDateStr);
-            LocalTime bookingTime = LocalTime.parse(bookingTimeStr); // Lấy giờ khách chọn
-            
             LocalDate today = LocalDate.now();
-            LocalTime now = LocalTime.now(); // Lấy giờ hiện tại
-            
             long daysBetween = ChronoUnit.DAYS.between(today, bookingDate);
 
-            // Bắt lỗi ngày quá khứ
+            // Bắt lỗi quá khứ
             if (daysBetween < 0) {
-                request.setAttribute("error", "Lỗi: Không thể đặt lịch vào ngày trong quá khứ!");
+                request.setAttribute("error", "Lỗi: Không thể đặt lịch trong quá khứ!");
                 request.getRequestDispatcher("booking.jsp").forward(request, response);
                 return;
             }
 
-            // [BUG FIX]: Bắt lỗi giờ quá khứ nếu khách đặt lịch trong ngày hôm nay
-            if (daysBetween == 0 && bookingTime.isBefore(now)) {
-                request.setAttribute("error", "Lỗi: Thời gian này đã qua. Vui lòng chọn khung giờ khác trong hôm nay!");
-                request.getRequestDispatcher("booking.jsp").forward(request, response);
-                return;
-            }
-
-            // 3. Logic: Giới hạn ngày theo Hạng 
+            // Ngô Gia Long {
+            // 3. Logic: Giới hạn ngày theo Hạng (Workshop 2)
             int maxDaysAllowed = 0;
             switch (tierId) {
                 case 1:
@@ -148,7 +114,8 @@ public class CreateBookingServlet extends HttpServlet {
                 return;
             }
 
-            // 4. Gọi DAO lưu vào Database
+            // --- ĐÂY LÀ PHẦN MỚI THÊM VÀO ---
+            // 4. Nếu qua hết các ải, tiến hành gọi DAO lưu vào Database
             int vehicleId = Integer.parseInt(vehicleIdStr);
             int serviceId = Integer.parseInt(serviceIdStr);
 
@@ -165,6 +132,7 @@ public class CreateBookingServlet extends HttpServlet {
             } else {
                 request.setAttribute("error", "Lỗi hệ thống: Không thể lưu vào Database!");
             }
+            // --------------------------------
 
             request.getRequestDispatcher("booking.jsp").forward(request, response);
 
