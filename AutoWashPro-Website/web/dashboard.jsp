@@ -134,7 +134,7 @@
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
                 Profile
             </a>
-                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="CreateBookingServlet">
+                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= request.getContextPath() %>/MainController?action=Booking">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
                     Book Wash
                 </a>

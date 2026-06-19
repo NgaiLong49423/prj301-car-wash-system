@@ -60,6 +60,10 @@ public class BookingServlet extends HttpServlet {
             Date bookingDate = Date.valueOf(request.getParameter("bookingDate"));
             Time bookingTime = Time.valueOf(normalizeTime(request.getParameter("bookingTime")));
             int[] serviceIds = parseServiceIds(request.getParameterValues("serviceIds"));
+            if (serviceIds.length == 0) {
+                forwardWithError(request, response, account.getId(), "Vui long chon it nhat mot dich vu.");
+                return;
+            }
 
             if (bookingDate.toLocalDate().isBefore(LocalDate.now())) {
                 forwardWithError(request, response, account.getId(), "Vui long chon ngay dat lich tu hom nay tro di.");
@@ -86,7 +90,8 @@ public class BookingServlet extends HttpServlet {
             request.setAttribute("MEMBER_TIER_DETAIL", tier);
             request.getRequestDispatcher("/booking-result.jsp").forward(request, response);
         } catch (Exception e) {
-            forwardWithError(request, response, account.getId(), "Du lieu dat lich khong hop le. Vui long kiem tra lai.");
+            log("Booking submission failed", e);
+            forwardWithError(request, response, account.getId(), "Loi dat lich: " + (e.getMessage() != null ? e.getMessage() : "Du lieu khong hop le. Vui long kiem tra lai."));
         }
     }
 

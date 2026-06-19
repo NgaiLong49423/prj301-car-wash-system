@@ -23,7 +23,7 @@ public class CreateBookingServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("booking.jsp").forward(request, response);
+        request.getRequestDispatcher("/booking.jsp").forward(request, response);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class CreateBookingServlet extends HttpServlet {
         // Phòng ngừa trường hợp lỗi hệ thống không tải được hồ sơ
         if (customerProfile == null) {
             request.setAttribute("error", "Lỗi hệ thống: Không thể tải thông tin hạng thành viên!");
-            request.getRequestDispatcher("booking.jsp").forward(request, response);
+            request.getRequestDispatcher("/booking.jsp").forward(request, response);
             return;
         }
 
@@ -78,7 +78,7 @@ public class CreateBookingServlet extends HttpServlet {
             // Bắt lỗi quá khứ
             if (daysBetween < 0) {
                 request.setAttribute("error", "Lỗi: Không thể đặt lịch trong quá khứ!");
-                request.getRequestDispatcher("booking.jsp").forward(request, response);
+                request.getRequestDispatcher("/booking.jsp").forward(request, response);
                 return;
             }
 
@@ -101,7 +101,7 @@ public class CreateBookingServlet extends HttpServlet {
                 default:
                     request.setAttribute("error",
                             "Lỗi hệ thống: Hạng thành viên của bạn không hợp lệ để đặt lịch trước!");
-                    request.getRequestDispatcher("booking.jsp").forward(request, response);
+                    request.getRequestDispatcher("/booking.jsp").forward(request, response);
                     return;
             }
             // } Ngô Gia Long
@@ -110,7 +110,7 @@ public class CreateBookingServlet extends HttpServlet {
             if (daysBetween > maxDaysAllowed) {
                 request.setAttribute("error",
                         "Quyền lợi Hạng " + tierName + " chỉ được đặt trước tối đa " + maxDaysAllowed + " ngày!");
-                request.getRequestDispatcher("booking.jsp").forward(request, response);
+                request.getRequestDispatcher("/booking.jsp").forward(request, response);
                 return;
             }
 
@@ -134,12 +134,12 @@ public class CreateBookingServlet extends HttpServlet {
             }
             // --------------------------------
 
-            request.getRequestDispatcher("booking.jsp").forward(request, response);
+            request.getRequestDispatcher("/booking.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi dữ liệu: Vui lòng kiểm tra lại các thông tin đã nhập!");
-            request.getRequestDispatcher("booking.jsp").forward(request, response);
+            request.getRequestDispatcher("/booking.jsp").forward(request, response);
         }
     }
 }
