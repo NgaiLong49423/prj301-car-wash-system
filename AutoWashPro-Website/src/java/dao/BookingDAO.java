@@ -16,7 +16,7 @@ public class BookingDAO {
         boolean isSuccess = false;
 
         try {
-            //cập nhậthàm makeConnection()
+            // Đã cập nhật đúng hàm makeConnection() của nhóm bạn!
             cn = DBUtils.getConnection();
             
             if (cn != null) {
