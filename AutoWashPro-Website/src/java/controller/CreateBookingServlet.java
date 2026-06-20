@@ -23,6 +23,38 @@ public class CreateBookingServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        HttpSession session = request.getSession(false);
+        User account = (session != null) ? (User) session.getAttribute(AppKeys.SESSION_ACCOUNT) : null;
+
+        if (account == null) {
+            request.setAttribute("error", "Bạn chưa đăng nhập, vui lòng đăng nhập để tiếp tục!");
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            return;
+        }
+
+        try {
+            // 1.ID khách hàng đang đăng nhâp
+            int customerId = account.getId(); 
+
+            // 2. Lấy danh sách xe của khách hàng này từ VehicleDAO
+            dao.VehicleDAO vehicleDao = new dao.VehicleDAO();
+            java.util.List<dto.Vehicle> listVehicles = vehicleDao.getCars(customerId);
+            
+            // 3. Truyền danh sách xe sang JSP để vòng lặp JSTL in ra
+            request.setAttribute("listVehicles", listVehicles);
+
+            // 4. Bắt ID xe được truyền từ trang Profile (nếu khách bấm nút "Đặt lịch rửa xe này")
+            String selectedVehicleId = request.getParameter("selectedVehicleId");
+            if (selectedVehicleId != null) {
+                request.setAttribute("selectedVehicleId", selectedVehicleId);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 5. Mở cánh cửa sang trang giao diện
         request.getRequestDispatcher("booking.jsp").forward(request, response);
     }
 
