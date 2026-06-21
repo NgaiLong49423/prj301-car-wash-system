@@ -99,8 +99,14 @@
                 <%-- Sử dụng Java thuần (Scriptlet) --%>
                 <%
                     List<Vehicle> listVehicles = (List<Vehicle>) request.getAttribute("listVehicles");
+                    if (listVehicles == null) {
+                        listVehicles = (List<Vehicle>) request.getAttribute("VEHICLE_LIST");
+                    }
                     String selectedVehicleId = (String) request.getAttribute("selectedVehicleId");
-                    if (listVehicles != null) {
+                    if (selectedVehicleId == null) {
+                        selectedVehicleId = request.getParameter("vehicleId");
+                    }
+                    if (listVehicles != null && !listVehicles.isEmpty()) {
                         for (Vehicle v : listVehicles) {
                             String isChecked = (selectedVehicleId != null && selectedVehicleId.equals(String.valueOf(v.getVehicleId()))) ? "checked" : "";
                 %>
@@ -115,6 +121,12 @@
                     </label>
                 <%
                         }
+                    } else {
+                %>
+                    <div class="w-full p-4 rounded-xl border border-outline-variant bg-surface-container text-on-surface-variant">
+                        Bạn chưa có xe nào. Vui lòng vào Profile để thêm xe trước khi đặt lịch.
+                    </div>
+                <%
                     }
                 %>
             </div>

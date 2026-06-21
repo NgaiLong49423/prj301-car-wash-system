@@ -43,6 +43,7 @@ public class CreateBookingServlet extends HttpServlet {
 
             // 3. Truyền danh sách xe sang JSP để vòng lặp JSTL in ra
             request.setAttribute("listVehicles", listVehicles);
+            request.setAttribute("VEHICLE_LIST", listVehicles);
 
             // 4. Bắt ID xe được truyền từ trang Profile (nếu khách bấm nút "Đặt lịch rửa xe này")
             String selectedVehicleId = request.getParameter("selectedVehicleId");
@@ -85,6 +86,10 @@ public class CreateBookingServlet extends HttpServlet {
 
         // Lấy thông tin user từ session
         int customerId = account.getId();
+        dao.VehicleDAO vehicleDao = new dao.VehicleDAO();
+        java.util.List<dto.Vehicle> listVehicles = vehicleDao.getCars(customerId);
+        request.setAttribute("listVehicles", listVehicles);
+        request.setAttribute("VEHICLE_LIST", listVehicles);
         // Gọi DAO để lấy hồ sơ thông tin hạng thành viên thật từ database
         CustomerDAO customerDAO = new CustomerDAO();
         Customer customerProfile = customerDAO.getCustomerProfile(customerId);
