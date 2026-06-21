@@ -17,13 +17,45 @@ import dao.CustomerDAO;
 import mylib.AppKeys;
 //Ngô Gia Long End
 
-@WebServlet(name = "CreateBookingServlet", urlPatterns = { "/CreateBookingServlet" })
+@WebServlet(name = "CreateBookingServlet", urlPatterns = {"/CreateBookingServlet"})
 public class CreateBookingServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/booking.jsp").forward(request, response);
+
+        HttpSession session = request.getSession(false);
+        User account = (session != null) ? (User) session.getAttribute(AppKeys.SESSION_ACCOUNT) : null;
+
+        if (account == null) {
+            request.setAttribute("error", "Bạn chưa đăng nhập, vui lòng đăng nhập để tiếp tục!");
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            return;
+        }
+
+        try {
+            // 1.ID khách hàng đang đăng nhâp
+            int customerId = account.getId();
+
+            // 2. Lấy danh sách xe của khách hàng này từ VehicleDAO
+            dao.VehicleDAO vehicleDao = new dao.VehicleDAO();
+            java.util.List<dto.Vehicle> listVehicles = vehicleDao.getCars(customerId);
+
+            // 3. Truyền danh sách xe sang JSP để vòng lặp JSTL in ra
+            request.setAttribute("listVehicles", listVehicles);
+
+            // 4. Bắt ID xe được truyền từ trang Profile (nếu khách bấm nút "Đặt lịch rửa xe này")
+            String selectedVehicleId = request.getParameter("selectedVehicleId");
+            if (selectedVehicleId != null) {
+                request.setAttribute("selectedVehicleId", selectedVehicleId);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 5. Mở cánh cửa sang trang giao diện
+        request.getRequestDispatcher("booking.jsp").forward(request, response);
     }
 
     @Override
@@ -69,7 +101,6 @@ public class CreateBookingServlet extends HttpServlet {
         String tierName = customerProfile.getTierName();
 
         // } Ngô Gia Long
-
         try {
             LocalDate bookingDate = LocalDate.parse(bookingDateStr);
             LocalDate today = LocalDate.now();
@@ -84,25 +115,10 @@ public class CreateBookingServlet extends HttpServlet {
 
             // Ngô Gia Long {
             // 3. Logic: Giới hạn ngày theo Hạng (Workshop 2)
-            int maxDaysAllowed = 0;
-            switch (tierId) {
-                case 1:
-                    maxDaysAllowed = 7;
-                    break;
-                case 2:
-                    maxDaysAllowed = 10;
-                    break;
-                case 3:
-                    maxDaysAllowed = 12;
-                    break;
-                case 4:
-                    maxDaysAllowed = 14;
-                    break;
-                default:
-                    request.setAttribute("error",
-                            "Lỗi hệ thống: Hạng thành viên của bạn không hợp lệ để đặt lịch trước!");
-                    request.getRequestDispatcher("/booking.jsp").forward(request, response);
-                    return;
+            int maxDaysAllowed = customerProfile.getBookingWindowDays();
+
+            if (maxDaysAllowed <= 0) {
+                maxDaysAllowed = 7;
             }
             // } Ngô Gia Long
 

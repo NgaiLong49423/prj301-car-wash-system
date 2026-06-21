@@ -27,7 +27,8 @@ public class CustomerDAO {
                 // Lệnh JOIN bảng Customer và Tier theo đúng thiết kế của Leader
                 // Thêm c.tier_id để lấy mã hạng thành viên chuẩn bị cho chức năng FR-06b: ràng
                 // buộc thời gian đặt lịch theo hạng thành viên
-                String sql = "SELECT c.customer_id, c.full_name, c.phone, c.email, c.join_date, c.total_points, c.tier_id, t.tier_name "
+                String sql = "SELECT c.customer_id, c.full_name, c.phone, c.email, c.join_date, c.total_points, "
+                        + "c.tier_id, t.tier_name, t.booking_window_days "
                         + "FROM Customer c "
                         + "LEFT JOIN MembershipTier t ON c.tier_id = t.tier_id "
                         + "WHERE c.customer_id = ?";
@@ -48,19 +49,27 @@ public class CustomerDAO {
                     cus.setTierName(tier != null ? tier : "Thành viên mới");
                     // Lấy mã tier_id để chuẩn bị cho chức năng FR-06b: ràng buộc thời gian đặt lịch
                     // theo hạng thành viên
-                    cus.setTierId(table.getInt("tier_id")); // Ngô Gia Long
+                    int bookingWindowDays = table.getInt("booking_window_days");
+                    if (bookingWindowDays <= 0) {
+                        bookingWindowDays = 7;
+                    }
+                    cus.setBookingWindowDays(bookingWindowDays);
+                    cus.setTierId(table.getInt("tier_id"));
                 }
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to load customer profile for customerId=" + customerId, e);
         } finally {
             try {
-                if (table != null)
+                if (table != null) {
                     table.close();
-                if (st != null)
+                }
+                if (st != null) {
                     st.close();
-                if (cn != null)
+                }
+                if (cn != null) {
                     cn.close();
+                }
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Failed to close resources when loading customer profile", e);
             }
@@ -73,12 +82,11 @@ public class CustomerDAO {
 
         // Dùng cụm try-with-resources này để nó tự đóng kết nối khi chạy xong, đỡ bị
         // nghẽn DB
-        try (Connection conn = DBUtils.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, email); // Nhét cái email cần check vào chỗ dấu chấm hỏi
 
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return true; // Nếu rải lệnh ra mà thấy có dòng dữ liệu -> Email bị trùng rồi
                 }
@@ -90,11 +98,10 @@ public class CustomerDAO {
     public boolean isPhoneExist(String phone) throws ClassNotFoundException, SQLException {
         String sql = "SELECT customer_id FROM Customer WHERE phone = ?";
 
-        try (Connection conn = DBUtils.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, phone);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return true; // Số điện thoại này có người đăng ký mất rồi
                 }
@@ -109,8 +116,7 @@ public class CustomerDAO {
         String sql = "INSERT INTO Customer (full_name, phone, email, [password], tier_id) VALUES (?, ?, ?, ?, ?)";
         int kết_quả = 0;
 
-        try (Connection conn = DBUtils.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
 
             // Lần lượt lấy dữ liệu từ cục DTO gán vào các dấu chấm hỏi theo đúng thứ tự câu
             // lệnh SQL
