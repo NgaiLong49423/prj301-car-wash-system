@@ -96,7 +96,9 @@ public class BookingServlet extends HttpServlet {
     }
 
     private void loadBookingPageData(HttpServletRequest request, int customerId) {
-        request.setAttribute("VEHICLE_LIST", vehicleDAO.getCars(customerId));
+        List<?> vehicles = vehicleDAO.getCars(customerId);
+        request.setAttribute("VEHICLE_LIST", vehicles);
+        request.setAttribute("listVehicles", vehicles);
         request.setAttribute("SERVICE_LIST", serviceDAO.getAllServices());
         request.setAttribute("MEMBER_TIER_DETAIL", tierDAO.getTierByCustomerId(customerId));
         request.setAttribute("RECENT_BOOKINGS", bookingDAO.getRecentBookingsByCustomer(customerId));

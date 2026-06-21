@@ -59,6 +59,7 @@ public class CustomerDAO {
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to load customer profile for customerId=" + customerId, e);
+            cus = getBasicCustomerProfile(customerId);
         } finally {
             try {
                 if (table != null) {
@@ -75,6 +76,34 @@ public class CustomerDAO {
             }
         }
         return cus;
+    }
+
+    private Customer getBasicCustomerProfile(int customerId) {
+        String sql = "SELECT customer_id, full_name, phone, email, join_date, total_points, tier_id "
+                + "FROM Customer WHERE customer_id = ?";
+
+        try (Connection cn = DBUtils.getConnection();
+                PreparedStatement st = cn.prepareStatement(sql)) {
+            st.setInt(1, customerId);
+            try (ResultSet table = st.executeQuery()) {
+                if (table.next()) {
+                    Customer cus = new Customer();
+                    cus.setCustomerId(table.getInt("customer_id"));
+                    cus.setFullName(table.getNString("full_name"));
+                    cus.setPhone(table.getString("phone"));
+                    cus.setEmail(table.getString("email"));
+                    cus.setJoinDate(table.getDate("join_date"));
+                    cus.setTotalPoints(table.getInt("total_points"));
+                    cus.setTierId(table.getInt("tier_id"));
+                    cus.setTierName("Member");
+                    cus.setBookingWindowDays(7);
+                    return cus;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to load basic customer profile for customerId=" + customerId, e);
+        }
+        return null;
     }
 
     public boolean isEmailExist(String email) throws ClassNotFoundException, SQLException {
