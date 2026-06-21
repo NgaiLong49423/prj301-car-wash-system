@@ -17,13 +17,13 @@ import dao.CustomerDAO;
 import mylib.AppKeys;
 //Ngô Gia Long End
 
-@WebServlet(name = "CreateBookingServlet", urlPatterns = { "/CreateBookingServlet" })
+@WebServlet(name = "CreateBookingServlet", urlPatterns = {"/CreateBookingServlet"})
 public class CreateBookingServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession(false);
         User account = (session != null) ? (User) session.getAttribute(AppKeys.SESSION_ACCOUNT) : null;
 
@@ -35,12 +35,12 @@ public class CreateBookingServlet extends HttpServlet {
 
         try {
             // 1.ID khách hàng đang đăng nhâp
-            int customerId = account.getId(); 
+            int customerId = account.getId();
 
             // 2. Lấy danh sách xe của khách hàng này từ VehicleDAO
             dao.VehicleDAO vehicleDao = new dao.VehicleDAO();
             java.util.List<dto.Vehicle> listVehicles = vehicleDao.getCars(customerId);
-            
+
             // 3. Truyền danh sách xe sang JSP để vòng lặp JSTL in ra
             request.setAttribute("listVehicles", listVehicles);
 
@@ -101,7 +101,6 @@ public class CreateBookingServlet extends HttpServlet {
         String tierName = customerProfile.getTierName();
 
         // } Ngô Gia Long
-
         try {
             LocalDate bookingDate = LocalDate.parse(bookingDateStr);
             LocalDate today = LocalDate.now();
@@ -116,25 +115,10 @@ public class CreateBookingServlet extends HttpServlet {
 
             // Ngô Gia Long {
             // 3. Logic: Giới hạn ngày theo Hạng (Workshop 2)
-            int maxDaysAllowed = 0;
-            switch (tierId) {
-                case 1:
-                    maxDaysAllowed = 7;
-                    break;
-                case 2:
-                    maxDaysAllowed = 10;
-                    break;
-                case 3:
-                    maxDaysAllowed = 12;
-                    break;
-                case 4:
-                    maxDaysAllowed = 14;
-                    break;
-                default:
-                    request.setAttribute("error",
-                            "Lỗi hệ thống: Hạng thành viên của bạn không hợp lệ để đặt lịch trước!");
-                    request.getRequestDispatcher("booking.jsp").forward(request, response);
-                    return;
+            int maxDaysAllowed = customerProfile.getBookingWindowDays();
+
+            if (maxDaysAllowed <= 0) {
+                maxDaysAllowed = 7;
             }
             // } Ngô Gia Long
 

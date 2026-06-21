@@ -1,13 +1,13 @@
-﻿USE AutoWashPro_DB;
+USE AutoWashPro_DB;
 GO
 
 -- 1. Insert MembershipTier (Bám sát 100% logic của cô)
 -- Quy đổi: 1 point = 1,000 VND[cite: 10]. Vậy: 2M VND = 2000 points, 6M VND = 6000 points, 15M VND = 15000 points.
-INSERT INTO MembershipTier (tier_name, min_points, discount_percent, benefits) VALUES
-('Member', 0, 0.00, '1 point = 1,000 VND spent'),
-('Silver', 2000, 0.00, '+10% points, priority slot'),
-('Gold', 6000, 0.00, '+20% points, free upgrade monthly'),
-('Platinum', 15000, 0.00, '+30% points, free wash monthly');
+INSERT INTO MembershipTier (tier_name, min_points, discount_percent, benefits, booking_window_days) VALUES
+('Member', 0, 0.00, '1 point = 1,000 VND spent', 7),
+('Silver', 2000, 0.00, '+10% points, priority slot', 10),
+('Gold', 6000, 0.00, '+20% points, free upgrade monthly', 12),
+('Platinum', 15000, 0.00, '+30% points, free wash monthly', 14);
 
 -- 2. Insert Customer (Tạo nhiều khách hàng ở các hạng khác nhau để test giao diện)
 INSERT INTO Customer (full_name, phone, email, [password], total_spent_money, total_points, tier_id) VALUES

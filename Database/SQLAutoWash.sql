@@ -1,4 +1,4 @@
-﻿/* PROJECT: Vehicle Service Management System
+/* PROJECT: Vehicle Service Management System
    ENGINE: Microsoft SQL Server
    INSTRUCTION: Chỉ cần chạy file này, tất cả sẽ được setup tự động
 */
@@ -23,7 +23,8 @@ CREATE TABLE MembershipTier (
     tier_name VARCHAR(50) NOT NULL,
     min_points INT DEFAULT 0,
     discount_percent DECIMAL(5,2),
-    benefits NVARCHAR(MAX)
+    benefits NVARCHAR(MAX),
+    booking_window_days INT NOT NULL DEFAULT 7
 );
 
 -- 3. Tạo bảng Customer (Khách hàng)
