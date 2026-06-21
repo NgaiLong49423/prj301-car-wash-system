@@ -35,24 +35,22 @@ public class MainController extends HttpServlet {
     private static final String LOGOUT_CONTROLLER = "/logout";
     private static final String COMING_SOON_CONTROLLER = "/coming-soon";
     private static final String BOOKING_CONTROLLER = "/booking";
+    private static final String BOOKING_HISTORY_CONTROLLER = "/UserBookingHistoryServlet";
 
     /**
      * Phương thức xử lý tập trung cho mọi yêu cầu HTTP (cả GET và POST) gửi đến ứng dụng.
      * Áp dụng mô hình thiết kế Front Controller Pattern.
-     * 
-     * Bài toán giải quyết:
+     * * Bài toán giải quyết:
      * - Tiếp nhận tất cả các yêu cầu từ Client thông qua tham số `action`.
      * - Phân tích giá trị của `action` để quyết định chuyển hướng luồng xử lý (routing) tới Servlet con hoặc trang JSP phù hợp.
      * - Quản lý việc hiển thị thông báo phản hồi Support Chat và thiết lập Cookie tương ứng cho trang Dashboard.
-     * 
-     * Luồng dữ liệu (Data Flow):
+     * * Luồng dữ liệu (Data Flow):
      * - Đầu vào (Input): 
-     *   + Lấy từ Request Parameter: "action" (Hành động yêu cầu từ người dùng).
+     * + Lấy từ Request Parameter: "action" (Hành động yêu cầu từ người dùng).
      * - Đầu ra (Output):
-     *   + Chuyển tiếp request và response (Forward) tới servlet hoặc trang JSP đích.
-     *   + Hoặc gọi hàm xử lý Support Chat chuyên biệt nếu hành động là đề xuất tính năng.
-     * 
-     * @param request  Đối tượng HttpServletRequest chứa thông tin yêu cầu.
+     * + Chuyển tiếp request và response (Forward) tới servlet hoặc trang JSP đích.
+     * + Hoặc gọi hàm xử lý Support Chat chuyên biệt nếu hành động là đề xuất tính năng.
+     * * @param request  Đối tượng HttpServletRequest chứa thông tin yêu cầu.
      * @param response Đối tượng HttpServletResponse để gửi phản hồi.
      * @throws ServletException Nếu xảy ra lỗi Servlet.
      * @throws IOException      Nếu xảy ra lỗi luồng I/O.
@@ -109,6 +107,9 @@ public class MainController extends HttpServlet {
             } else if (action.equals("EditVehicle")) {
                 // Chuyển luồng lấy thông tin xe chuẩn bị sửa tới EditVehicleServlet
                 url = EDIT_VEHICLE_CONTROLLER;
+            } else if (action.equals("BookingHistory") || action.equals("WashingHistory")) {
+                // Điều phối luồng xử lý lịch sử sang Servlet lịch sử đặt lịch
+                url = BOOKING_HISTORY_CONTROLLER;
             } else if (action.equals(CHAT_SUPPORT_ACTION)) {
                 // Nếu là hành động gửi đề xuất chat support, gọi hàm xử lý riêng và kết thúc luôn
                 handleSupportChat(request, response);
@@ -157,8 +158,7 @@ public class MainController extends HttpServlet {
 
     /**
      * Kiểm tra xem hành động hiện tại hoặc URL đích có tương ứng với trang Dashboard hay không.
-     * 
-     * @param action Tên hành động yêu cầu.
+     * * @param action Tên hành động yêu cầu.
      * @param url    URL trang đích.
      * @return true nếu là hành động liên quan tới Dashboard, ngược lại trả về false.
      */
@@ -168,20 +168,17 @@ public class MainController extends HttpServlet {
 
     /**
      * Xử lý yêu cầu gửi ý kiến đề xuất tính năng mới qua cổng Support Chat.
-     * 
-     * Bài toán giải quyết:
+     * * Bài toán giải quyết:
      * - Lấy chuỗi đề xuất từ form chat.
      * - Sử dụng biểu thức chính quy (Regex) bóc tách chỉ các phần tính năng được viết trong ngoặc vuông `[...]`.
      * - Nếu cú pháp sai (không có ngoặc vuông hoặc trống), redirect về dashboard kèm mã lỗi định dạng.
      * - Nếu hợp lệ, mã hóa chuỗi theo chuẩn UTF-8, tạo Cookie để lưu trữ đề xuất của khách hàng xuống trình duyệt client.
-     * 
-     * Luồng dữ liệu (Data Flow):
+     * * Luồng dữ liệu (Data Flow):
      * - Đầu vào (Input): Request Parameter "supportFeature" chứa nội dung chat đề xuất.
      * - Đầu ra (Output): 
-     *   + Nếu sai định dạng: Redirect về "/MainController?action=Dashboard&chatError=invalid_format".
-     *   + Nếu thành công: Tạo Cookie "chatCookie" lưu trữ trên Client và Redirect về trang Dashboard.
-     * 
-     * @param request  Yêu cầu HTTP gửi tới.
+     * + Nếu sai định dạng: Redirect về "/MainController?action=Dashboard&chatError=invalid_format".
+     * + Nếu thành công: Tạo Cookie "chatCookie" lưu trữ trên Client và Redirect về trang Dashboard.
+     * * @param request  Yêu cầu HTTP gửi tới.
      * @param response Phản hồi HTTP gửi đi.
      * @throws IOException Nếu xảy ra lỗi chuyển hướng hoặc kết nối.
      */
@@ -235,21 +232,18 @@ public class MainController extends HttpServlet {
 
     /**
      * Kiểm tra và nạp thông tin đề xuất tính năng từ Cookie của Client vào Request Attribute để hiển thị lên Dashboard.
-     * 
-     * Bài toán giải quyết:
+     * * Bài toán giải quyết:
      * - Đọc các Cookie từ request client gửi lên để tìm kiếm "chatCookie".
      * - Nếu tìm thấy, thực hiện giải mã (decode) chuỗi UTF-8.
      * - Thực hiện chuẩn hóa và làm sạch chuỗi (HTML Escaping) chống tấn công XSS.
      * - Tạo lời nhắn cảm ơn cá nhân hóa thiết lập vào request attribute hiển thị lên giao diện Dashboard.
-     * 
-     * Luồng dữ liệu (Data Flow):
+     * * Luồng dữ liệu (Data Flow):
      * - Đầu vào (Input): Mảng cookies của client gửi lên thông qua `request.getCookies()`.
      * - Đầu ra (Output): Thiết lập các request attributes:
-     *   + "REQ_CHAT_SUPPORT_HAS_COOKIE": boolean (true nếu tìm thấy cookie hợp lệ).
-     *   + "REQ_CHAT_SUPPORT_FEATURE": Chuỗi tính năng đã làm sạch.
-     *   + "REQ_CHAT_SUPPORT_RESPONSE": Lời nhắn cảm ơn đã được format.
-     * 
-     * @param request  Yêu cầu HTTP chứa danh sách cookies.
+     * + "REQ_CHAT_SUPPORT_HAS_COOKIE": boolean (true nếu tìm thấy cookie hợp lệ).
+     * + "REQ_CHAT_SUPPORT_FEATURE": Chuỗi tính năng đã làm sạch.
+     * + "REQ_CHAT_SUPPORT_RESPONSE": Lời nhắn cảm ơn đã được format.
+     * * @param request  Yêu cầu HTTP chứa danh sách cookies.
      * @param response Phản hồi HTTP để xóa cookie nếu dữ liệu rác.
      */
     private void applySupportChatCookie(HttpServletRequest request, HttpServletResponse response) {
@@ -312,12 +306,10 @@ public class MainController extends HttpServlet {
 
     /**
      * Xóa bỏ Cookie Support Chat khỏi trình duyệt của client.
-     * 
-     * Cách hoạt động:
+     * * Cách hoạt động:
      * - Tạo một cookie mới cùng tên "chatCookie" nhưng có giá trị là chuỗi rỗng.
      * - Thiết lập thời gian sống `MaxAge = 0` để thông báo cho trình duyệt khách hàng xóa cookie này ngay lập tức.
-     * 
-     * @param request  Yêu cầu HTTP để lấy đường dẫn ngữ cảnh.
+     * * @param request  Yêu cầu HTTP để lấy đường dẫn ngữ cảnh.
      * @param response Phản hồi HTTP để chèn cookie xóa.
      */
     private void clearSupportChatCookie(HttpServletRequest request, HttpServletResponse response) {
@@ -331,8 +323,7 @@ public class MainController extends HttpServlet {
 
     /**
      * Kiểm tra tham số lỗi từ URL gửi về và thiết lập thông báo lỗi chi tiết hiển thị cho người dùng.
-     * 
-     * @param request Yêu cầu HTTP chứa tham số báo lỗi.
+     * * @param request Yêu cầu HTTP chứa tham số báo lỗi.
      */
     private void applySupportChatErrorFlag(HttpServletRequest request) {
         String chatError = request.getParameter(CHAT_ERROR_PARAM);
@@ -346,15 +337,13 @@ public class MainController extends HttpServlet {
 
     /**
      * Bóc tách tất cả các chuỗi nội dung nằm bên trong các cặp dấu ngoặc vuông `[...]` từ chuỗi chat nhập vào.
-     * 
-     * Cách thức hoạt động:
+     * * Cách thức hoạt động:
      * - Sử dụng Regex Pattern `\\[(.+?)\\]` để tìm kiếm:
-     *   + `\\[` và `\\]`: đại diện cho hai dấu ngoặc vuông thực tế.
-     *   + `(.+?)`: Nhóm thu giữ (Capture Group 1) bắt toàn bộ các ký tự bên trong một cách tối thiểu (non-greedy),
-     *     nghĩa là nó sẽ dừng lại ngay khi gặp dấu đóng ngoặc vuông đầu tiên, hỗ trợ bóc tách nhiều tính năng độc lập.
+     * + `\\[` và `\\]`: đại diện cho hai dấu ngoặc vuông thực tế.
+     * + `(.+?)`: Nhóm thu giữ (Capture Group 1) bắt toàn bộ các ký tự bên trong một cách tối thiểu (non-greedy),
+     * nghĩa là nó sẽ dừng lại ngay khi gặp dấu đóng ngoặc vuông đầu tiên, hỗ trợ bóc tách nhiều tính năng độc lập.
      * - Ví dụ: "[Rửa xe nhanh] và [Đặt lịch online]" -> "Rửa xe nhanh, Đặt lịch online".
-     * 
-     * @param value Chuỗi gốc người dùng nhập vào.
+     * * @param value Chuỗi gốc người dùng nhập vào.
      * @return Chuỗi chứa các tính năng đã bóc tách phân tách bởi dấu phẩy, hoặc chuỗi rỗng nếu không khớp định dạng.
      */
     private String extractBracketedFeatures(String value) {
@@ -405,14 +394,12 @@ public class MainController extends HttpServlet {
 
     /**
      * Chuyển đổi các ký tự HTML đặc biệt thành thực thể HTML an toàn (HTML Entities).
-     * 
-     * Bài toán giải quyết:
+     * * Bài toán giải quyết:
      * - Phòng ngừa lỗ hổng XSS (Cross-Site Scripting). 
      * - Khi dữ liệu lấy ra từ input của người dùng có chứa các thẻ HTML như <script> alert('hack'); </script> 
-     *   hoặc các thẻ HTML phá vỡ cấu trúc CSS, hàm này sẽ biến đổi chúng thành các chuỗi văn bản thuần túy 
-     *   vô hại hiển thị lên màn hình (Ví dụ: `<` thành `&lt;`, `>` thành `&gt;`).
-     * 
-     * @param value Chuỗi văn bản gốc cần xử lý.
+     * hoặc các thẻ HTML phá vỡ cấu trúc CSS, hàm này sẽ biến đổi chúng thành các chuỗi văn bản thuần túy 
+     * vô hại hiển thị lên màn hình (Ví dụ: `<` thành `&lt;`, `>` thành `&gt;`).
+     * * @param value Chuỗi văn bản gốc cần xử lý.
      * @return Chuỗi văn bản đã được làm sạch, an toàn để hiển thị trên trang web.
      */
     private String escapeHtml(String value) {
