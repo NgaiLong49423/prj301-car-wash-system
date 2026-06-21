@@ -1,4 +1,4 @@
-﻿/* PROJECT: Vehicle Service Management System
+/* PROJECT: Vehicle Service Management System
    ENGINE: Microsoft SQL Server
    INSTRUCTION: Chỉ cần chạy file này, tất cả sẽ được setup tự động
 */
@@ -25,7 +25,7 @@ CREATE TABLE MembershipTier (
     discount_percent DECIMAL(5,2),
     benefits NVARCHAR(MAX),
     priority_score INT DEFAULT 10,
-    advance_booking_days INT DEFAULT 3,
+    booking_window_days INT NOT NULL DEFAULT 7,
     reserved_slot_eligible BIT DEFAULT 0
 );
 
