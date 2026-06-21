@@ -134,10 +134,10 @@
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
                 Profile
             </a>
-            <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= request.getContextPath() %>/MainController?action=Booking">
-                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
-                Book Wash
-            </a>
+                <a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="CreateBookingServlet">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_car_wash</span>
+                    Book Wash
+                </a>
             <a class="text-primary font-bold font-label-bold text-label-bold hover:text-primary transition-colors flex items-center gap-xs" href="<%= request.getContextPath() %>/MainController?action=Rewards">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">military_tech</span>
                 Membership
@@ -176,10 +176,10 @@
                         Hệ thống detailing chuyên nghiệp dành riêng cho những kiệt tác cơ khí. Độ bóng hoàn hảo, bảo vệ tối đa, dịch vụ chuẩn mực.
                     </p>
 <div class="flex flex-wrap gap-md">
-<button class="bg-primary text-on-primary font-label-bold text-label-bold px-8 py-4 rounded-lg flex items-center gap-2 hover:bg-primary-container transition-all box-glow-primary">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
-                            Đặt lịch ngay
-                        </button>
+<a href="CreateBookingServlet" class="bg-primary text-on-primary font-label-bold text-label-bold px-8 py-4 rounded-lg flex items-center gap-2 hover:bg-primary-container transition-all box-glow-primary">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+    Đặt lịch ngay
+</a>
 <a class="glass-panel text-on-surface font-label-bold text-label-bold px-8 py-4 rounded-lg hover:bg-surface-bright transition-all border border-outline-variant inline-flex items-center justify-center" href="<%= request.getContextPath() %>/MainController?action=Rewards">
                             Tìm hiểu về Membership
 </a>

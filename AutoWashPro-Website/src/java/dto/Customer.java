@@ -12,7 +12,16 @@ public class Customer {
     private int totalPoints;
     private int tierId;
     private String tierName; 
+    private int bookingWindowDays;
 
+    public int getBookingWindowDays() {
+        return bookingWindowDays;
+    }
+
+    public void setBookingWindowDays(int bookingWindowDays) {
+        this.bookingWindowDays = bookingWindowDays;
+    }
+    
     public Customer() {
     }
 
