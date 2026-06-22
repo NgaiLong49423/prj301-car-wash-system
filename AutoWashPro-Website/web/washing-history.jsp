@@ -30,6 +30,15 @@
 </head>
 <body class="bg-surface text-on-surface font-['Inter'] antialiased p-6 md:p-12">
     <div class="max-w-6xl mx-auto">
+        
+        <div class="mb-6">
+            <a href="<%= request.getContextPath() %>/MainController?action=Dashboard" 
+               class="inline-flex items-center gap-2 text-zinc-400 hover:text-emerald-400 transition-colors group font-medium text-sm bg-zinc-900/50 hover:bg-zinc-800/50 border border-zinc-800 px-4 py-2 rounded-xl backdrop-blur-sm">
+                <span class="material-symbols-outlined text-xl group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                Quay về Trang chủ
+            </a>
+        </div>
+
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold font-['Montserrat'] text-primary flex items-center gap-2">
@@ -37,8 +46,8 @@
                 </h1>
                 <p class="text-sm text-on-surface-variant mt-1">Danh sách các lượt đặt lịch đã hoàn thành quy trình chăm sóc xe tại trung tâm</p>
             </div>
-            <a href="UserBookingHistoryServlet?view=all" class="inline-flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-on-surface font-semibold text-sm px-5 py-2.5 rounded-xl transition-all border border-zinc-700 active:scale-95">
-                <span class="material-symbols-outlined text-lg">arrow_back</span> Quay Lại Lịch Sử Đặt Lịch
+            <a href="<%= request.getContextPath() %>/MainController?action=BookingHistory" class="inline-flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-on-surface font-semibold text-sm px-5 py-2.5 rounded-xl transition-all border border-zinc-700 active:scale-95">
+                <span class="material-symbols-outlined text-lg">history</span> Quay Lại Lịch Sử Đặt Lịch
             </a>
         </div>
 
