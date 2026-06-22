@@ -30,15 +30,6 @@
 </head>
 <body class="bg-surface text-on-surface font-['Inter'] antialiased p-6 md:p-12">
     <div class="max-w-6xl mx-auto">
-        
-        <div class="mb-6">
-            <a href="<%= request.getContextPath() %>/MainController?action=Dashboard" 
-               class="inline-flex items-center gap-2 text-zinc-400 hover:text-primary transition-colors group font-medium text-sm bg-zinc-900/50 hover:bg-zinc-800/50 border border-zinc-800 px-4 py-2 rounded-xl backdrop-blur-sm">
-                <span class="material-symbols-outlined text-xl group-hover:-translate-x-1 transition-transform">arrow_back</span>
-                Quay về Trang chủ
-            </a>
-        </div>
-
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold font-['Montserrat'] text-primary flex items-center gap-2">
@@ -46,7 +37,7 @@
                 </h1>
                 <p class="text-sm text-on-surface-variant mt-1">Quản lý trạng thái các lượt đặt lịch dịch vụ của bạn</p>
             </div>
-            <a href="<%= request.getContextPath() %>/MainController?action=WashingHistory" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all shadow-lg active:scale-95">
+            <a href="UserBookingHistoryServlet?view=washing" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all shadow-lg active:scale-95">
                 <span class="material-symbols-outlined text-lg">local_car_wash</span> Xem Lịch Sử Rửa Xe
             </a>
         </div>
@@ -89,12 +80,12 @@
                             <td class="p-4 text-center">
                                 <% if ("pending".equalsIgnoreCase(status)) { %>
                                     <div class="flex items-center justify-center gap-2">
-                                        <a href="<%= request.getContextPath() %>/MainController?action=BookingHistory&subAction=cancel&bookingId=<%= booking.getBookingId() %>" 
+                                        <a href="UserBookingHistoryServlet?action=cancel&bookingId=<%= booking.getBookingId() %>" 
                                            class="inline-flex items-center gap-1 bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
                                            onclick="return confirm('Bạn có chắc chắn muốn hủy lịch này không?')">
                                             <span class="material-symbols-outlined text-sm">close</span> Cancel
                                         </a>
-                                        <a href="<%= request.getContextPath() %>/MainController?action=BookingHistory&subAction=checkin&bookingId=<%= booking.getBookingId() %>" 
+                                        <a href="UserBookingHistoryServlet?action=checkin&bookingId=<%= booking.getBookingId() %>" 
                                            class="inline-flex items-center gap-1 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
                                            onclick="return confirm('Xác nhận phương tiện này đã đến làm dịch vụ?')">
                                             <span class="material-symbols-outlined text-sm">done</span> Check-in

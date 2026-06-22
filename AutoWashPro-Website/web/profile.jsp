@@ -351,7 +351,7 @@
                         </div>
                         <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
                     </a>
-                    <a href="<%= request.getContextPath() %>/MainController?action=BookingHistory" class="flex items-center justify-between px-5 py-4 hover:bg-surface-bright transition-colors group">
+                    <a href="<%= request.getContextPath() %>/MainController?action=ComingSoon" class="flex items-center justify-between px-5 py-4 hover:bg-surface-bright transition-colors group">
                         <div class="flex items-center gap-3 text-on-surface">
                             <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">history</span>
                             <span class="font-medium">Lịch sử dịch vụ</span>
