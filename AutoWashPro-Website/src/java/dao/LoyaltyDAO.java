@@ -66,7 +66,8 @@ public class LoyaltyDAO {
 
             // Chạy lệnh INSERT, nếu số dòng bị tác động (rows) > 0 nghĩa là ghi lịch sử
             // thành công
-            int rows = ps.executeUpdate();
+            int rows = ps.executeUpdate(); // câu lệnh trả về 1 số nguyên để cho người dùng biết bao nhiêu dòng dưới
+                                           // database đã đc thay đổi
             return rows > 0;
 
         } catch (SQLException e) {
@@ -154,4 +155,122 @@ public class LoyaltyDAO {
         return false;
     }
 
+    // Hàm lấy thông tin giá tiền và ID khách hàng của booking
+    public dto.BookingDTO getBookingDetailForLoyalty(int bookingId) {
+        String sql = "SELECT customer_id, total_price FROM Booking WHERE booking_id = ?";
+        try (Connection conn = mylib.DBUtils.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, bookingId)
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    dto.BookingDTO booking = new dto.BookingDTO();
+                    booking.setCustomerId(rs.getInt("customer_id"));
+                    booking.setTotalPrice(rs.getBigDecimal("total_price"));
+                    return booking;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("--- LỖI tại getBookingDetailForLoyalty ---");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Hàm lấy số lần rửa và tổng tiền trong 12 tháng gần nhất để xét hạng
+    public dto.Customer getCustomerLoyaltyData12Months(int customerId) {
+        String sql = "SELECT COUNT(*) AS washes_12m, SUM(total_price) AS spent_12m "
+                + "FROM Booking "
+                + "WHERE customer_id = ? "
+                + "  AND status = 'Completed' "
+                + "  AND booking_date >= DATEADD(month, -12, GETDATE())";
+
+        try (Connection conn = DBUtils.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    dto.Customer cus = new dto.Customer();
+                    cus.setCustomerId(customerId);
+                    // Dùng tạm trường bookingWindowDays để chứa số lượt rửa 12 tháng
+                    cus.setBookingWindowDays(rs.getInt("washes_12m"));
+                    // Dùng tạm trường totalPoints để chứa tổng tiền 12 tháng (ép kiểu về int)
+                    cus.setTotalPoints(rs.getInt("spent_12m"));
+                    return cus;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("--- LỖI tại getCustomerLoyaltyData12Months ---");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Hàm xử lý nghiệp vụ tích điểm chính cho FR-09
+    public boolean accumulatePoints(int bookingId) {
+        try {
+            // Bước 1: Kiểm tra xem booking này đã được cộng điểm trước đó chưa
+            if (checkPointsEarned(bookingId)) {
+                System.out.println("Booking này đã được cộng điểm trước đó. Bỏ qua!");
+                return false;
+            }
+
+            // Bước 2: Lấy thông tin giá tiền và ID khách hàng của booking này
+            dto.BookingDTO booking = getBookingDetailForLoyalty(bookingId);
+            if (booking == null) {
+                System.err.println("Không tìm thấy thông tin booking ID: " + bookingId);
+                return false;
+            }
+
+            int customerId = booking.getCustomerId();
+            // Lấy giá trị tiền rửa xe (chuyển đổi từ BigDecimal sang double)
+            double price = booking.getTotalPrice() != null ? booking.getTotalPrice().doubleValue() : 0.0;
+            if (price <= 0) {
+                System.err.println("Giá trị booking không hợp lệ để tích điểm: " + price);
+                return false;
+            }
+
+            // Bước 3: Lấy thông tin hạng thành viên hiện tại của khách hàng để tính điểm
+            // thưởng bonus
+            CustomerDAO customerDAO = new CustomerDAO();
+            dto.Customer customerProfile = customerDAO.getCustomerProfile(customerId);
+            String tierName = customerProfile != null ? customerProfile.getTierName() : "Member";
+
+            // Tính tỉ lệ bonus dựa theo hạng hiện tại của khách hàng
+            double bonusRate = 0.0;
+            if (tierName.equalsIgnoreCase("Silver")) {
+                bonusRate = 0.10; // +10% điểm
+            } else if (tierName.equalsIgnoreCase("Gold")) {
+                bonusRate = 0.20; // +20% điểm
+            } else if (tierName.equalsIgnoreCase("Platinum")) {
+                bonusRate = 0.30; // +30% điểm
+            }
+
+            // Bước 4: Tính toán điểm số nhận được
+            // Công thức: 1.000 VND = 1 điểm cơ bản + % điểm thưởng theo hạng
+            int basePoints = (int) (price / 1000);
+            int finalPoints = (int) (basePoints * (1 + bonusRate));
+
+            // Bước 5: Thực hiện cộng điểm và ghi lịch sử (Chạy cùng lúc)
+            boolean isLogged = insertTransaction(customerId, bookingId, finalPoints, "Earned");
+            boolean isUpdated = updateCustomerPointsAndSpent(customerId, finalPoints, price);
+
+            if (isLogged && isUpdated) {
+                System.out.println(
+                        "Tích điểm thành công cho khách hàng ID: " + customerId + " + " + finalPoints + " điểm.");
+
+                // TODO: Ở đây sau này bạn sẽ gọi hàm tự động xét hạng FR-10a ngay sau khi tích
+                // điểm thành công!
+                // Ví dụ: this.assessAndUpdateTier(customerId);
+
+                return true;
+            }
+
+        } catch (Exception e) {
+            System.err.println("--- LỖI tại accumulatePoints ---");
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
