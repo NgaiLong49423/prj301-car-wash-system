@@ -1,6 +1,7 @@
-/* PROJECT: Vehicle Service Management System
+/* PROJECT: Vehicle Service Management System - AutoWash Pro
    ENGINE: Microsoft SQL Server
-   INSTRUCTION: Chỉ cần chạy file này, tất cả sẽ được setup tự động
+   VERSION: Database V2 (Merged Schema)
+   INSTRUCTION: Chạy file này để cài đặt toàn bộ cấu trúc bảng, khóa ngoại và index.
 */
 
 -- 1. Xóa Database cũ nếu tồn tại, sau đó tạo Database mới
@@ -22,7 +23,7 @@ CREATE TABLE MembershipTier (
     tier_id INT PRIMARY KEY IDENTITY(1,1),
     tier_name VARCHAR(50) NOT NULL,
     min_points INT DEFAULT 0,
-    discount_percent DECIMAL(5,2),
+    discount_percent DECIMAL(5,2) DEFAULT 0.00, -- Tỷ lệ phần trăm cộng thêm điểm thưởng (Ví dụ: 10.00 cho 10%)
     benefits NVARCHAR(MAX),
     priority_score INT DEFAULT 10,
     booking_window_days INT NOT NULL DEFAULT 7,
@@ -36,14 +37,13 @@ CREATE TABLE Customer (
     phone VARCHAR(15),
     email VARCHAR(100),
     [password] NVARCHAR(255),
-    avatar_url NVARCHAR(500),  -- Lưu đường dẫn ảnh đại diện, VD: /web/uploads/avatars/customer_1.jpg
+    avatar_url NVARCHAR(500),
     join_date DATETIME DEFAULT GETDATE(),
-    total_spent_money DECIMAL(18,2) DEFAULT 0,  -- Tiền đã chi tiêu (dùng để tính lên hạng)
-    total_points INT DEFAULT 0,  -- Điểm quy từ tiền chi tiêu (1000 VND = 1 điểm)
+    total_spent_money DECIMAL(18,2) DEFAULT 0,  -- Tổng chi tiêu trọn đời
+    total_points INT DEFAULT 0,  -- Điểm tích lũy khả dụng hiện có
     tier_id INT,
     CONSTRAINT FK_Customer_Tier FOREIGN KEY (tier_id) REFERENCES MembershipTier(tier_id)
-    );
-
+);
 
 -- 4. Tạo bảng Vehicle (Phương tiện)
 CREATE TABLE Vehicle (
@@ -198,7 +198,41 @@ CREATE TABLE Payment (
     paid_at DATETIME,
     CONSTRAINT FK_Payment_Booking FOREIGN KEY (booking_id) REFERENCES Booking(booking_id)
 );
+
+-- 16. Tạo bảng BookingPriorityAllocation (Hàng đợi ẩn của Workshop 2)
+CREATE TABLE BookingPriorityAllocation (
+    allocation_id INT PRIMARY KEY IDENTITY(1,1),
+    booking_id INT NOT NULL,
+    booking_date DATE NOT NULL,
+    shift_name VARCHAR(20) NOT NULL,
+    slot_type VARCHAR(20) NOT NULL,
+    slot_order INT NULL,
+    tier_name VARCHAR(20) NOT NULL,
+    priority_rank INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT FK_BookingPriorityAllocation_Booking
+        FOREIGN KEY (booking_id) REFERENCES Booking(booking_id),
+    CONSTRAINT CK_BookingPriorityAllocation_Shift
+        CHECK (shift_name IN ('MORNING', 'AFTERNOON')),
+    CONSTRAINT CK_BookingPriorityAllocation_Type
+        CHECK (slot_type IN ('MAIN', 'BACKUP', 'WAITING'))
+);
 GO
 
+-- 17. Các Unique Index cho hàng đợi ẩn (Workshop 2)
+CREATE UNIQUE INDEX UX_BookingPriorityAllocation_Booking
+ON BookingPriorityAllocation(booking_id);
 
-PRINT 'Database setup hoàn tất! ✅';
+CREATE UNIQUE INDEX UX_BookingPriorityAllocation_AssignedSlot
+ON BookingPriorityAllocation(booking_date, shift_name, slot_type, slot_order)
+WHERE slot_type IN ('MAIN', 'BACKUP');
+
+CREATE INDEX IX_BookingPriorityAllocation_Waiting
+ON BookingPriorityAllocation(booking_date, shift_name, slot_type, priority_rank DESC, created_at ASC);
+GO
+
+-- 18. Index chống cộng điểm trùng cho cùng 1 booking (FR-09)
+CREATE UNIQUE INDEX UX_LoyaltyTransaction_Booking_Earned
+ON LoyaltyTransaction(booking_id)
+WHERE booking_id IS NOT NULL AND transaction_type = 'Earned';
+GO

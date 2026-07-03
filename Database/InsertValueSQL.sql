@@ -1,13 +1,12 @@
 USE AutoWashPro_DB;
 GO
 
--- 1. Insert MembershipTier (Bám sát 100% logic của cô)
--- Quy đổi: 1 point = 1,000 VND[cite: 10]. Vậy: 2M VND = 2000 points, 6M VND = 6000 points, 15M VND = 15000 points.
+-- 1. Insert MembershipTier (Đã bao gồm tỷ lệ phần trăm bonus điểm)
 INSERT INTO MembershipTier (tier_name, min_points, discount_percent, benefits, priority_score, booking_window_days, reserved_slot_eligible) VALUES
 ('Member', 0, 0.00, '1 point = 1,000 VND spent', 10, 7, 0),
-('Silver', 2000, 0.00, '+10% points, priority slot', 20, 10, 0),
-('Gold', 6000, 0.00, '+20% points, free upgrade monthly', 30, 12, 1),
-('Platinum', 15000, 0.00, '+30% points, free wash monthly', 40, 14, 1);
+('Silver', 2000, 10.00, '+10% points, priority slot', 20, 10, 0),
+('Gold', 6000, 20.00, '+20% points, free upgrade monthly', 30, 12, 1),
+('Platinum', 15000, 30.00, '+30% points, free wash monthly', 40, 14, 1);
 
 -- 2. Insert Customer (Tạo nhiều khách hàng ở các hạng khác nhau để test giao diện)
 INSERT INTO Customer (full_name, phone, email, [password], total_spent_money, total_points, tier_id) VALUES
@@ -21,7 +20,6 @@ INSERT INTO Customer (full_name, phone, email, [password], total_spent_money, to
 ('Dang Hoa G', '0977889900', 'ghoa@gmail.com', '123456', 18000000.00, 18000, 4);      -- Platinum (18M spent)
 
 -- 3. Insert Reward (Đúng theo ví dụ trong file requirement của đề)
--- Đề bài: "Redemption: Points -> discount, free wash (eg. Redeems 300 pts -> gets free wax)"
 INSERT INTO Reward (reward_name, required_points, description) VALUES
 (N'Free Waxing (Phủ sáp miễn phí)', 300, N'Nhận ngay 1 lần phủ sáp bảo vệ sơn ngoài'),
 (N'10% Discount (Giảm giá 10%)', 500, N'Giảm 10% cho hóa đơn dịch vụ tiếp theo'),
@@ -75,9 +73,7 @@ INSERT INTO BookingService (booking_id, service_id, quantity, price) VALUES
 (9, 3, 1, 200000.00),
 (10, 5, 1, 800000.00);
 
--- 5. Insert LoyaltyTransaction (Cốt lõi cho hàm getCurrentPoints của em)
--- Khách số 1 (Long) kiếm được 1100 điểm, nhưng đã tiêu mất 300 điểm đổi phần thưởng.
--- Số dư thực tế hiển thị trên JSP phải là: 1100 - 300 = 800 điểm.
+-- 5. Insert LoyaltyTransaction (Cột lõi cho hàm getCurrentPoints của em)
 INSERT INTO LoyaltyTransaction (customer_id, booking_id, points, transaction_type) VALUES
 (1, 1, 500, 'Earned'),     -- Booking 1
 (1, 2, 100, 'Earned'),     -- Booking 2

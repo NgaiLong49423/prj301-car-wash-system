@@ -8,14 +8,14 @@ import java.sql.SQLException;
 import mylib.DBUtils;
 
 public class LoyaltyDAO {
+
     // hàm kiểm tra sẽ xem booking đã đc cổng điểm chưa
     // Tại sao có hàm này: Để chống lỗi cộng điểm trùng. Khi khách hàng bấm
     // "Check-in" nhiều lần
     public boolean checkPointsEarned(int bookingId) throws SQLException, ClassNotFoundException {
         String sql = "SELECT COUNT(*) FROM LoyaltyTransaction WHERE booking_id = ? AND transaction_type = 'Earned'";
         // Mở kết nối Database và chuẩn bị câu lệnh SQL
-        try (Connection conn = DBUtils.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, bookingId);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -49,8 +49,7 @@ public class LoyaltyDAO {
         String sql = "INSERT INTO LoyaltyTransaction (customer_id, booking_id, points, transaction_type, created_at) "
                 + "VALUES (?, ?, ?, ?, GETDATE())";
 
-        try (Connection conn = DBUtils.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, customerId);
 
             // Xử lý đặc biệt cho bookingId vì nó có thể bằng null (khi khách đổi quà)
@@ -67,7 +66,7 @@ public class LoyaltyDAO {
             // Chạy lệnh INSERT, nếu số dòng bị tác động (rows) > 0 nghĩa là ghi lịch sử
             // thành công
             int rows = ps.executeUpdate(); // câu lệnh trả về 1 số nguyên để cho người dùng biết bao nhiêu dòng dưới
-                                           // database đã đc thay đổi
+            // database đã đc thay đổi
             return rows > 0;
 
         } catch (SQLException e) {
@@ -101,8 +100,7 @@ public class LoyaltyDAO {
                 + "    total_spent_money = total_spent_money + ? "
                 + "WHERE customer_id = ?";
         // Mở kết nối Database và chuẩn bị câu lệnh SQL
-        try (Connection conn = DBUtils.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             // Cộng thêm điểm: Truyền số điểm cần cộng vào dấu hỏi chấm (?) thứ nhất
             ps.setInt(1, pointsToAdd);
             // Cộng thêm tiền: Truyền số tiền chi tiêu mới vào dấu hỏi chấm (?) thứ hai
@@ -135,8 +133,7 @@ public class LoyaltyDAO {
         // Câu lệnh SQL: Thay đổi mã hạng thành viên (tier_id) của khách hàng
         String sql = "UPDATE Customer SET tier_id = ? WHERE customer_id = ?";
         // Mở kết nối Database và chuẩn bị câu lệnh SQL
-        try (Connection conn = DBUtils.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             // Truyền mã hạng mới (tier_id mới) vào dấu hỏi chấm (?) thứ nhất
             ps.setInt(1, newTierId);
             // Truyền customerId vào dấu hỏi chấm (?) thứ hai
@@ -158,8 +155,7 @@ public class LoyaltyDAO {
     // Hàm lấy thông tin giá tiền và ID khách hàng của booking
     public dto.BookingDTO getBookingDetailForLoyalty(int bookingId) {
         String sql = "SELECT customer_id, total_price FROM Booking WHERE booking_id = ?";
-        try (Connection conn = mylib.DBUtils.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = mylib.DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, bookingId)
             try (ResultSet rs = ps.executeQuery()) {
@@ -185,8 +181,7 @@ public class LoyaltyDAO {
                 + "  AND status = 'Completed' "
                 + "  AND booking_date >= DATEADD(month, -12, GETDATE())";
 
-        try (Connection conn = DBUtils.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, customerId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -208,6 +203,7 @@ public class LoyaltyDAO {
     }
 
     // Hàm xử lý nghiệp vụ tích điểm chính cho FR-09
+    // Hàm xử lý nghiệp vụ tích điểm chính cho FR-09 (Đã bỏ hardcode)
     public boolean accumulatePoints(int bookingId) {
         try {
             // Bước 1: Kiểm tra xem booking này đã được cộng điểm trước đó chưa
@@ -224,46 +220,30 @@ public class LoyaltyDAO {
             }
 
             int customerId = booking.getCustomerId();
-            // Lấy giá trị tiền rửa xe (chuyển đổi từ BigDecimal sang double)
             double price = booking.getTotalPrice() != null ? booking.getTotalPrice().doubleValue() : 0.0;
             if (price <= 0) {
                 System.err.println("Giá trị booking không hợp lệ để tích điểm: " + price);
                 return false;
             }
 
-            // Bước 3: Lấy thông tin hạng thành viên hiện tại của khách hàng để tính điểm
-            // thưởng bonus
+            // Bước 3: Lấy thông tin hạng thành viên hiện tại của khách hàng
             CustomerDAO customerDAO = new CustomerDAO();
             dto.Customer customerProfile = customerDAO.getCustomerProfile(customerId);
             String tierName = customerProfile != null ? customerProfile.getTierName() : "Member";
 
-            // Tính tỉ lệ bonus dựa theo hạng hiện tại của khách hàng
-            double bonusRate = 0.0;
-            if (tierName.equalsIgnoreCase("Silver")) {
-                bonusRate = 0.10; // +10% điểm
-            } else if (tierName.equalsIgnoreCase("Gold")) {
-                bonusRate = 0.20; // +20% điểm
-            } else if (tierName.equalsIgnoreCase("Platinum")) {
-                bonusRate = 0.30; // +30% điểm
-            }
+            // BƯỚC THAY THẾ: Lấy tỷ lệ bonus trực tiếp từ database thông qua tên hạng
+            double bonusRate = getBonusRateByTierName(tierName);
 
             // Bước 4: Tính toán điểm số nhận được
-            // Công thức: 1.000 VND = 1 điểm cơ bản + % điểm thưởng theo hạng
             int basePoints = (int) (price / 1000);
             int finalPoints = (int) (basePoints * (1 + bonusRate));
 
-            // Bước 5: Thực hiện cộng điểm và ghi lịch sử (Chạy cùng lúc)
+            // Bước 5: Thực hiện cộng điểm và ghi lịch sử
             boolean isLogged = insertTransaction(customerId, bookingId, finalPoints, "Earned");
             boolean isUpdated = updateCustomerPointsAndSpent(customerId, finalPoints, price);
 
             if (isLogged && isUpdated) {
-                System.out.println(
-                        "Tích điểm thành công cho khách hàng ID: " + customerId + " + " + finalPoints + " điểm.");
-
-                // TODO: Ở đây sau này bạn sẽ gọi hàm tự động xét hạng FR-10a ngay sau khi tích
-                // điểm thành công!
-                // Ví dụ: this.assessAndUpdateTier(customerId);
-
+                System.out.println("Tích điểm thành công cho khách hàng ID: " + customerId + " + " + finalPoints + " điểm (Tỷ lệ bonus: " + (bonusRate * 100) + "%).");
                 return true;
             }
 
@@ -272,5 +252,29 @@ public class LoyaltyDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    // Hàm lấy tỷ lệ phần trăm bonus điểm của một hạng từ Database
+    public double getBonusRateByTierName(String tierName) {
+        // Trong bảng MembershipTier đã có sẵn cột discount_percent (dùng làm tỷ lệ bonus điểm)
+        // Ví dụ: Silver là 10.00%, Gold là 20.00%, Platinum là 30.00%
+        String sql = "SELECT discount_percent FROM MembershipTier WHERE tier_name = ?";
+
+        try (Connection conn = mylib.DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, tierName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // Lấy giá trị phần trăm (Ví dụ: 10.00 hoặc 20.00)
+                    double percent = rs.getDouble("discount_percent");
+                    // Đổi từ phần trăm sang số thập phân để tính toán (Ví dụ: 20.00% -> 0.20)
+                    return percent / 100.0;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("--- LỖI tại getBonusRateByTierName ---");
+            e.printStackTrace();
+        }
+        return 0.0; // Mặc định nếu lỗi hoặc là Member thường thì trả về 0.0
     }
 }
