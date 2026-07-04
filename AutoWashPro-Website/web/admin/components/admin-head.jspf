@@ -1,0 +1,114 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    String pageTitle = (String) request.getAttribute("pageTitle");
+    if (pageTitle == null || pageTitle.trim().isEmpty()) {
+        pageTitle = "Admin";
+    }
+%>
+<!DOCTYPE html>
+<html class="dark" lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LUXE WASH ADMIN - <%= pageTitle %></title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#0e0e0f',
+                        surface: '#131314',
+                        'surface-soft': '#1b1b1c',
+                        'surface-card': '#1f1f20',
+                        'surface-high': '#2a2a2b',
+                        'outline-soft': '#353436',
+                        'outline-strong': '#414755',
+                        gold: '#e9c349',
+                        'gold-soft': '#ffe088',
+                        'gold-dark': '#af8d11',
+                        blue: '#adc6ff',
+                        'blue-strong': '#4b8eff',
+                        text: '#e5e2e3',
+                        'text-muted': '#a7a9b2',
+                        success: '#7be495',
+                        warning: '#ffd166',
+                        danger: '#ff8a80'
+                    },
+                    fontFamily: {
+                        display: ['Montserrat', 'sans-serif'],
+                        body: ['Inter', 'sans-serif']
+                    },
+                    boxShadow: {
+                        glow: '0 0 0 1px rgba(233, 195, 73, .18), 0 18px 60px rgba(0, 0, 0, .42)',
+                        blueglow: '0 0 0 1px rgba(173, 198, 255, .16), 0 18px 60px rgba(0, 0, 0, .36)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: Inter, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(233, 195, 73, .08), transparent 30%),
+                radial-gradient(circle at 85% 10%, rgba(75, 142, 255, .10), transparent 28%),
+                #0e0e0f;
+        }
+        .lw-card {
+            border: 1px solid rgba(255,255,255,.08);
+            background: linear-gradient(180deg, rgba(31,31,32,.92), rgba(19,19,20,.92));
+            box-shadow: 0 18px 60px rgba(0,0,0,.26);
+            border-radius: 1rem;
+        }
+        .lw-panel {
+            border: 1px solid rgba(255,255,255,.08);
+            background: rgba(19,19,20,.72);
+            backdrop-filter: blur(18px);
+            border-radius: 1rem;
+        }
+        .lw-input, .lw-select, .lw-textarea {
+            width: 100%;
+            border-radius: .75rem;
+            border: 1px solid rgba(255,255,255,.10);
+            background: rgba(14,14,15,.78);
+            color: #e5e2e3;
+            outline: none;
+        }
+        .lw-input:focus, .lw-select:focus, .lw-textarea:focus {
+            border-color: rgba(233,195,73,.65);
+            box-shadow: 0 0 0 3px rgba(233,195,73,.16);
+        }
+        .lw-label { color: #a7a9b2; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+        .lw-btn-primary {
+            display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+            border-radius: .75rem; padding: .75rem 1rem;
+            background: linear-gradient(135deg, #adc6ff, #4b8eff);
+            color: #001a41; font-weight: 800;
+        }
+        .lw-btn-gold {
+            display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+            border-radius: .75rem; padding: .75rem 1rem;
+            background: linear-gradient(135deg, #ffe088, #e9c349);
+            color: #241a00; font-weight: 800;
+        }
+        .lw-btn-ghost {
+            display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+            border-radius: .75rem; padding: .75rem 1rem;
+            border: 1px solid rgba(255,255,255,.10);
+            background: rgba(255,255,255,.04);
+            color: #e5e2e3; font-weight: 700;
+        }
+        .lw-table th { color: #a7a9b2; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 800; }
+        .lw-table td { border-top: 1px solid rgba(255,255,255,.07); color: #e5e2e3; }
+        .lw-badge { display: inline-flex; align-items: center; gap: .35rem; border-radius: 999px; padding: .25rem .65rem; font-size: .75rem; font-weight: 800; border: 1px solid rgba(255,255,255,.08); }
+        .lw-badge-active { background: rgba(123,228,149,.10); color: #7be495; }
+        .lw-badge-warn { background: rgba(255,209,102,.10); color: #ffd166; }
+        .lw-badge-muted { background: rgba(255,255,255,.06); color: #a7a9b2; }
+        .lw-badge-danger { background: rgba(255,138,128,.10); color: #ff8a80; }
+        .material-symbols-outlined { font-size: 20px; vertical-align: middle; }
+    </style>
+</head>
