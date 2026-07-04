@@ -198,6 +198,33 @@ chore: cập nhật .gitignore
 
 ---
 
+## Database Folder Policy
+
+Trong scope PRJ301 Assessment, thư mục `database/` chỉ được chứa 2 file canonical:
+
+- `schema.sql`: tạo database schema, tables, relationships, constraints.
+- `sample-data.sql`: chèn dữ liệu mẫu phục vụ demo và kiểm thử.
+
+Không thành viên nào được tự tạo thêm file SQL mới trong `database/` nếu chưa có sự đồng ý của Leader.
+
+Nếu một issue cần thay đổi database, thành viên phải cập nhật trực tiếp vào `schema.sql` và/hoặc `sample-data.sql` trong cùng Pull Request.
+
+Nếu cần viết nháp hoặc đề xuất thay đổi database, thành viên có thể tạo file tạm trong thư mục draft như `.agent/outputs/drafts/database/`, nhưng các file này không được xem là nguồn database chính và không được dùng để demo chính thức.
+
+Pull Request liên quan database phải ghi rõ:
+- Bảng nào được thêm/sửa/xóa.
+- Cột nào được thêm/sửa/xóa.
+- Data mẫu nào được thêm/sửa.
+- Cách chạy lại database từ đầu.
+
+Reviewer có quyền yêu cầu sửa PR nếu:
+- Thêm file SQL mới trong `database/` ngoài `schema.sql` và `sample-data.sql`.
+- Sửa schema nhưng không cập nhật sample data cần thiết.
+- Thêm sample data không khớp với schema.
+- Làm app không thể chạy khi chỉ dùng `schema.sql` + `sample-data.sql`.
+
+---
+
 ## Quy Tắc Pull Request
 
 **Pull Request** (yêu cầu gộp code / PR) là cách bạn yêu cầu những người quản lý dự án xem xét và gộp mã nguồn từ nhánh của bạn vào nhánh chính.
