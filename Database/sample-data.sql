@@ -136,7 +136,7 @@ GO
 INSERT INTO Redemption (customer_id, reward_id, points_used, redeem_date, valid_from, valid_until, status, applied_booking_id, used_at) VALUES
 (2, 1, 300, '2026-06-11 10:00:00', '2026-06-11 10:00:00', '2026-09-09 23:59:59', 'AVAILABLE', NULL, NULL),
 (4, 2, 500, '2026-06-24 10:00:00', '2026-06-24 10:00:00', '2026-09-22 23:59:59', 'USED', 10, '2026-06-25 10:00:00'),
-(5, 4, 1000, '2026-01-01 10:00:00', '2026-01-01 10:00:00', '2026-03-31 23:59:59', 'EXPIRED', NULL, NULL);
+(6, 4, 1000, '2026-01-01 10:00:00', '2026-01-01 10:00:00', '2026-03-31 23:59:59', 'EXPIRED', NULL, NULL);
 GO
 
 UPDATE Booking SET applied_redemption_id = 2 WHERE booking_id = 10;
@@ -168,68 +168,37 @@ INSERT INTO LoyaltyTransaction (customer_id, booking_id, redemption_id, point_ba
 (4, NULL, 2, 4, -500, 'REDEEMED', N'Đổi điểm lấy voucher giảm 10%', '2026-06-24 10:00:00'),
 (4, 10, NULL, 6, 324, 'EARNED', N'Cộng điểm theo final amount sau giảm giá', '2026-06-25 10:00:00'),
 (5, 6, NULL, 7, 20150, 'EARNED', N'Cộng điểm theo hạng Platinum', '2026-06-20 14:00:00'),
-(6, 7, NULL, 8, 3000, 'EARNED', N'Điểm cũ đã quá hạn', '2025-03-01 11:00:00'),
-(6, NULL, NULL, 8, -3000, 'EXPIRED', N'Điểm batch #8 hết hạn sau 12 tháng', '2026-03-01 11:00:00'),
+(6, 7, NULL, 8, 3000, 'EARNED', N'Điểm cũ được cộng từ booking #7', '2025-03-01 11:00:00'),
+(6, NULL, 3, 8, -1000, 'REDEEMED', N'Đổi điểm lấy voucher Free Basic Wash đã hết hạn sau thời gian sử dụng', '2026-01-01 10:00:00'),
+(6, NULL, NULL, 8, -2000, 'EXPIRED', N'Phần điểm còn lại của batch #8 hết hạn sau 12 tháng', '2026-03-01 11:00:00'),
 (6, 8, NULL, 9, 1500, 'EARNED', N'Cộng điểm từ booking mới trong 12 tháng', '2026-06-22 17:00:00');
 GO
 
 /* =========================
-   8. Payments, feedback, LPR
-   ========================= */
-INSERT INTO Payment (booking_id, amount, payment_method, payment_status, transaction_code, paid_at) VALUES
-(1, 300000, N'Cash', 'COMPLETED', 'PAY001', '2026-06-01 09:05:00'),
-(2, 500000, N'Credit Card', 'COMPLETED', 'PAY002', '2026-06-10 15:05:00'),
-(3, 2400000, N'Bank Transfer', 'COMPLETED', 'PAY003', '2026-06-15 11:05:00'),
-(4, 1500000, N'Credit Card', 'COMPLETED', 'PAY004', '2026-06-16 12:05:00'),
-(5, 5300000, N'Bank Transfer', 'COMPLETED', 'PAY005', '2026-06-18 16:05:00'),
-(6, 15500000, N'Bank Transfer', 'COMPLETED', 'PAY006', '2026-06-20 14:05:00'),
-(7, 3000000, N'Cash', 'COMPLETED', 'PAY007', '2025-03-01 11:05:00'),
-(8, 1500000, N'Credit Card', 'COMPLETED', 'PAY008', '2026-06-22 17:05:00'),
-(9, 0, N'Cash', 'PENDING', 'PAY009', NULL),
-(10, 270000, N'Cash', 'COMPLETED', 'PAY010', '2026-06-25 10:05:00'),
-(11, 0, N'Cash', 'PENDING', 'PAY011', NULL);
-GO
-
-INSERT INTO Feedback (customer_id, booking_id, rating, comment, created_at) VALUES
-(2, 1, 5, N'Dịch vụ nhanh và sạch.', '2026-06-01 10:00:00'),
-(3, 3, 4, N'Gói Silver Care ổn, nhân viên tư vấn rõ.', '2026-06-15 12:00:00'),
-(4, 5, 5, N'Gói Gold Full Care rất tốt.', '2026-06-18 17:00:00'),
-(5, 6, 5, N'Dịch vụ Platinum xứng đáng.', '2026-06-20 15:00:00');
-GO
-
-INSERT INTO LPRLog (vehicle_id, detected_plate, checkin_time, confidence_score) VALUES
-(1, '61B1-123.45', '2026-06-01 07:55:00', 0.9999),
-(2, '29A1-234.56', '2026-06-15 08:55:00', 0.9997),
-(3, '36A1-456.78', '2026-06-18 12:55:00', 0.9996),
-(4, '92C1-567.89', '2026-06-20 08:25:00', 0.9998),
-(5, '79A1-678.90', '2026-06-22 14:55:00', 0.9995);
-GO
-
-/* =========================
-   9. Promotions and targeted delivery inbox
+   8. Promotions and targeted delivery inbox
    ========================= */
 INSERT INTO Promotion (
-    title, description, promotion_type, promotion_value, discount_percent,
+    title, description, promotion_type, promotion_value, target_type, discount_percent,
     target_tier_id, target_tier, start_date, end_date, status, is_active
 ) VALUES
-(N'Silver Summer 10% Off', N'Ưu đãi 10% cho khách Silver trong mùa hè.', 'PERCENT_DISCOUNT', 10, 10, 2, N'Silver', '2026-07-01', '2026-08-31', 'ACTIVE', 1),
-(N'Gold Free Wax Weekend', N'Khách Gold nhận ưu đãi phủ sáp miễn phí cuối tuần.', 'FREE_SERVICE', 0, 0, 3, N'Gold', '2026-07-01', '2026-07-31', 'ACTIVE', 1),
-(N'Platinum VIP Wash', N'Ưu đãi rửa xe VIP cho khách Platinum.', 'FREE_WASH', 0, 0, 4, N'Platinum', '2026-07-01', '2026-09-30', 'ACTIVE', 1),
-(N'Old Member Campaign', N'Khuyến mãi cũ đã hết hạn.', 'PERCENT_DISCOUNT', 15, 15, 1, N'Member', '2026-01-01', '2026-02-01', 'EXPIRED', 0);
+(N'Silver Summer 10% Off', N'Ưu đãi 10% cho khách Silver trong mùa hè.', 'PERCENT_DISCOUNT', 10, 'TIER', 10, 2, N'Silver', '2026-07-01', '2026-08-31', 'ACTIVE', 1),
+(N'Gold Free Wax Weekend', N'Khách Gold nhận ưu đãi phủ sáp miễn phí cuối tuần.', 'FREE_SERVICE', 0, 'TIER', 0, 3, N'Gold', '2026-07-01', '2026-07-31', 'ACTIVE', 1),
+(N'Platinum VIP Wash', N'Ưu đãi rửa xe VIP cho khách Platinum.', 'FREE_WASH', 0, 'TIER', 0, 4, N'Platinum', '2026-07-01', '2026-09-30', 'ACTIVE', 1),
+(N'All Customer Welcome Back', N'Ưu đãi chung cho tất cả khách hàng đang hoạt động.', 'PERCENT_DISCOUNT', 5, 'ALL', 5, NULL, N'All Customers', '2026-07-01', '2026-08-15', 'ACTIVE', 1),
+(N'Old Member Campaign', N'Khuyến mãi cũ đã hết hạn.', 'PERCENT_DISCOUNT', 15, 'TIER', 15, 1, N'Member', '2026-01-01', '2026-02-01', 'EXPIRED', 0);
 GO
 
 INSERT INTO CustomerPromotion (promotion_id, customer_id, delivery_status, sent_at, viewed_at) VALUES
 (1, 3, 'SENT', '2026-07-01 08:00:00', NULL),
 (2, 4, 'VIEWED', '2026-07-01 08:05:00', '2026-07-01 09:00:00'),
 (3, 5, 'SENT', '2026-07-01 08:10:00', NULL),
-(4, 2, 'SENT', '2026-01-01 08:00:00', NULL),
-(4, 6, 'SENT', '2026-01-01 08:00:00', NULL);
-GO
-
-INSERT INTO AIRecommendation (customer_id, promotion_id, recommendation_reason, created_at) VALUES
-(3, 1, N'Khách Silver phù hợp với ưu đãi mùa hè.', '2026-07-01 08:30:00'),
-(4, 2, N'Khách Gold có lịch sử dùng dịch vụ chăm sóc ngoại thất.', '2026-07-01 08:35:00'),
-(5, 3, N'Khách Platinum phù hợp ưu đãi VIP.', '2026-07-01 08:40:00');
+(4, 2, 'SENT', '2026-07-01 08:15:00', NULL),
+(4, 3, 'SENT', '2026-07-01 08:15:00', NULL),
+(4, 4, 'VIEWED', '2026-07-01 08:15:00', '2026-07-01 09:30:00'),
+(4, 5, 'SENT', '2026-07-01 08:15:00', NULL),
+(4, 6, 'SENT', '2026-07-01 08:15:00', NULL),
+(5, 2, 'SENT', '2026-01-01 08:00:00', NULL),
+(5, 6, 'SENT', '2026-01-01 08:00:00', NULL);
 GO
 
 PRINT 'sample-data.sql completed: demo data inserted.';

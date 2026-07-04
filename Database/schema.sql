@@ -181,17 +181,6 @@ CREATE TABLE BookingSlot (
 );
 GO
 
-CREATE TABLE BookingQueueLog (
-    log_id INT IDENTITY(1,1) PRIMARY KEY,
-    booking_id INT NOT NULL,
-    old_status VARCHAR(30) NULL,
-    new_status VARCHAR(30) NULL,
-    reason NVARCHAR(255) NULL,
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    CONSTRAINT FK_BookingQueueLog_Booking FOREIGN KEY (booking_id) REFERENCES Booking(booking_id)
-);
-GO
-
 CREATE TABLE BookingPriorityAllocation (
     allocation_id INT IDENTITY(1,1) PRIMARY KEY,
     booking_id INT NOT NULL UNIQUE,
@@ -261,6 +250,18 @@ ALTER TABLE Booking
 ADD CONSTRAINT FK_Booking_AppliedRedemption FOREIGN KEY (applied_redemption_id) REFERENCES Redemption(redemption_id);
 GO
 
+-- Ensure one voucher/redemption can be attached to at most one booking.
+CREATE UNIQUE INDEX UX_Booking_AppliedRedemption_NotNull
+ON Booking(applied_redemption_id)
+WHERE applied_redemption_id IS NOT NULL;
+GO
+
+CREATE UNIQUE INDEX UX_Redemption_AppliedBooking_NotNull
+ON Redemption(applied_booking_id)
+WHERE applied_booking_id IS NOT NULL;
+GO
+
+-- Each EARNED point batch tracks the remaining points and expiry date for FIFO redemption.
 CREATE TABLE LoyaltyPointBatch (
     point_batch_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_id INT NOT NULL,
@@ -301,7 +302,7 @@ WHERE transaction_type = 'EARNED' AND booking_id IS NOT NULL;
 GO
 
 /* =========================
-   5. Promotions and reports data
+   5. Promotions and targeted delivery data
    ========================= */
 CREATE TABLE Promotion (
     promotion_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -309,6 +310,9 @@ CREATE TABLE Promotion (
     description NVARCHAR(MAX) NULL,
     promotion_type VARCHAR(30) NOT NULL DEFAULT 'PERCENT_DISCOUNT',
     promotion_value DECIMAL(18,2) NOT NULL DEFAULT 0,
+
+    -- Target rule: ALL = all customers; TIER = customers in one membership tier.
+    target_type VARCHAR(20) NOT NULL DEFAULT 'TIER',
 
     -- Legacy compatibility with old promotion pages.
     discount_percent DECIMAL(5,2) NOT NULL DEFAULT 0,
@@ -323,8 +327,17 @@ CREATE TABLE Promotion (
     CONSTRAINT FK_Promotion_TargetTier FOREIGN KEY (target_tier_id) REFERENCES MembershipTier(tier_id),
     CONSTRAINT CK_Promotion_Status CHECK (status IN ('DRAFT', 'ACTIVE', 'EXPIRED', 'INACTIVE')),
     CONSTRAINT CK_Promotion_Type CHECK (promotion_type IN ('FIXED_DISCOUNT', 'PERCENT_DISCOUNT', 'FREE_SERVICE', 'FREE_WASH')),
+    CONSTRAINT CK_Promotion_TargetType CHECK (target_type IN ('ALL', 'TIER')),
+    CONSTRAINT CK_Promotion_TargetRule CHECK (
+        (target_type = 'ALL' AND target_tier_id IS NULL)
+        OR (target_type = 'TIER' AND target_tier_id IS NOT NULL)
+    ),
     CONSTRAINT CK_Promotion_Date CHECK (end_date >= start_date)
 );
+GO
+
+CREATE INDEX IX_Promotion_Target
+ON Promotion(target_type, target_tier_id, status, start_date, end_date);
 GO
 
 CREATE TABLE CustomerPromotion (
@@ -339,57 +352,6 @@ CREATE TABLE CustomerPromotion (
     CONSTRAINT FK_CustomerPromotion_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
     CONSTRAINT UQ_CustomerPromotion UNIQUE (promotion_id, customer_id),
     CONSTRAINT CK_CustomerPromotion_Status CHECK (delivery_status IN ('SENT', 'VIEWED', 'USED'))
-);
-GO
-
-CREATE TABLE AIRecommendation (
-    recommendation_id INT IDENTITY(1,1) PRIMARY KEY,
-    customer_id INT NOT NULL,
-    promotion_id INT NOT NULL,
-    recommendation_reason NVARCHAR(MAX) NULL,
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    CONSTRAINT FK_AIRecommendation_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
-    CONSTRAINT FK_AIRecommendation_Promotion FOREIGN KEY (promotion_id) REFERENCES Promotion(promotion_id)
-);
-GO
-
-/* =========================
-   6. Payment, feedback, LPR
-   ========================= */
-CREATE TABLE Payment (
-    payment_id INT IDENTITY(1,1) PRIMARY KEY,
-    booking_id INT NOT NULL,
-    amount DECIMAL(18,2) NOT NULL,
-    payment_method NVARCHAR(50) NOT NULL,
-    payment_status VARCHAR(30) NOT NULL,
-    transaction_code VARCHAR(100) NULL,
-    paid_at DATETIME NULL,
-    CONSTRAINT FK_Payment_Booking FOREIGN KEY (booking_id) REFERENCES Booking(booking_id),
-    CONSTRAINT CK_Payment_Status CHECK (payment_status IN ('PENDING', 'COMPLETED', 'FAILED', 'REFUNDED')),
-    CONSTRAINT CK_Payment_Amount CHECK (amount >= 0)
-);
-GO
-
-CREATE TABLE Feedback (
-    feedback_id INT IDENTITY(1,1) PRIMARY KEY,
-    customer_id INT NOT NULL,
-    booking_id INT NOT NULL,
-    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
-    comment NVARCHAR(MAX) NULL,
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    CONSTRAINT FK_Feedback_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
-    CONSTRAINT FK_Feedback_Booking FOREIGN KEY (booking_id) REFERENCES Booking(booking_id)
-);
-GO
-
-CREATE TABLE LPRLog (
-    log_id INT IDENTITY(1,1) PRIMARY KEY,
-    vehicle_id INT NOT NULL,
-    detected_plate VARCHAR(20) NOT NULL,
-    checkin_time DATETIME NOT NULL DEFAULT GETDATE(),
-    confidence_score DECIMAL(5,4) NULL,
-    CONSTRAINT FK_LPRLog_Vehicle FOREIGN KEY (vehicle_id) REFERENCES Vehicle(vehicle_id),
-    CONSTRAINT CK_LPRLog_Confidence CHECK (confidence_score IS NULL OR (confidence_score >= 0 AND confidence_score <= 1))
 );
 GO
 
