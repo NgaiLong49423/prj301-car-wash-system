@@ -26,6 +26,7 @@ CREATE TABLE LoyaltyConfig (
     config_value NVARCHAR(255) NOT NULL,
     description NVARCHAR(500) NULL,
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
+    ,updated_by INT NULL
 );
 GO
 
@@ -216,6 +217,7 @@ CREATE TABLE Reward (
     description NVARCHAR(MAX) NULL,
     reward_type VARCHAR(30) NOT NULL,
     reward_value DECIMAL(18,2) NOT NULL DEFAULT 0,
+    maximum_discount DECIMAL(18,2) NULL,
     target_service_id INT NULL,
     valid_days INT NOT NULL DEFAULT 90,
     is_active BIT NOT NULL DEFAULT 1,
@@ -238,6 +240,12 @@ CREATE TABLE Redemption (
     applied_booking_id INT NULL,
     used_at DATETIME NULL,
     cancelled_reason NVARCHAR(255) NULL,
+    voucher_code VARCHAR(32) NOT NULL,
+    reward_name_snapshot NVARCHAR(100) NULL,
+    reward_type_snapshot VARCHAR(30) NULL,
+    reward_value_snapshot DECIMAL(18,2) NULL,
+    maximum_discount_snapshot DECIMAL(18,2) NULL,
+    request_token VARCHAR(64) NULL,
     CONSTRAINT FK_Redemption_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
     CONSTRAINT FK_Redemption_Reward FOREIGN KEY (reward_id) REFERENCES Reward(reward_id),
     CONSTRAINT FK_Redemption_AppliedBooking FOREIGN KEY (applied_booking_id) REFERENCES Booking(booking_id),
@@ -259,6 +267,11 @@ GO
 CREATE UNIQUE INDEX UX_Redemption_AppliedBooking_NotNull
 ON Redemption(applied_booking_id)
 WHERE applied_booking_id IS NOT NULL;
+GO
+
+CREATE UNIQUE INDEX UX_Redemption_VoucherCode ON Redemption(voucher_code);
+GO
+CREATE UNIQUE INDEX UX_Redemption_RequestToken ON Redemption(customer_id, request_token) WHERE request_token IS NOT NULL;
 GO
 
 -- Each EARNED point batch tracks the remaining points and expiry date for FIFO redemption.
@@ -299,6 +312,10 @@ GO
 CREATE UNIQUE INDEX UX_LoyaltyTransaction_EarnedBooking
 ON LoyaltyTransaction(booking_id, transaction_type)
 WHERE transaction_type = 'EARNED' AND booking_id IS NOT NULL;
+GO
+CREATE UNIQUE INDEX UX_LoyaltyTransaction_ExpiredBatch ON LoyaltyTransaction(point_batch_id, transaction_type) WHERE transaction_type = 'EXPIRED' AND point_batch_id IS NOT NULL;
+GO
+CREATE INDEX IX_PointBatch_Refresh ON LoyaltyPointBatch(customer_id, status, expires_at) INCLUDE (remaining_points);
 GO
 
 /* =========================

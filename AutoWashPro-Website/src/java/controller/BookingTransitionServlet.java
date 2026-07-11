@@ -1,0 +1,5 @@
+package controller;
+import dto.User;import java.io.IOException;import javax.servlet.annotation.WebServlet;import javax.servlet.http.*;import mylib.AppKeys;import service.LoyaltyService;
+/** Admin-only booking transition keeps booking, point earning and voucher lifecycle atomic. */
+@WebServlet(name="BookingTransitionServlet",urlPatterns={"/admin/bookings/transition"})
+public class BookingTransitionServlet extends HttpServlet{protected void doPost(HttpServletRequest q,HttpServletResponse p)throws IOException{HttpSession s=q.getSession(false);User u=s==null?null:(User)s.getAttribute(AppKeys.SESSION_ACCOUNT);if(u==null){p.sendError(401);return;}if(!"ADMIN".equals(u.getRoleName())){p.sendError(403);return;}try{new LoyaltyService().transitionBooking(Integer.parseInt(q.getParameter("bookingId")),q.getParameter("status"));s.setAttribute("flashSuccess","Booking status updated.");}catch(Exception e){log("Booking transition failed",e);s.setAttribute("flashError","Unable to update booking status.");}p.sendRedirect(q.getContextPath()+"/admin/dashboard");}}

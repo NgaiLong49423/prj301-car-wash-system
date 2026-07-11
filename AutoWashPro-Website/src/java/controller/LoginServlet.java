@@ -23,8 +23,15 @@ public class LoginServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
+        request.setCharacterEncoding("UTF-8");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+
+        if (email == null || email.trim().isEmpty() || password == null || password.isEmpty()) {
+            request.setAttribute(AppKeys.REQ_ERROR, "Vui lòng nhập đầy đủ email và mật khẩu.");
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            return;
+        }
 
         UserDAO dao = new UserDAO();
 
@@ -50,9 +57,11 @@ public class LoginServlet extends HttpServlet {
 
         } else {
 
-            request.setAttribute(AppKeys.REQ_ERROR, "Wrong username or password");
-
-            response.sendRedirect(request.getContextPath() + "/MainController?action=Login");
+            String error = dao.getLastError();
+            request.setAttribute(AppKeys.REQ_ERROR,
+                    error != null ? error : "Email hoặc mật khẩu không đúng.");
+            // Forward preserves the diagnostic message; redirect previously discarded it.
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
     }
 

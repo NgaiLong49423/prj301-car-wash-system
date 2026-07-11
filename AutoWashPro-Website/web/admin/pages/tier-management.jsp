@@ -2,7 +2,7 @@
 <%@ include file="../components/admin-head.jspf" %>
 <%@ include file="../components/admin-shell-start.jspf" %>
 
-<!-- UI MOCK ONLY: Replace static tier rows with ${tiers} from AdminTierServlet. -->
+<%@ page import="java.util.*" %>
 <div class="grid gap-6 xl:grid-cols-[1.6fr_.9fr]">
     <div class="lw-card p-6">
         <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
@@ -12,12 +12,7 @@
         <div class="overflow-x-auto">
             <table class="lw-table w-full min-w-[980px] text-left text-sm">
                 <thead><tr><th class="py-3">Tier</th><th>Min Spend</th><th>Min Visits</th><th>Multiplier</th><th>Booking Window</th><th>Priority</th><th>Benefits</th><th>Status</th><th>Action</th></tr></thead>
-                <tbody>
-                <tr><td class="py-4 font-bold text-white">Member</td><td>0</td><td>1</td><td>1.00x</td><td>7 days</td><td>10</td><td>Base point earning</td><td><span class="lw-badge lw-badge-active">ACTIVE</span></td><td><button class="text-blue font-bold">Edit</button></td></tr>
-                <tr><td class="py-4 font-bold text-white">Silver</td><td>2,000,000</td><td>5</td><td>1.10x</td><td>10 days</td><td>20</td><td>Priority slot</td><td><span class="lw-badge lw-badge-active">ACTIVE</span></td><td><button class="text-blue font-bold">Edit</button></td></tr>
-                <tr><td class="py-4 font-bold text-gold">Gold</td><td>6,000,000</td><td>15</td><td>1.20x</td><td>12 days</td><td>30</td><td>Free upgrade monthly</td><td><span class="lw-badge lw-badge-active">ACTIVE</span></td><td><button class="text-blue font-bold">Edit</button></td></tr>
-                <tr><td class="py-4 font-bold text-gold-soft">Platinum</td><td>15,000,000</td><td>30</td><td>1.30x</td><td>14 days</td><td>40</td><td>Free wash monthly</td><td><span class="lw-badge lw-badge-active">ACTIVE</span></td><td><button class="text-blue font-bold">Edit</button></td></tr>
-                </tbody>
+                <tbody><% List<Map<String,Object>> tiers=(List<Map<String,Object>>)request.getAttribute("tiers"); if(tiers!=null)for(Map<String,Object> t:tiers){ %><tr><td class="py-4 font-bold text-white"><%=t.get("tier_name")%></td><td><%=t.get("min_spent_money")%></td><td><%=t.get("min_visit_count")%></td><td><%=t.get("point_multiplier")%>x</td><td><%=t.get("booking_window_days")%> days</td><td><%=t.get("priority_score")%></td><td><%=t.get("benefits")%></td><td><%=Boolean.TRUE.equals(t.get("is_active"))?"ACTIVE":"INACTIVE"%></td><td><%=t.get("tier_id")%></td></tr><%}%></tbody>
             </table>
         </div>
     </div>
@@ -26,11 +21,10 @@
         <p class="lw-label">Add / Edit</p>
         <h2 class="font-display text-xl font-bold text-white">Tier Form</h2>
         <form class="mt-5 space-y-4" action="${pageContext.request.contextPath}/admin/tiers/save" method="post">
-            <input type="hidden" name="tierId" value="" />
+            <div><label class="lw-label">Tier ID</label><input class="lw-input mt-2" name="tierId" type="number" required /></div>
             <div><label class="lw-label">Tier Name</label><input class="lw-input mt-2" name="tierName" placeholder="Gold" /></div>
-            <div class="grid grid-cols-2 gap-3"><div><label class="lw-label">Min Spend</label><input class="lw-input mt-2" name="minSpentMoney" type="number" placeholder="6000000" /></div><div><label class="lw-label">Min Visits</label><input class="lw-input mt-2" name="minVisitCount" type="number" placeholder="15" /></div></div>
-            <div class="grid grid-cols-2 gap-3"><div><label class="lw-label">Multiplier</label><input class="lw-input mt-2" name="pointMultiplier" placeholder="1.20" /></div><div><label class="lw-label">Booking Days</label><input class="lw-input mt-2" name="bookingWindowDays" type="number" placeholder="12" /></div></div>
-            <div class="grid grid-cols-2 gap-3"><div><label class="lw-label">Priority Score</label><input class="lw-input mt-2" name="priorityScore" type="number" placeholder="30" /></div><div><label class="lw-label">Status</label><select class="lw-select mt-2" name="status"><option>ACTIVE</option><option>INACTIVE</option></select></div></div>
+            <div class="grid grid-cols-2 gap-3"><div><label class="lw-label">Min Points</label><input class="lw-input mt-2" name="minPoints" min="0" required type="number" /></div><div><label class="lw-label">Discount %</label><input class="lw-input mt-2" name="discountPercent" min="0" max="100" required /></div></div>
+            <div class="grid grid-cols-2 gap-3"><div><label class="lw-label">Priority Score</label><input class="lw-input mt-2" name="priorityScore" min="0" required type="number" /></div><div><label class="lw-label">Status</label><select class="lw-select mt-2" name="isActive"><option value="true">ACTIVE</option><option value="false">INACTIVE</option></select></div></div>
             <div><label class="lw-label">Benefits</label><textarea class="lw-textarea mt-2" name="benefits" rows="3" placeholder="Free upgrade monthly"></textarea></div>
             <div class="flex gap-3"><button class="lw-btn-primary flex-1" type="submit">Save Tier</button><button class="lw-btn-ghost" type="reset">Clear</button></div>
         </form>
