@@ -117,6 +117,14 @@
                 </table>
             </div>
         </div>
+        <div class="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5">
+            <h3 class="mb-3 font-bold text-white">Apply loyalty voucher</h3>
+            <form method="post" action="<%= request.getContextPath() %>/booking/apply-voucher" class="flex flex-wrap gap-3">
+                <input name="bookingId" type="number" min="1" required placeholder="Booking ID" class="rounded-lg bg-zinc-900 p-3 text-white" />
+                <input name="voucherCode" required placeholder="Voucher code" class="rounded-lg bg-zinc-900 p-3 text-white" />
+                <button type="submit" class="rounded-lg bg-blue-600 px-5 py-3 font-bold text-white">Apply voucher</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>

@@ -1,6 +1,7 @@
 ﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="dto.RewardDTO" %>
+<%@ page import="dto.RedemptionDTO" %>
 <%@ page import="mylib.AppKeys" %>
 <!DOCTYPE html>
 <html class="dark" lang="vi">
@@ -218,6 +219,9 @@
          Chua cac section: error display, welcome, points balance, tiers, reward list, bottom nav.
     -->
     <main class="max-w-7xl mx-auto px-container-margin grid grid-cols-4 md:grid-cols-12 gap-gutter mt-lg">
+        <% String flashSuccess=(String)session.getAttribute("flashSuccess"),flashError=(String)session.getAttribute("flashError"); session.removeAttribute("flashSuccess");session.removeAttribute("flashError"); %>
+        <% if(flashSuccess!=null){ %><div class="col-span-full glass-card rounded-xl p-md text-green-400"><%=flashSuccess%></div><% } %>
+        <% if(flashError!=null){ %><div class="col-span-full glass-card rounded-xl p-md text-red-400"><%=flashError%></div><% } %>
         
         <!-- ========== SECTION: ERROR DISPLAY ==========
              Hien thi thong bao loi tu controller (neu validation hoac DB fail).
@@ -483,7 +487,10 @@
                                 <p class="font-body-sm text-body-sm text-on-surface-variant mb-md"><%= reward.getDescription() %></p>
                             <% } %>
                             <!-- Redeem button: if canRedeem=true, button is enabled (blue), else disabled (gray) with lock icon -->
-                            <button <% if (!canRedeem) { %>disabled<% } %> class="mt-sm w-full <% if (canRedeem) { %>bg-primary hover:bg-primary-fixed text-on-primary<% } else { %>bg-surface-container border border-outline-variant text-on-surface-variant cursor-not-allowed flex items-center justify-center gap-xs<% } %> font-label-bold text-label-bold py-2 rounded-lg transition-colors active:scale-95">
+                            <form method="post" action="<%= request.getContextPath() %>/rewards/redeem">
+                            <input type="hidden" name="rewardId" value="<%= reward.getRewardId() %>" />
+                            <input type="hidden" name="requestToken" value="<%= java.util.UUID.randomUUID().toString() %>" />
+                            <button type="submit" <% if (!canRedeem) { %>disabled<% } %> class="mt-sm w-full <% if (canRedeem) { %>bg-primary hover:bg-primary-fixed text-on-primary<% } else { %>bg-surface-container border border-outline-variant text-on-surface-variant cursor-not-allowed flex items-center justify-center gap-xs<% } %> font-label-bold text-label-bold py-2 rounded-lg transition-colors active:scale-95">
                                 <% if (canRedeem) { %>
                                     <!-- If points sufficient: show green button with text "ĐỔI QUÀ" (Redeem) -->
                                     ĐỔI QUÀ
@@ -492,6 +499,7 @@
                                     <span class="material-symbols-outlined text-[16px]">lock</span> KHÓA
                                 <% } %>
                             </button>
+                            </form>
                         </div>
                     </div>
                 <%
@@ -517,6 +525,7 @@
             <% } %>
         </section>
 
+        <section class="col-span-full mt-lg"><h3 class="font-title-md text-title-md text-on-surface mb-md">Voucher của bạn</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-md"><% List<RedemptionDTO> vouchers=(List<RedemptionDTO>)request.getAttribute("vouchers");if(vouchers!=null)for(RedemptionDTO v:vouchers){%><div class="glass-card rounded-xl p-md"><strong><%=v.getRewardName()==null?"Voucher":v.getRewardName()%></strong><p class="text-primary"><%=v.getVoucherCode()%></p><small><%=v.getStatus()%> · <%=v.getValidUntil()%></small></div><%}%></div></section>
     </main>
 
     <!-- ========== SECTION: BottomNavBar (Mobile Only) ==========

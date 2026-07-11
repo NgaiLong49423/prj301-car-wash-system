@@ -2,7 +2,6 @@
 <%@ include file="../components/admin-head.jspf" %>
 <%@ include file="../components/admin-shell-start.jspf" %>
 
-<!-- UI MOCK ONLY: Replace values with ${loyaltyConfig} from AdminLoyaltySettingsServlet. -->
 <div class="grid gap-6 xl:grid-cols-[1fr_.8fr]">
     <div class="lw-card p-6">
         <p class="lw-label">Global Configuration</p>
@@ -12,19 +11,18 @@
             <div class="lw-panel p-5">
                 <div class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-gold/10 text-gold"><span class="material-symbols-outlined">hourglass_top</span></div>
                 <label class="lw-label">Point Expiry Months</label>
-                <input class="lw-input mt-2" name="pointExpiryMonths" type="number" value="12" />
-                <p class="mt-2 text-sm text-text-muted">Mock value only. Do not hardcode in Java.</p>
+                <input class="lw-input mt-2" name="pointExpiryMonths" min="1" required type="number" value="${configs.POINT_EXPIRY_MONTHS}" />
             </div>
             <div class="lw-panel p-5">
                 <div class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-blue/10 text-blue"><span class="material-symbols-outlined">paid</span></div>
                 <label class="lw-label">Point Rate Amount</label>
-                <input class="lw-input mt-2" name="pointRateAmount" type="number" value="1000" />
+                <input class="lw-input mt-2" name="pointRateAmount" min="1" required type="number" value="${configs.POINT_CONVERSION_RATE}" />
                 <p class="mt-2 text-sm text-text-muted">Example: 1 point per 1,000 VND before multiplier.</p>
             </div>
             <div class="lw-panel p-5">
                 <div class="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-gold/10 text-gold"><span class="material-symbols-outlined">confirmation_number</span></div>
                 <label class="lw-label">Default Voucher Valid Days</label>
-                <input class="lw-input mt-2" name="defaultVoucherValidDays" type="number" value="30" />
+                <input class="lw-input mt-2" name="defaultVoucherValidDays" min="1" required type="number" value="${configs.DEFAULT_VOUCHER_VALIDITY_DAYS}" />
                 <p class="mt-2 text-sm text-text-muted">Default validity when reward does not override it.</p>
             </div>
             <div class="lw-panel p-5">

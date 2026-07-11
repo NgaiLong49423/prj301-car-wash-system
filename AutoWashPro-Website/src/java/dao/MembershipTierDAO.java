@@ -15,7 +15,7 @@ public class MembershipTierDAO {
     public MembershipTierDTO getTierByCustomerId(int customerId) {
         String sql = "SELECT mt.tier_id, mt.tier_name, mt.min_points, mt.discount_percent, mt.benefits, "
                 + "ISNULL(mt.priority_score, 10) AS priority_score, "
-                + "ISNULL(mt.advance_booking_days, 3) AS advance_booking_days, "
+                + "mt.booking_window_days AS advance_booking_days, "
                 + "ISNULL(mt.reserved_slot_eligible, 0) AS reserved_slot_eligible "
                 + "FROM Customer c "
                 + "JOIN MembershipTier mt ON c.tier_id = mt.tier_id "

@@ -1,10 +1,16 @@
 package dto;
 
+import java.math.BigDecimal;
+
 public class RewardDTO {
     private int rewardId;
     private String rewardName;
     private int pointsRequired;
     private String description;
+    private String rewardType;
+    private BigDecimal rewardValue;
+    private int validDays;
+    private boolean active;
 
     // Constructor (Hàm khởi tạo) rỗng và đầy đủ
     public RewardDTO() {
@@ -30,4 +36,12 @@ public class RewardDTO {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public String getRewardType() { return rewardType; }
+    public void setRewardType(String rewardType) { this.rewardType = rewardType; }
+    public BigDecimal getRewardValue() { return rewardValue; }
+    public void setRewardValue(BigDecimal rewardValue) { this.rewardValue = rewardValue; }
+    public int getValidDays() { return validDays; }
+    public void setValidDays(int validDays) { this.validDays = validDays; }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 }
