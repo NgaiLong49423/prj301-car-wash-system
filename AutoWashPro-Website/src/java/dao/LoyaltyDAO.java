@@ -1,280 +1,241 @@
 package dao;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import mylib.DBUtils;
 
+/** Atomic loyalty award flow for a completed booking. */
 public class LoyaltyDAO {
 
-    // hàm kiểm tra sẽ xem booking đã đc cổng điểm chưa
-    // Tại sao có hàm này: Để chống lỗi cộng điểm trùng. Khi khách hàng bấm
-    // "Check-in" nhiều lần
-    public boolean checkPointsEarned(int bookingId) throws SQLException, ClassNotFoundException {
-        String sql = "SELECT COUNT(*) FROM LoyaltyTransaction WHERE booking_id = ? AND transaction_type = 'Earned'";
-        // Mở kết nối Database và chuẩn bị câu lệnh SQL
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, bookingId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    // Lấy ra con số đếm được ở cột đầu tiên (cột số 1)
-                    int count = rs.getInt(1);
-
-                    // Nếu count > 0 nghĩa là booking này đã được cộng điểm trước đó rồi
-                    return count > 0;
-                }
-            }
-        } catch (SQLException e) {
-            // In chi tiết lỗi SQL ra màn hình Console của NetBeans để bạn debug
-            System.err.println("--- LỖI tại checkPointsEarned (Mã lỗi: " + e.getErrorCode() + ") ---");
-            e.printStackTrace(); // In ra toàn bộ dấu vết lỗi dòng nào, lỗi gì
-        } catch (ClassNotFoundException e) {
-            // Lỗi Driver kết nối database
-            System.err.println("--- LỖI không tìm thấy Driver Database tại checkPointsEarned ---");
-            e.printStackTrace();
-        }
-        return false;
-
-    }
-
-    // Mục đích: Thêm một dòng lịch sử mới vào bảng LoyaltyTransaction (ví dụ: cộng
-    // điểm sau khi rửa xe, hoặc trừ điểm khi đổi quà).
-    // Tại sao cần: Quy tắc nghiệp vụ yêu cầu mọi biến động điểm phải được lưu lại
-    // lịch sử rõ ràng để khách hàng và Admin kiểm tra.
-    public boolean insertTransaction(int customerId, Integer bookingId, int points, String transactionType)
+    /** Awards points exactly once for a completed booking. */
+    public boolean awardLoyaltyForCompletedBooking(int bookingId)
             throws SQLException, ClassNotFoundException {
-        String sql = "INSERT INTO LoyaltyTransaction (customer_id, booking_id, points, transaction_type, created_at) "
-                + "VALUES (?, ?, ?, ?, GETDATE())";
-
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, customerId);
-
-            // Xử lý đặc biệt cho bookingId vì nó có thể bằng null (khi khách đổi quà)
-            if (bookingId == null) {
-                // Nếu bookingId là null, ta nạp giá trị NULL của SQL Server vào database
-                ps.setNull(2, java.sql.Types.INTEGER);
-            } else {
-                // Nếu có số bookingId cụ thể, ta nạp số đó vào database
-                ps.setInt(2, bookingId);
-            }
-            ps.setInt(3, points);
-            ps.setString(4, transactionType);
-
-            // Chạy lệnh INSERT, nếu số dòng bị tác động (rows) > 0 nghĩa là ghi lịch sử
-            // thành công
-            int rows = ps.executeUpdate(); // câu lệnh trả về 1 số nguyên để cho người dùng biết bao nhiêu dòng dưới
-            // database đã đc thay đổi
-            return rows > 0;
-
-        } catch (SQLException e) {
-            // In chi tiết lỗi SQL (Ví dụ: Lỗi trùng Unique Index nếu bạn cố tình cộng điểm
-            // lần 2)
-            System.err.println("--- LỖI tại insertTransaction (Mã lỗi: " + e.getErrorCode() + ") ---");
-            System.err.println("Thông điệp lỗi: " + e.getMessage());
-            e.printStackTrace();
-
-        } catch (ClassNotFoundException e) {
-            System.err.println("--- LỖI không tìm thấy Driver Database tại insertTransaction ---");
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    // (Cập nhật điểm và tiền tích lũy của khách hàng)
-    // Mục đích: Cập nhật lại 2 cột total_points và total_spent_money trong bảng
-    // Customer.
-    // Tại sao cần:
-    // Cộng dồn điểm mới vào tài khoản để khách hàng sử dụng.
-    // Cộng dồn số tiền của đơn rửa xe vừa xong vào tổng chi tiêu để làm cơ sở xét
-    // lên hạng thành viên.
-    public boolean updateCustomerPointsAndSpent(int customerId, int pointsToAdd, double spentMoneyToAdd)
-            throws SQLException, ClassNotFoundException {
-
-        // Câu lệnh SQL: Cộng dồn điểm mới và số tiền rửa xe mới vào thông tin khách
-        // hàng
-        String sql = "UPDATE Customer "
-                + "SET total_points = total_points + ?, "
-                + "    total_spent_money = total_spent_money + ? "
-                + "WHERE customer_id = ?";
-        // Mở kết nối Database và chuẩn bị câu lệnh SQL
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            // Cộng thêm điểm: Truyền số điểm cần cộng vào dấu hỏi chấm (?) thứ nhất
-            ps.setInt(1, pointsToAdd);
-            // Cộng thêm tiền: Truyền số tiền chi tiêu mới vào dấu hỏi chấm (?) thứ hai
-            ps.setDouble(2, spentMoneyToAdd);
-            // Xác định khách hàng nào: Truyền customerId vào dấu hỏi chấm (?) thứ ba
-            ps.setInt(3, customerId);
-            // Chạy lệnh UPDATE, trả về true nếu cập nhật dữ liệu thành công
-            int rows = ps.executeUpdate();
-            return rows > 0;
-        } catch (SQLException e) {
-            System.err.println("--- LỖI tại updateCustomerPointsAndSpent (Mã lỗi: " + e.getErrorCode() + ") ---");
-            System.err.println("Thông điệp lỗi: " + e.getMessage());
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            System.err.println("--- LỖI không tìm thấy Driver Database tại updateCustomerPointsAndSpent ---");
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    // (Cập nhật hạng mới cho khách hàng)
-    // Mục đích: Thay đổi giá trị của cột tier_id của khách hàng trong bảng Customer
-    // khi họ đủ điều kiện lên hạng mới.
-    // Tại sao cần: Đây chính là cốt lõi của tính năng xét hạng tự động.
-    // Khi khách hàng đổi sang hạng mới (ví dụ từ Member lên Silver), quyền lợi đặt
-    // lịch và tích điểm của họ sẽ tự động thay đổi theo.
-    public boolean updateCustomerTier(int customerId, int newTierId)
-            throws SQLException, ClassNotFoundException {
-
-        // Câu lệnh SQL: Thay đổi mã hạng thành viên (tier_id) của khách hàng
-        String sql = "UPDATE Customer SET tier_id = ? WHERE customer_id = ?";
-        // Mở kết nối Database và chuẩn bị câu lệnh SQL
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            // Truyền mã hạng mới (tier_id mới) vào dấu hỏi chấm (?) thứ nhất
-            ps.setInt(1, newTierId);
-            // Truyền customerId vào dấu hỏi chấm (?) thứ hai
-            ps.setInt(2, customerId);
-            // Chạy lệnh UPDATE, trả về true nếu nâng/hạ hạng thành công
-            int rows = ps.executeUpdate();
-            return rows > 0;
-        } catch (SQLException e) {
-            System.err.println("--- LỖI tại updateCustomerTier (Mã lỗi: " + e.getErrorCode() + ") ---");
-            System.err.println("Thông điệp lỗi: " + e.getMessage());
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            System.err.println("--- LỖI không tìm thấy Driver Database tại updateCustomerTier ---");
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    // Hàm lấy thông tin giá tiền và ID khách hàng của booking
-    public dto.BookingDTO getBookingDetailForLoyalty(int bookingId) {
-        String sql = "SELECT customer_id, total_price FROM Booking WHERE booking_id = ?";
-        try (Connection conn = mylib.DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, bookingId)
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    dto.BookingDTO booking = new dto.BookingDTO();
-                    booking.setCustomerId(rs.getInt("customer_id"));
-                    booking.setTotalPrice(rs.getBigDecimal("total_price"));
-                    return booking;
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("--- LỖI tại getBookingDetailForLoyalty ---");
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    // Hàm lấy số lần rửa và tổng tiền trong 12 tháng gần nhất để xét hạng
-    public dto.Customer getCustomerLoyaltyData12Months(int customerId) {
-        String sql = "SELECT COUNT(*) AS washes_12m, SUM(total_price) AS spent_12m "
-                + "FROM Booking "
-                + "WHERE customer_id = ? "
-                + "  AND status = 'Completed' "
-                + "  AND booking_date >= DATEADD(month, -12, GETDATE())";
-
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, customerId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    dto.Customer cus = new dto.Customer();
-                    cus.setCustomerId(customerId);
-                    // Dùng tạm trường bookingWindowDays để chứa số lượt rửa 12 tháng
-                    cus.setBookingWindowDays(rs.getInt("washes_12m"));
-                    // Dùng tạm trường totalPoints để chứa tổng tiền 12 tháng (ép kiểu về int)
-                    cus.setTotalPoints(rs.getInt("spent_12m"));
-                    return cus;
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("--- LỖI tại getCustomerLoyaltyData12Months ---");
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    // Hàm xử lý nghiệp vụ tích điểm chính cho FR-09
-    // Hàm xử lý nghiệp vụ tích điểm chính cho FR-09 (Đã bỏ hardcode)
-    public boolean accumulatePoints(int bookingId) {
-        try {
-            // Bước 1: Kiểm tra xem booking này đã được cộng điểm trước đó chưa
-            if (checkPointsEarned(bookingId)) {
-                System.out.println("Booking này đã được cộng điểm trước đó. Bỏ qua!");
+        try (Connection conn = DBUtils.getConnection()) {
+            if (conn == null) {
                 return false;
             }
+            boolean previousAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try {
+                BookingLoyaltyData booking = loadBookingForAward(conn, bookingId);
+                if (booking == null || !"COMPLETED".equalsIgnoreCase(booking.status)
+                        || booking.loyaltyPointsAwarded) {
+                    conn.rollback();
+                    return false;
+                }
 
-            // Bước 2: Lấy thông tin giá tiền và ID khách hàng của booking này
-            dto.BookingDTO booking = getBookingDetailForLoyalty(bookingId);
-            if (booking == null) {
-                System.err.println("Không tìm thấy thông tin booking ID: " + bookingId);
-                return false;
-            }
+                TierRule tier = loadTierRule(conn, booking.customerId);
+                if (tier == null) {
+                    throw new SQLException("No active membership tier for customer " + booking.customerId);
+                }
 
-            int customerId = booking.getCustomerId();
-            double price = booking.getTotalPrice() != null ? booking.getTotalPrice().doubleValue() : 0.0;
-            if (price <= 0) {
-                System.err.println("Giá trị booking không hợp lệ để tích điểm: " + price);
-                return false;
-            }
+                int expiryMonths = loadPointExpiryMonths(conn);
+                int earnedPoints = calculatePoints(booking.finalAmount, tier.pointRate, tier.pointMultiplier);
+                int pointBatchId = insertPointBatch(conn, booking.customerId, bookingId, earnedPoints, expiryMonths);
+                insertEarnedTransaction(conn, booking.customerId, bookingId, pointBatchId, earnedPoints);
+                updateCustomerSummary(conn, booking.customerId, earnedPoints, booking.finalAmount);
+                refreshTier(conn, booking.customerId);
 
-            // Bước 3: Lấy thông tin hạng thành viên hiện tại của khách hàng
-            CustomerDAO customerDAO = new CustomerDAO();
-            dto.Customer customerProfile = customerDAO.getCustomerProfile(customerId);
-            String tierName = customerProfile != null ? customerProfile.getTierName() : "Member";
-
-            // BƯỚC THAY THẾ: Lấy tỷ lệ bonus trực tiếp từ database thông qua tên hạng
-            double bonusRate = getBonusRateByTierName(tierName);
-
-            // Bước 4: Tính toán điểm số nhận được
-            int basePoints = (int) (price / 1000);
-            int finalPoints = (int) (basePoints * (1 + bonusRate));
-
-            // Bước 5: Thực hiện cộng điểm và ghi lịch sử
-            boolean isLogged = insertTransaction(customerId, bookingId, finalPoints, "Earned");
-            boolean isUpdated = updateCustomerPointsAndSpent(customerId, finalPoints, price);
-
-            if (isLogged && isUpdated) {
-                System.out.println("Tích điểm thành công cho khách hàng ID: " + customerId + " + " + finalPoints + " điểm (Tỷ lệ bonus: " + (bonusRate * 100) + "%).");
+                if (markBookingAwarded(conn, bookingId) != 1) {
+                    throw new SQLException("Booking was already awarded or is no longer completed: " + bookingId);
+                }
+                conn.commit();
                 return true;
-            }
-
-        } catch (Exception e) {
-            System.err.println("--- LỖI tại accumulatePoints ---");
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    // Hàm lấy tỷ lệ phần trăm bonus điểm của một hạng từ Database
-    public double getBonusRateByTierName(String tierName) {
-        // Trong bảng MembershipTier đã có sẵn cột discount_percent (dùng làm tỷ lệ bonus điểm)
-        // Ví dụ: Silver là 10.00%, Gold là 20.00%, Platinum là 30.00%
-        String sql = "SELECT discount_percent FROM MembershipTier WHERE tier_name = ?";
-
-        try (Connection conn = mylib.DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, tierName);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    // Lấy giá trị phần trăm (Ví dụ: 10.00 hoặc 20.00)
-                    double percent = rs.getDouble("discount_percent");
-                    // Đổi từ phần trăm sang số thập phân để tính toán (Ví dụ: 20.00% -> 0.20)
-                    return percent / 100.0;
+            } catch (SQLException | RuntimeException ex) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackError) {
+                    ex.addSuppressed(rollbackError);
+                }
+                throw ex;
+            } finally {
+                try {
+                    conn.setAutoCommit(previousAutoCommit);
+                } catch (SQLException ignored) {
+                    // Connection is closing.
                 }
             }
-        } catch (Exception e) {
-            System.err.println("--- LỖI tại getBonusRateByTierName ---");
-            e.printStackTrace();
         }
-        return 0.0; // Mặc định nếu lỗi hoặc là Member thường thì trả về 0.0
+    }
+
+    private BookingLoyaltyData loadBookingForAward(Connection conn, int bookingId) throws SQLException {
+        String sql = "SELECT customer_id, status, final_amount, loyalty_points_awarded "
+                + "FROM Booking WITH (UPDLOCK, ROWLOCK) WHERE booking_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, bookingId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    return null;
+                }
+                BookingLoyaltyData booking = new BookingLoyaltyData();
+                booking.customerId = rs.getInt("customer_id");
+                booking.status = rs.getString("status");
+                booking.finalAmount = rs.getBigDecimal("final_amount");
+                booking.loyaltyPointsAwarded = rs.getBoolean("loyalty_points_awarded");
+                return booking;
+            }
+        }
+    }
+
+    private TierRule loadTierRule(Connection conn, int customerId) throws SQLException {
+        String sql = "SELECT t.point_rate, t.point_multiplier "
+                + "FROM Customer c JOIN MembershipTier t ON c.tier_id = t.tier_id "
+                + "WHERE c.customer_id = ? AND t.is_active = 1";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    return null;
+                }
+                TierRule tier = new TierRule();
+                tier.pointRate = rs.getInt("point_rate");
+                tier.pointMultiplier = rs.getBigDecimal("point_multiplier");
+                return tier;
+            }
+        }
+    }
+
+    private int loadPointExpiryMonths(Connection conn) throws SQLException {
+        String sql = "SELECT TRY_CONVERT(INT, config_value) AS expiry_months "
+                + "FROM LoyaltyConfig WHERE config_key = 'POINT_EXPIRY_MONTHS'";
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (!rs.next() || rs.getObject("expiry_months") == null || rs.getInt("expiry_months") <= 0) {
+                throw new SQLException("Missing valid POINT_EXPIRY_MONTHS configuration");
+            }
+            return rs.getInt("expiry_months");
+        }
+    }
+
+    private int calculatePoints(BigDecimal finalAmount, int pointRate, BigDecimal pointMultiplier) {
+        if (finalAmount == null || finalAmount.signum() < 0 || pointRate <= 0
+                || pointMultiplier == null || pointMultiplier.signum() <= 0) {
+            throw new IllegalArgumentException("Invalid loyalty award inputs");
+        }
+        return finalAmount.divide(BigDecimal.valueOf(pointRate), 0, RoundingMode.DOWN)
+                .multiply(pointMultiplier)
+                .setScale(0, RoundingMode.DOWN)
+                .intValueExact();
+    }
+
+    private int insertPointBatch(Connection conn, int customerId, int bookingId,
+            int earnedPoints, int expiryMonths) throws SQLException {
+        String sql = "INSERT INTO LoyaltyPointBatch "
+                + "(customer_id, source_booking_id, earned_points, remaining_points, earned_at, expires_at, status) "
+                + "VALUES (?, ?, ?, ?, GETDATE(), DATEADD(MONTH, ?, GETDATE()), 'ACTIVE')";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, customerId);
+            ps.setInt(2, bookingId);
+            ps.setInt(3, earnedPoints);
+            ps.setInt(4, earnedPoints);
+            ps.setInt(5, expiryMonths);
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (!keys.next()) {
+                    throw new SQLException("Could not retrieve loyalty point batch id");
+                }
+                return keys.getInt(1);
+            }
+        }
+    }
+
+    private void insertEarnedTransaction(Connection conn, int customerId, int bookingId,
+            int pointBatchId, int points) throws SQLException {
+        String sql = "INSERT INTO LoyaltyTransaction "
+                + "(customer_id, booking_id, point_batch_id, points, transaction_type, description, created_at) "
+                + "VALUES (?, ?, ?, ?, 'EARNED', ?, GETDATE())";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setInt(2, bookingId);
+            ps.setInt(3, pointBatchId);
+            ps.setInt(4, points);
+            ps.setString(5, "Points earned from completed booking #" + bookingId);
+            ps.executeUpdate();
+        }
+    }
+
+    private void updateCustomerSummary(Connection conn, int customerId, int points,
+            BigDecimal finalAmount) throws SQLException {
+        String sql = "UPDATE Customer SET active_points = active_points + ?, "
+                + "active_spent_money_12m = active_spent_money_12m + ?, "
+                + "active_visit_count_12m = active_visit_count_12m + 1, "
+                + "lifetime_spent_money = lifetime_spent_money + ?, "
+                + "lifetime_visit_count = lifetime_visit_count + 1, "
+                + "total_points = total_points + ?, "
+                + "total_spent_money = total_spent_money + ? WHERE customer_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, points);
+            ps.setBigDecimal(2, finalAmount);
+            ps.setBigDecimal(3, finalAmount);
+            ps.setInt(4, points);
+            ps.setBigDecimal(5, finalAmount);
+            ps.setInt(6, customerId);
+            if (ps.executeUpdate() != 1) {
+                throw new SQLException("Customer summary was not updated: " + customerId);
+            }
+        }
+    }
+
+    private void refreshTier(Connection conn, int customerId) throws SQLException {
+        BigDecimal spent;
+        int visits;
+        String summarySql = "SELECT active_spent_money_12m, active_visit_count_12m "
+                + "FROM Customer WHERE customer_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(summarySql)) {
+            ps.setInt(1, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new SQLException("Customer not found: " + customerId);
+                }
+                spent = rs.getBigDecimal("active_spent_money_12m");
+                visits = rs.getInt("active_visit_count_12m");
+            }
+        }
+
+        String tierSql = "SELECT TOP 1 tier_id FROM MembershipTier WHERE is_active = 1 "
+                + "AND (min_spent_money <= ? OR min_visit_count <= ?) ORDER BY tier_order DESC";
+        int tierId;
+        try (PreparedStatement ps = conn.prepareStatement(tierSql)) {
+            ps.setBigDecimal(1, spent);
+            ps.setInt(2, visits);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new SQLException("No eligible tier for customer: " + customerId);
+                }
+                tierId = rs.getInt("tier_id");
+            }
+        }
+
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE Customer SET tier_id = ? WHERE customer_id = ?")) {
+            ps.setInt(1, tierId);
+            ps.setInt(2, customerId);
+            ps.executeUpdate();
+        }
+    }
+
+    private int markBookingAwarded(Connection conn, int bookingId) throws SQLException {
+        String sql = "UPDATE Booking SET loyalty_points_awarded = 1, loyalty_awarded_at = GETDATE() "
+                + "WHERE booking_id = ? AND status = 'COMPLETED' AND loyalty_points_awarded = 0";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, bookingId);
+            return ps.executeUpdate();
+        }
+    }
+
+    private static class BookingLoyaltyData {
+        private int customerId;
+        private String status;
+        private BigDecimal finalAmount;
+        private boolean loyaltyPointsAwarded;
+    }
+
+    private static class TierRule {
+        private int pointRate;
+        private BigDecimal pointMultiplier;
     }
 }
