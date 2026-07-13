@@ -1,6 +1,7 @@
 package controller;
 
 import dao.RewardDAO;
+import dao.LoyaltyDAO;
 import dto.RewardDTO;
 import dto.User;
 import java.io.IOException;
@@ -40,6 +41,13 @@ public class RewardServlet extends HttpServlet {
             // Chưa đăng nhập thì chuyển về luồng Login để tránh truy cập trái phép trang rewards.
             response.sendRedirect(request.getContextPath() + "/MainController?action=Login");
             return;
+        }
+
+        // Refresh active 12-month loyalty data when the loyalty page is opened.
+        try {
+            new LoyaltyDAO().refreshActiveLoyaltyData(account.getId());
+        } catch (Exception refreshError) {
+            getServletContext().log("Could not refresh loyalty data for customerId=" + account.getId(), refreshError);
         }
 
         String displayName = resolveDisplayName(session, account);

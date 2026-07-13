@@ -1,6 +1,7 @@
 package controller;
 
 import dao.CustomerDAO;
+import dao.LoyaltyDAO;
 import dao.VehicleDAO;
 import dto.Customer;
 import dto.Vehicle;
@@ -39,6 +40,13 @@ public class ProfileServlet extends HttpServlet {
 
         try {
             int currentCustomerId = account.getId();
+
+            // Refresh active 12-month loyalty data before displaying the profile.
+            try {
+                new LoyaltyDAO().refreshActiveLoyaltyData(currentCustomerId);
+            } catch (Exception refreshError) {
+                LOGGER.log(Level.WARNING, "Could not refresh loyalty data for customerId=" + currentCustomerId, refreshError);
+            }
 
             CustomerDAO cDao = new CustomerDAO();
             Customer profile = cDao.getCustomerProfile(currentCustomerId);

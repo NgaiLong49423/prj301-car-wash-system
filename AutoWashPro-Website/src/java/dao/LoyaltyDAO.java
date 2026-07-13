@@ -40,11 +40,44 @@ public class LoyaltyDAO {
                 int pointBatchId = insertPointBatch(conn, booking.customerId, bookingId, earnedPoints, expiryMonths);
                 insertEarnedTransaction(conn, booking.customerId, bookingId, pointBatchId, earnedPoints);
                 updateCustomerSummary(conn, booking.customerId, earnedPoints, booking.finalAmount);
-                refreshTier(conn, booking.customerId);
+                refreshActiveLoyaltyData(conn, booking.customerId);
 
                 if (markBookingAwarded(conn, bookingId) != 1) {
                     throw new SQLException("Booking was already awarded or is no longer completed: " + bookingId);
                 }
+                conn.commit();
+                return true;
+            } catch (SQLException | RuntimeException ex) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackError) {
+                    ex.addSuppressed(rollbackError);
+                }
+                throw ex;
+            } finally {
+                try {
+                    conn.setAutoCommit(previousAutoCommit);
+                } catch (SQLException ignored) {
+                    // Connection is closing.
+                }
+            }
+        }
+    }
+
+    /**
+     * Rebuilds active 12-month loyalty metrics and assigns the highest eligible tier.
+     * Lifetime totals are intentionally not changed by this refresh.
+     */
+    public boolean refreshActiveLoyaltyData(int customerId)
+            throws SQLException, ClassNotFoundException {
+        try (Connection conn = DBUtils.getConnection()) {
+            if (conn == null) {
+                return false;
+            }
+            boolean previousAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try {
+                refreshActiveLoyaltyData(conn, customerId);
                 conn.commit();
                 return true;
             } catch (SQLException | RuntimeException ex) {
@@ -181,19 +214,36 @@ public class LoyaltyDAO {
         }
     }
 
-    private void refreshTier(Connection conn, int customerId) throws SQLException {
+    private void refreshActiveLoyaltyData(Connection conn, int customerId) throws SQLException {
         BigDecimal spent;
         int visits;
-        String summarySql = "SELECT active_spent_money_12m, active_visit_count_12m "
-                + "FROM Customer WHERE customer_id = ?";
-        try (PreparedStatement ps = conn.prepareStatement(summarySql)) {
+        int activePoints;
+        String activeBookingSql = "SELECT COALESCE(SUM(final_amount), 0) AS active_spent, "
+                + "COUNT(*) AS active_visits FROM Booking "
+                + "WHERE customer_id = ? AND status = 'COMPLETED' "
+                + "AND loyalty_points_awarded = 1 "
+                + "AND loyalty_awarded_at >= DATEADD(MONTH, -12, GETDATE())";
+        try (PreparedStatement ps = conn.prepareStatement(activeBookingSql)) {
             ps.setInt(1, customerId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
                     throw new SQLException("Customer not found: " + customerId);
                 }
-                spent = rs.getBigDecimal("active_spent_money_12m");
-                visits = rs.getInt("active_visit_count_12m");
+                spent = rs.getBigDecimal("active_spent");
+                visits = rs.getInt("active_visits");
+            }
+        }
+
+        String activePointsSql = "SELECT COALESCE(SUM(remaining_points), 0) AS active_points "
+                + "FROM LoyaltyPointBatch WHERE customer_id = ? "
+                + "AND status = 'ACTIVE' AND expires_at > GETDATE()";
+        try (PreparedStatement ps = conn.prepareStatement(activePointsSql)) {
+            ps.setInt(1, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new SQLException("Could not refresh active points for customer: " + customerId);
+                }
+                activePoints = rs.getInt("active_points");
             }
         }
 
@@ -211,9 +261,15 @@ public class LoyaltyDAO {
             }
         }
 
-        try (PreparedStatement ps = conn.prepareStatement("UPDATE Customer SET tier_id = ? WHERE customer_id = ?")) {
-            ps.setInt(1, tierId);
-            ps.setInt(2, customerId);
+        String updateSql = "UPDATE Customer SET active_points = ?, "
+                + "active_spent_money_12m = ?, active_visit_count_12m = ?, tier_id = ? "
+                + "WHERE customer_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
+            ps.setInt(1, activePoints);
+            ps.setBigDecimal(2, spent);
+            ps.setInt(3, visits);
+            ps.setInt(4, tierId);
+            ps.setInt(5, customerId);
             ps.executeUpdate();
         }
     }
