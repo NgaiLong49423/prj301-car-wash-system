@@ -13,6 +13,8 @@ public class BookingDTO {
     private Time bookingTime;
     private String status;
     private BigDecimal totalPrice;
+    private BigDecimal finalAmount;
+    private boolean loyaltyPointsAwarded;
     private Timestamp requestedAt;
     private int priorityScore;
     private Integer queuePosition;
@@ -75,6 +77,22 @@ public class BookingDTO {
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public BigDecimal getFinalAmount() {
+        return finalAmount;
+    }
+
+    public void setFinalAmount(BigDecimal finalAmount) {
+        this.finalAmount = finalAmount;
+    }
+
+    public boolean isLoyaltyPointsAwarded() {
+        return loyaltyPointsAwarded;
+    }
+
+    public void setLoyaltyPointsAwarded(boolean loyaltyPointsAwarded) {
+        this.loyaltyPointsAwarded = loyaltyPointsAwarded;
     }
 
     public Timestamp getRequestedAt() {

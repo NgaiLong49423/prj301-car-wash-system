@@ -53,16 +53,16 @@ public class RewardDAO {
      * Input: customerId lấy từ tầng nghiệp vụ/controller.
      * Output: tổng điểm thực nhận (có thể bằng 0 nếu chưa có giao dịch).
      * DB: đọc bảng LoyaltyTransaction theo customer_id, áp dụng công thức:
-     * - Earned  -> cộng points
-     * - Spent   -> trừ points
+     * - EARNED  -> cộng points
+     * - REDEEMED -> trừ points
      * - Khác loại -> cộng 0
      * Tổng kết bằng SUM(CASE WHEN ... END).
      */
     /*public int getCurrentPoints(int customerId) {
         int totalPoints = 0;
-        // Điểm cuối = tổng Earned - tổng Spent, tính trực tiếp trên DB để tránh sai lệch khi gom dữ liệu ở Java.
-        String sql = "SELECT SUM(CASE WHEN transaction_type = 'Earned' THEN points " +
-                "                WHEN transaction_type = 'Spent' THEN -points " +
+        // Điểm cuối = tổng EARNED - tổng REDEEMED, tính trực tiếp trên DB.
+        String sql = "SELECT SUM(CASE WHEN transaction_type = 'EARNED' THEN points " +
+                "                WHEN transaction_type = 'REDEEMED' THEN -points " +
                 "                ELSE 0 END) AS Balance " +
                 "FROM LoyaltyTransaction " +
                 "WHERE customer_id = ?";

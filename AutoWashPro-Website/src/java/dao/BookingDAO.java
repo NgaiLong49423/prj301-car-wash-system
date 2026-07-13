@@ -94,8 +94,8 @@ public class BookingDAO {
     }
 
     public boolean createNewBooking(int customerId, int vehicleId, int serviceId, String bookingDateStr, String bookingTimeStr, double price) {
-        String bookingSql = "INSERT INTO Booking (customer_id, vehicle_id, booking_date, booking_time, status, total_price) "
-                + "VALUES (?, ?, ?, ?, 'PENDING', ?)";
+        String bookingSql = "INSERT INTO Booking (customer_id, vehicle_id, booking_date, booking_time, status, total_price, original_amount, final_amount) "
+                + "VALUES (?, ?, ?, ?, 'PENDING', ?, ?, ?)";
         String serviceSql = "INSERT INTO BookingService (booking_id, service_id, quantity, price) VALUES (?, ?, 1, ?)";
 
         Connection cn = null;
@@ -111,6 +111,8 @@ public class BookingDAO {
                 st.setString(3, bookingDateStr);
                 st.setString(4, bookingTimeStr);
                 st.setDouble(5, price);
+                st.setDouble(6, price);
+                st.setDouble(7, price);
 
                 int rowsAffected = st.executeUpdate();
                 if (rowsAffected <= 0) {
@@ -284,8 +286,8 @@ public class BookingDAO {
 
     private int insertBooking(Connection cn, int customerId, int vehicleId, Date bookingDate, Time bookingTime,
             String status, BigDecimal totalPrice) throws Exception {
-        String sql = "INSERT INTO Booking(customer_id, vehicle_id, booking_date, booking_time, status, total_price) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Booking(customer_id, vehicle_id, booking_date, booking_time, status, total_price, original_amount, final_amount) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement st = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             st.setInt(1, customerId);
             st.setInt(2, vehicleId);
@@ -293,6 +295,8 @@ public class BookingDAO {
             st.setTime(4, bookingTime);
             st.setString(5, status);
             st.setBigDecimal(6, totalPrice);
+            st.setBigDecimal(7, totalPrice);
+            st.setBigDecimal(8, totalPrice);
             st.executeUpdate();
 
             try (ResultSet keys = st.getGeneratedKeys()) {
@@ -417,8 +421,8 @@ public class BookingDAO {
     }
 
     private int createNewBooking(int customerId, int vehicleId, int[] serviceIds, Date bookingDate, Time bookingTime, BigDecimal price) {
-        String bookingSql = "INSERT INTO Booking (customer_id, vehicle_id, booking_date, booking_time, status, total_price) "
-                + "VALUES (?, ?, ?, ?, 'PENDING', ?)";
+        String bookingSql = "INSERT INTO Booking (customer_id, vehicle_id, booking_date, booking_time, status, total_price, original_amount, final_amount) "
+                + "VALUES (?, ?, ?, ?, 'PENDING', ?, ?, ?)";
         String serviceSql = "INSERT INTO BookingService (booking_id, service_id, quantity, price) VALUES (?, ?, 1, ?)";
 
         Connection cn = null;
@@ -434,6 +438,8 @@ public class BookingDAO {
                 st.setDate(3, bookingDate);
                 st.setTime(4, bookingTime);
                 st.setBigDecimal(5, price);
+                st.setBigDecimal(6, price);
+                st.setBigDecimal(7, price);
 
                 int rowsAffected = st.executeUpdate();
                 if (rowsAffected <= 0) {
