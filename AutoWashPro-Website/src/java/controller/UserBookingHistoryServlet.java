@@ -1,6 +1,7 @@
 package controller;
 
 import dao.UserBookingHistoryDAO;
+import dao.LoyaltyDAO;
 import dto.BookingDTO;
 import dto.User;
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class UserBookingHistoryServlet extends HttpServlet {
             if ("cancel".equals(subAction)) {
                 String idStr = request.getParameter("bookingId");
                 if (idStr != null) {
-                    historyDAO.updateBookingStatus(Integer.parseInt(idStr), "cancel");
+                    historyDAO.updateBookingStatus(Integer.parseInt(idStr), "CANCELLED");
                 }
                 // Quay về MainController để giữ đúng cấu trúc Filter/Routing tập trung
                 response.sendRedirect(request.getContextPath() + "/MainController?action=BookingHistory&view=" + view);
@@ -51,7 +52,11 @@ public class UserBookingHistoryServlet extends HttpServlet {
             } else if ("checkin".equals(subAction)) {
                 String idStr = request.getParameter("bookingId");
                 if (idStr != null) {
-                    historyDAO.updateBookingStatus(Integer.parseInt(idStr), "Completed");
+                    int bookingId = Integer.parseInt(idStr);
+                    boolean completed = historyDAO.updateBookingStatus(bookingId, "COMPLETED");
+                    if (completed) {
+                        new LoyaltyDAO().awardLoyaltyForCompletedBooking(bookingId);
+                    }
                 }
                 response.sendRedirect(request.getContextPath() + "/MainController?action=WashingHistory&view=washing");
                 return;
