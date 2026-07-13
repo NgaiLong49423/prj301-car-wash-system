@@ -1,0 +1,167 @@
+{
+  "ready": [],
+  "backlog": [
+    {
+      "number": 62,
+      "title": "[BUG] Kiểm tra biển số xe cho phép định dạng không hợp lệ",
+      "prev_status": "Ready"
+    }
+  ],
+  "skipped": [
+    {
+      "number": 41,
+      "title": "FR-09 — Tích điểm tự động sau khi hoàn thành rửa xe",
+      "reason": "Already in Ready status"
+    },
+    {
+      "number": 42,
+      "title": "FR-10a — Xét hạng thành viên tự động",
+      "reason": "Already in Ready status"
+    },
+    {
+      "number": 43,
+      "title": "FR-11 — Đổi điểm loyalty lấy ưu đãi",
+      "reason": "Already in Ready status"
+    },
+    {
+      "number": 44,
+      "title": "FR-12 — Điểm loyalty hết hạn sau 12 tháng",
+      "reason": "Already in Ready status"
+    },
+    {
+      "number": 45,
+      "title": "FR-13 — Admin Loyalty Configuration: Cấu hình luật loyalty cho Admin",
+      "reason": "Already in Ready status"
+    },
+    {
+      "number": 46,
+      "title": "FR-14a — Gửi khuyến mãi nhắm mục tiêu theo hạng thành viên",
+      "reason": "Already in Ready status"
+    },
+    {
+      "number": 47,
+      "title": "FR-15 — Báo cáo thống kê khách hàng dành cho Admin",
+      "reason": "Already in Ready status"
+    },
+    {
+      "number": 48,
+      "title": "FR-16 — Báo cáo doanh thu và lịch đặt dành cho Admin",
+      "reason": "Already in Ready status"
+    },
+    {
+      "number": 58,
+      "title": "FR-10b — Tự động kích hoạt xét lại hạng khi dữ liệu loyalty thay đổi",
+      "reason": "Already in Ready status"
+    },
+    {
+      "number": 59,
+      "title": "FR-14b AI Recommendations: Tích hợp hệ thống AI gợi ý khuyến mãi cá nhân hóa",
+      "reason": "Already in Backlog status"
+    },
+    {
+      "number": 61,
+      "title": "[BUG] Hero car image is not displayed on dashboards.jsp",
+      "reason": "Already in Backlog status"
+    },
+    {
+      "number": 63,
+      "title": "[Refactor] Replace hardcoded JSP data with database-driven data",
+      "reason": "Already in Backlog status"
+    },
+    {
+      "number": 64,
+      "title": "Luồng đi dữ liệu của booking",
+      "reason": "Already in Backlog status"
+    },
+    {
+      "number": 33,
+      "title": "FR-01 Customer Registration: Cho phép khách hàng đăng ký tài khoản mới",
+      "reason": "Skipped - Already Done/Closed"
+    },
+    {
+      "number": 34,
+      "title": "FR-02 Login: Đăng nhập hệ thống bằng SĐT và Mật khẩu",
+      "reason": "Skipped - Already Done/Closed"
+    },
+    {
+      "number": 35,
+      "title": "FR-03 Logout: Đăng xuất và hủy phiên làm việc",
+      "reason": "Skipped - Already Done/Closed"
+    },
+    {
+      "number": 36,
+      "title": "FR-04 View Profile: Xem hồ sơ cá nhân và hạng thành viên",
+      "reason": "Skipped - Already Done/Closed"
+    },
+    {
+      "number": 37,
+      "title": "FR-05 Update Profile: Cập nhật thông tin hồ sơ và phương tiện",
+      "reason": "Skipped - Already Done/Closed"
+    },
+    {
+      "number": 38,
+      "title": "FR-06a Create Booking: Thiết lập biểu mẫu và lưu thông tin đặt lịch",
+      "reason": "Skipped - Already Done/Closed"
+    },
+    {
+      "number": 39,
+      "title": "FR-07 Booking History: Xem lịch sử đặt lịch và thanh toán",
+      "reason": "Skipped - Already Done/Closed"
+    },
+    {
+      "number": 40,
+      "title": "FR-08 Priority Queue: Cơ chế xếp hàng đặt lịch ưu tiên theo hạng",
+      "reason": "Skipped - Already Done/Closed"
+    },
+    {
+      "number": 49,
+      "title": "NFR-01 Performance: Thời gian phản hồi hệ thống dưới 5 giây",
+      "reason": "Skipped - Already Backlog"
+    },
+    {
+      "number": 50,
+      "title": "NFR-02 Booking Processing: Thời gian xử lý đặt lịch dưới 5 giây",
+      "reason": "Skipped - Already Backlog"
+    },
+    {
+      "number": 51,
+      "title": "NFR-03 Concurrent Users: Khả năng chịu tải tối thiểu 500 người dùng đồng thời",
+      "reason": "Skipped - Already Backlog"
+    },
+    {
+      "number": 52,
+      "title": "NFR-04 LPR Processing: Thời gian nhận dạng biển số xe dưới 10 giây",
+      "reason": "Skipped - Already Backlog"
+    },
+    {
+      "number": 53,
+      "title": "NFR-05 Availability: Đảm bảo thời gian hoạt động hệ thống đạt 99.5%",
+      "reason": "Skipped - Already Backlog"
+    },
+    {
+      "number": 54,
+      "title": "NFR-06 Backup and Recovery: Sao lưu dữ liệu hàng ngày và khôi phục dưới 2 giờ",
+      "reason": "Skipped - Already Backlog"
+    },
+    {
+      "number": 55,
+      "title": "NFR-07 Security: Mã hóa mật khẩu (BCrypt) và phân quyền truy cập (RBAC)",
+      "reason": "Skipped - Already Backlog"
+    },
+    {
+      "number": 56,
+      "title": "NFR-08 Usability: Giao diện người dùng đơn giản và phản hồi linh hoạt (Responsive)",
+      "reason": "Skipped - Already Backlog"
+    },
+    {
+      "number": 57,
+      "title": "FR-06b Booking Window: Ràng buộc thời gian đặt lịch theo hạng thành viên",
+      "reason": "Skipped - Already Done/Closed"
+    },
+    {
+      "number": 60,
+      "title": "[BUG] Truy cập trực tiếp rewards.jsp hiển thị thông tin Guest thay vì người dùng đã đăng nhập",
+      "reason": "Skipped - needs user review (Related to rewards program)"
+    }
+  ]
+}
