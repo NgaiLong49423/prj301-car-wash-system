@@ -19,7 +19,7 @@ public class UserBookingHistoryDAO {
         try {
             conn = DBUtils.getConnection();
             if (conn != null) {
-                String sql = "SELECT booking_id, booking_date, booking_time, vehicle_id, status, total_price "
+                 String sql = "SELECT booking_id, booking_date, booking_time, vehicle_id, status, total_price, final_amount, loyalty_points_awarded "
                            + "FROM Booking WHERE customer_id = ? "
                            + "ORDER BY booking_date DESC, booking_time DESC";
                 ptm = conn.prepareStatement(sql);
@@ -33,6 +33,8 @@ public class UserBookingHistoryDAO {
                     booking.setVehicleId(rs.getInt("vehicle_id"));
                     booking.setStatus(rs.getString("status"));
                     booking.setTotalPrice(rs.getBigDecimal("total_price"));
+                    booking.setFinalAmount(rs.getBigDecimal("final_amount"));
+                    booking.setLoyaltyPointsAwarded(rs.getBoolean("loyalty_points_awarded"));
                     list.add(booking);
                 }
             }
@@ -52,8 +54,8 @@ public class UserBookingHistoryDAO {
         try {
             conn = DBUtils.getConnection();
             if (conn != null) {
-                String sql = "SELECT booking_id, booking_date, booking_time, vehicle_id, status, total_price "
-                           + "FROM Booking WHERE customer_id = ? AND status = 'Completed' "
+                 String sql = "SELECT booking_id, booking_date, booking_time, vehicle_id, status, total_price, final_amount, loyalty_points_awarded "
+                           + "FROM Booking WHERE customer_id = ? AND status = 'COMPLETED' "
                            + "ORDER BY booking_date DESC, booking_time DESC";
                 ptm = conn.prepareStatement(sql);
                 ptm.setInt(1, customerId);
@@ -66,6 +68,8 @@ public class UserBookingHistoryDAO {
                     booking.setVehicleId(rs.getInt("vehicle_id"));
                     booking.setStatus(rs.getString("status"));
                     booking.setTotalPrice(rs.getBigDecimal("total_price"));
+                    booking.setFinalAmount(rs.getBigDecimal("final_amount"));
+                    booking.setLoyaltyPointsAwarded(rs.getBoolean("loyalty_points_awarded"));
                     list.add(booking);
                 }
             }
