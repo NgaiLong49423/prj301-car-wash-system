@@ -110,6 +110,8 @@ public class MainController extends HttpServlet {
             } else if (action.equals("BookingHistory") || action.equals("WashingHistory")) {
                 // Điều phối luồng xử lý lịch sử sang Servlet lịch sử đặt lịch
                 url = BOOKING_HISTORY_CONTROLLER;
+            } else if (action.equals("AdminDashboard")) {
+                url = "/admin/dashboard.jsp";
             } else if (action.equals(CHAT_SUPPORT_ACTION)) {
                 // Nếu là hành động gửi đề xuất chat support, gọi hàm xử lý riêng và kết thúc luôn
                 handleSupportChat(request, response);

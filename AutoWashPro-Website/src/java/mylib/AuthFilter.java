@@ -34,7 +34,8 @@ public class AuthFilter implements Filter {
 
         // Kiểm tra phân quyền (Authorization)
         String uri = req.getRequestURI();
-        if (uri.contains("/admin/")) {
+        String action = req.getParameter("action");
+        if (uri.contains("/admin/") || "AdminDashboard".equals(action)) {
             String role = (String) session.getAttribute(AppKeys.SESSION_USER_ROLE);
             if (!"ADMIN".equalsIgnoreCase(role)) {
                 // Khách hàng hoặc ai đó không phải ADMIN cố tình vào
