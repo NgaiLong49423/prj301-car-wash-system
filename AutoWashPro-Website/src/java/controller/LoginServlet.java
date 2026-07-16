@@ -40,13 +40,18 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute(AppKeys.SESSION_TOTAL_SPENT_MONEY,
                     user.getTotalSpentMoney() != null ? user.getTotalSpentMoney() : BigDecimal.ZERO);
             session.setAttribute(AppKeys.SESSION_USER_POINTS, user.getTotalPoints());
+            session.setAttribute(AppKeys.SESSION_USER_ROLE, user.getRoleName());
             session.setAttribute(AppKeys.REQ_USER_DISPLAY_NAME, user.getFullName());
             session.setAttribute(AppKeys.REQ_TOTAL_SPENT_MONEY,
                     user.getTotalSpentMoney() != null ? user.getTotalSpentMoney() : BigDecimal.ZERO);
             session.setAttribute(AppKeys.REQ_USER_POINTS, user.getTotalPoints());
 
-            // Báo cho MainController biết là hãy mở trang Dashboard
-            response.sendRedirect(request.getContextPath() + "/MainController?action=Dashboard");
+            // Rẽ nhánh theo Role
+            if ("ADMIN".equalsIgnoreCase(user.getRoleName())) {
+                response.sendRedirect(request.getContextPath() + "/MainController?action=AdminDashboard");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/MainController?action=Dashboard");
+            }
 
         } else {
 

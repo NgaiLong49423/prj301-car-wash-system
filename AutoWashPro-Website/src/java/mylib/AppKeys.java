@@ -35,8 +35,11 @@ public final class AppKeys {
     /** Lưu trữ tổng số tiền (BigDecimal) mà khách hàng này đã chi tiêu trong hệ thống */
     public static final String SESSION_TOTAL_SPENT_MONEY = "totalSpentMoney";
     
-    /** Lưu trữ tổng số điểm tích lũy hiện tại của khách hàng */
+    /** Lưu tổng số điểm tích lũy hiện tại của khách hàng */
     public static final String SESSION_USER_POINTS = "userPoints";
+
+    /** Lưu vai trò (Role) của người dùng để phân quyền (VD: ADMIN, CUSTOMER) */
+    public static final String SESSION_USER_ROLE = "userRole";
 
 
     /* =========================================================================
@@ -46,6 +49,9 @@ public final class AppKeys {
 
     /** Lưu chuỗi thông báo lỗi (Error Message) khi biểu mẫu (form) hoặc nghiệp vụ bị lỗi */
     public static final String REQ_ERROR = "error";
+
+    /** Lưu chuỗi thông báo lỗi khi người dùng không có quyền truy cập (Authorization) */
+    public static final String REQ_ERROR_AUTH = "errorAuth";
     
     /** Lưu chuỗi thông báo thành công (Success Message) khi thao tác hoàn tất */
     public static final String REQ_SUCCESS = "success";

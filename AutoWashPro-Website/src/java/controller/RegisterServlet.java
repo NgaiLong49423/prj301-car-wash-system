@@ -56,7 +56,11 @@ public class RegisterServlet extends HttpServlet {
                 return;
             }
 
-            CustomerDTO newCustomer = new CustomerDTO(fullName, phone, email, password, 1);
+            // Lấy mã hạng thành viên mặc định linh hoạt từ DB
+            dao.MembershipTierDAO tierDao = new dao.MembershipTierDAO();
+            int defaultTierId = tierDao.getDefaultTierId();
+
+            CustomerDTO newCustomer = new CustomerDTO(fullName, phone, email, password, defaultTierId);
             boolean check = dao.registerCustomer(newCustomer);
 
             if (check) {

@@ -119,4 +119,9 @@
         <filter-name>AuthFilter</filter-name>
         <url-pattern>/EditVehicleServlet</url-pattern>
     </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/admin/*</url-pattern>
+    </filter-mapping>
 </web-app>

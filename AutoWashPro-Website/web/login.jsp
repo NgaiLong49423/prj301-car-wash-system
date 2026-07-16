@@ -194,11 +194,20 @@
 <div class="glass-panel rounded-xl p-lg md:p-xl shadow-2xl">
 <h2 class="font-title-md text-title-md text-on-surface mb-lg">Đăng nhập</h2>
 <%
-        String error = (String) request.getAttribute(AppKeys.REQ_ERROR);
+    String error = (String) request.getAttribute(AppKeys.REQ_ERROR);
+    String errorAuth = (String) request.getAttribute(AppKeys.REQ_ERROR_AUTH);
     if (error != null) {
 %>
 <div class="mb-lg rounded-lg border border-red-500 bg-red-500/10 p-md text-red-500">
     <%= error %>
+</div>
+<%
+    }
+    if (errorAuth != null) {
+%>
+<div class="mb-lg rounded-lg border border-orange-500 bg-orange-500/10 p-md text-orange-500">
+    <span class="material-symbols-outlined align-middle mr-1" style="font-size: 20px;">warning</span>
+    <span class="align-middle"><%= errorAuth %></span>
 </div>
 <%
     }

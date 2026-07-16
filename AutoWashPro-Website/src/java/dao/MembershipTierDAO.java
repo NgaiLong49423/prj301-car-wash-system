@@ -41,6 +41,20 @@ public class MembershipTierDAO {
         return fallback;
     }
 
+    public int getDefaultTierId() {
+        String sql = "SELECT tier_id FROM MembershipTier WHERE tier_order = 0";
+        try (Connection cn = DBUtils.getConnection();
+             PreparedStatement st = cn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("tier_id");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to get default tier ID", e);
+        }
+        return 1; // Fallback to 1 if not found
+    }
+
     private MembershipTierDTO mapTier(ResultSet rs) throws Exception {
         return new MembershipTierDTO(
                 rs.getInt("tier_id"),
