@@ -7,11 +7,111 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import mylib.DBUtils;
 
 /** Atomic loyalty award flow for a completed booking. */
 public class LoyaltyDAO {
+
+    /**
+     * Expires due point batches exactly once and rebuilds active_points.
+     * Lifetime total_points is intentionally never changed by this flow.
+     */
+    public int refreshExpiredPoints(int customerId)
+            throws SQLException, ClassNotFoundException {
+        try (Connection conn = DBUtils.getConnection()) {
+            if (conn == null) {
+                return 0;
+            }
+            boolean previousAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try {
+                List<ExpiredPointBatch> dueBatches = loadDuePointBatches(conn, customerId);
+                int expiredPoints = 0;
+                for (ExpiredPointBatch batch : dueBatches) {
+                    if (markPointBatchExpired(conn, batch.pointBatchId) == 1) {
+                        insertExpiredTransaction(conn, customerId, batch);
+                        expiredPoints += batch.remainingPoints;
+                    }
+                }
+                updateActivePointBalance(conn, customerId);
+                conn.commit();
+                return expiredPoints;
+            } catch (SQLException | RuntimeException ex) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackError) {
+                    ex.addSuppressed(rollbackError);
+                }
+                throw ex;
+            } finally {
+                try {
+                    conn.setAutoCommit(previousAutoCommit);
+                } catch (SQLException ignored) {
+                    // Connection is closing.
+                }
+            }
+        }
+    }
+
+    private List<ExpiredPointBatch> loadDuePointBatches(Connection conn, int customerId)
+            throws SQLException {
+        String sql = "SELECT point_batch_id, remaining_points "
+                + "FROM LoyaltyPointBatch WITH (UPDLOCK, ROWLOCK) "
+                + "WHERE customer_id = ? AND status = 'ACTIVE' "
+                + "AND remaining_points > 0 AND expires_at <= GETDATE() "
+                + "ORDER BY expires_at, earned_at, point_batch_id";
+        List<ExpiredPointBatch> batches = new ArrayList<>();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    batches.add(new ExpiredPointBatch(
+                            rs.getInt("point_batch_id"), rs.getInt("remaining_points")));
+                }
+            }
+        }
+        return batches;
+    }
+
+    private int markPointBatchExpired(Connection conn, int pointBatchId) throws SQLException {
+        String sql = "UPDATE LoyaltyPointBatch SET status = 'EXPIRED' "
+                + "WHERE point_batch_id = ? AND status = 'ACTIVE'";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, pointBatchId);
+            return ps.executeUpdate();
+        }
+    }
+
+    private void insertExpiredTransaction(Connection conn, int customerId,
+            ExpiredPointBatch batch) throws SQLException {
+        String sql = "INSERT INTO LoyaltyTransaction "
+                + "(customer_id, point_batch_id, points, transaction_type, description, created_at) "
+                + "VALUES (?, ?, ?, 'EXPIRED', ?, GETDATE())";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setInt(2, batch.pointBatchId);
+            ps.setInt(3, batch.remainingPoints);
+            ps.setString(4, "Remaining points expired from batch #" + batch.pointBatchId);
+            ps.executeUpdate();
+        }
+    }
+
+    private void updateActivePointBalance(Connection conn, int customerId) throws SQLException {
+        String sql = "UPDATE Customer SET active_points = ("
+                + "SELECT COALESCE(SUM(remaining_points), 0) FROM LoyaltyPointBatch "
+                + "WHERE customer_id = ? AND status = 'ACTIVE' AND expires_at > GETDATE()"
+                + ") WHERE customer_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setInt(2, customerId);
+            if (ps.executeUpdate() != 1) {
+                throw new SQLException("Customer active point balance was not updated: " + customerId);
+            }
+        }
+    }
 
     /** Awards points exactly once for a completed booking. */
     public boolean awardLoyaltyForCompletedBooking(int bookingId)
@@ -293,5 +393,15 @@ public class LoyaltyDAO {
     private static class TierRule {
         private int pointRate;
         private BigDecimal pointMultiplier;
+    }
+
+    private static class ExpiredPointBatch {
+        private final int pointBatchId;
+        private final int remainingPoints;
+
+        private ExpiredPointBatch(int pointBatchId, int remainingPoints) {
+            this.pointBatchId = pointBatchId;
+            this.remainingPoints = remainingPoints;
+        }
     }
 }

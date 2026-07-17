@@ -43,7 +43,9 @@ public class ProfileServlet extends HttpServlet {
 
             // Refresh active 12-month loyalty data before displaying the profile.
             try {
-                new LoyaltyDAO().refreshActiveLoyaltyData(currentCustomerId);
+                LoyaltyDAO loyaltyDAO = new LoyaltyDAO();
+                loyaltyDAO.refreshExpiredPoints(currentCustomerId);
+                loyaltyDAO.refreshActiveLoyaltyData(currentCustomerId);
             } catch (Exception refreshError) {
                 LOGGER.log(Level.WARNING, "Could not refresh loyalty data for customerId=" + currentCustomerId, refreshError);
             }
