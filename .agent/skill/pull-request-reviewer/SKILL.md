@@ -506,11 +506,11 @@ Use for optional style or cleanup suggestions.
 
 Nits must never block merge.
 
-## 10. Review Output Format
+## 10. Review Output Format (Template)
 
 Start with:
 
-> Đây là kết quả review tự động cho PR #[PR_NUMBER], dựa trên diff, Issue liên quan, tài liệu dự án và các kiểm tra hiện có.
+> Đây là kết quả review tự động cho PR #[PR_NUMBER], dựa trên diff mới nhất, Issue liên quan, tài liệu dự án và các kiểm tra hiện có.
 
 Do not claim to represent a person unless that identity is explicitly configured.
 
@@ -520,111 +520,70 @@ Add this marker near the beginning of the review:
 <!-- antigravity-pr-review -->
 ```
 
-Structure the review as follows.
+Structure the review strictly matching the following template format:
 
-### 10.1 Review Context
+### Bối cảnh review
 
-Include:
+```text
+Bối cảnh review
+PR: [PR Title]
+Base / head: [Base Branch] ← [Head Branch]
+Issue liên kết: #[Issue Number]
+Đã đối chiếu: [List all source documents referenced, e.g., docs/requirements/PRD.md, docs/requirements/SRS.md, Issue #13 và diff mới nhất]
+CI: [Build status]
+```
 
-- Pull Request title
-- Base branch
-- Head branch
-- Linked Issue
-- Documents reviewed
-- Missing documents
-- CI status
-- Review confidence
-
-### 10.2 Acceptance Criteria Assessment
+### Đánh giá Acceptance Criteria
 
 Use a table:
 
-| Acceptance Criterion | Status | Evidence |
-|---|---|---|
-| AC-1 | Met / Partial / Not met / Cannot verify | File, line, test, or explanation |
-
-### 10.3 Passed Checks
-
-Use:
-
 ```text
-✅ Passed
+Đánh giá Acceptance Criteria của Issue #[Issue Number]
+| Tiêu chí | Trạng thái | Bằng chứng |
+|---|---|---|
+| [Criterion] | Đạt / Chưa đạt / Không thể xác minh | [Evidence] |
 ```
 
-Highlight what was implemented correctly.
+### Đã kiểm tra (Passed Checks)
 
-Do not exaggerate or claim requirements were met without evidence.
+```text
+✅ Đã kiểm tra
+- [Highlight what was implemented correctly]
+- [Another correct implementation detail]
+```
 
-### 10.4 Findings
+### Findings (Các vấn đề phát hiện)
 
-Group findings by severity.
-
-Use this format for every finding:
+Group findings by severity. Use this exact format for every finding:
 
 ```md
-### [Severity] Concise finding title
-
+Findings
+### [Severity] [Concise finding title]
 - File: `path/to/file`
 - Line: line or range
 - Evidence: exact behavior or code path
 - Problem: what is wrong
 - Impact: what could happen
 - Recommendation: how to correct it
-- Merge blocking: Yes or No
+- Merge blocking: Có or Không
 ```
 
-Where possible, provide a minimal correction example.
+### Nguồn yêu cầu (Referenced Sources)
 
-Do not provide a full unrelated rewrite of the implementation.
-
-### 10.5 Git Workflow Findings
-
-Use:
+List the exact requirements from the sources that justify the findings:
 
 ```text
-⚠️ Git Workflow
+Nguồn yêu cầu:
+- Issue #[Number] — Acceptance Criteria: [Detail]
+- [Document Path/Name], [Section/UC]: [Detail]
 ```
 
-Include only verified or evidence-backed workflow concerns.
-
-When the branch must be updated, provide exact commands using the actual base branch:
-
-```bash
-git fetch origin
-git checkout <head-branch>
-git merge origin/<base-branch>
-git push
-```
-
-Do not recommend force push unless repository policy explicitly permits it.
-
-### 10.6 Pull Request Description
-
-When needed, provide a corrected template inside:
-
-```html
-<details>
-<summary>PR description đề xuất</summary>
-
-...generated content...
-
-</details>
-```
-
-Use placeholders such as:
-
-```text
-[Chưa có bằng chứng kiểm thử]
-[Chưa xác định Issue]
-[Cần tác giả bổ sung ảnh]
-```
-
-when the information cannot be verified.
-
-### 10.7 Final Summary
+### Quyết định review (Review Decision)
 
 End with:
 
+```md
+Quyết định review
 - Critical findings count
 - High findings count
 - Medium findings count
@@ -632,15 +591,14 @@ End with:
 - Nit count
 - Overall risk: Critical / High / Medium / Low
 - Mandatory review decision:
-  - YÊU CẦU THAY ĐỔI — submit `REQUEST_CHANGES`
-  - ĐỀ XUẤT SẴN SÀNG MERGE — submit `COMMENT`, never `APPROVE`
-- Human maintainer remains responsible for final approval and merge
+- Kết quả: YÊU CẦU THAY ĐỔI / ĐỀ XUẤT SẴN SÀNG MERGE
+- GitHub review state: REQUEST_CHANGES / COMMENT
+- Lỗi chặn merge còn lại: <number>
+- Điều kiện tiếp theo: <specific action>
+- Quyền quyết định cuối cùng: Cần thành viên nhóm kiểm tra lại
+```
 
-Use a clear call to action in Vietnamese.
-
-Example:
-
-> Vui lòng khắc phục các lỗi có mức độ chặn merge, cập nhật lại PR và chạy lại các kiểm tra trước khi yêu cầu review tiếp theo.
+Use a clear call to action in Vietnamese at the end. Example: "Vui lòng khắc phục hoặc điều chỉnh phạm vi Issue/PR, sau đó yêu cầu review lại."
 
 ## 11. Mandatory Review Decision
 
