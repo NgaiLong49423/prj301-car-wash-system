@@ -48,7 +48,7 @@ public class LoginServlet extends HttpServlet {
 
             // Rẽ nhánh theo Role
             if ("ADMIN".equalsIgnoreCase(user.getRoleName())) {
-                response.sendRedirect(request.getContextPath() + "/MainController?action=AdminDashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard.jsp");
             } else {
                 response.sendRedirect(request.getContextPath() + "/MainController?action=Dashboard");
             }
