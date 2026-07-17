@@ -3,7 +3,7 @@ name: pull-request-reviewer
 description: Use this skill whenever the agent is asked to review a GitHub Pull Request, including reviews triggered automatically by GitHub Actions. Evaluate the PR against linked Issues, PRD, SRS, repository guidelines, Git workflow rules, tests, and the actual code diff.
 risk: medium
 source: self
-version: v2.1.0
+version: v2.1.1
 created_date: 2026-06-29
 last_updated_date: 2026-07-17
 ---
