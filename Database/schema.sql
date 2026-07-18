@@ -222,7 +222,7 @@ CREATE TABLE Reward (
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     CONSTRAINT FK_Reward_TargetService FOREIGN KEY (target_service_id) REFERENCES Service(service_id),
     CONSTRAINT CK_Reward_Type CHECK (reward_type IN ('FIXED_DISCOUNT', 'PERCENT_DISCOUNT', 'FREE_SERVICE', 'FREE_WASH')),
-    CONSTRAINT CK_Reward_NonNegative CHECK (required_points >= 0 AND reward_value >= 0 AND valid_days > 0)
+    CONSTRAINT CK_Reward_NonNegative CHECK (required_points > 0 AND reward_value >= 0 AND valid_days > 0)
 );
 GO
 
@@ -238,11 +238,16 @@ CREATE TABLE Redemption (
     applied_booking_id INT NULL,
     used_at DATETIME NULL,
     cancelled_reason NVARCHAR(255) NULL,
+    voucher_code VARCHAR(32) NOT NULL,
+    reward_name_snapshot NVARCHAR(100) NOT NULL,
+    reward_type_snapshot VARCHAR(30) NOT NULL,
+    reward_value_snapshot DECIMAL(18,2) NOT NULL,
+    request_token VARCHAR(64) NOT NULL,
     CONSTRAINT FK_Redemption_Customer FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
     CONSTRAINT FK_Redemption_Reward FOREIGN KEY (reward_id) REFERENCES Reward(reward_id),
     CONSTRAINT FK_Redemption_AppliedBooking FOREIGN KEY (applied_booking_id) REFERENCES Booking(booking_id),
     CONSTRAINT CK_Redemption_Status CHECK (status IN ('AVAILABLE', 'USED', 'EXPIRED', 'CANCELLED')),
-    CONSTRAINT CK_Redemption_Points CHECK (points_used >= 0)
+    CONSTRAINT CK_Redemption_Points CHECK (points_used > 0)
 );
 GO
 
@@ -299,6 +304,16 @@ GO
 CREATE UNIQUE INDEX UX_LoyaltyTransaction_EarnedBooking
 ON LoyaltyTransaction(booking_id, transaction_type)
 WHERE transaction_type = 'EARNED' AND booking_id IS NOT NULL;
+GO
+
+-- GI-06: voucher codes are public identifiers and must never collide.
+CREATE UNIQUE INDEX UX_Redemption_VoucherCode
+ON Redemption(voucher_code);
+GO
+
+-- GI-06: one browser request token can issue at most one voucher per customer.
+CREATE UNIQUE INDEX UX_Redemption_RequestToken
+ON Redemption(customer_id, request_token);
 GO
 
 -- GI-05: one EXPIRED history row per point batch, even under concurrent refreshes.

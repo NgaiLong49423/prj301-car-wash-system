@@ -25,7 +25,9 @@ public class RewardDAO {
     public List<RewardDTO> getAllRewards() {
         List<RewardDTO> list = new ArrayList<>();
         // Sắp xếp theo điểm tăng dần để phía trên có thể duyệt và tìm "mốc chưa đạt đầu tiên".
-        String sql = "SELECT reward_id, reward_name, required_points, description FROM Reward ORDER BY required_points ASC";
+        String sql = "SELECT reward_id, reward_name, required_points, description, "
+                + "reward_type, reward_value, valid_days "
+                + "FROM Reward WHERE is_active = 1 ORDER BY required_points ASC";
 
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -37,7 +39,10 @@ public class RewardDAO {
                         rs.getInt("reward_id"),
                         rs.getString("reward_name"),
                         rs.getInt("required_points"),
-                        rs.getString("description")
+                        rs.getString("description"),
+                        rs.getString("reward_type"),
+                        rs.getBigDecimal("reward_value"),
+                        rs.getInt("valid_days")
                 );
                 list.add(reward);
             }
