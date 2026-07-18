@@ -45,7 +45,9 @@ public class RewardServlet extends HttpServlet {
 
         // Refresh active 12-month loyalty data when the loyalty page is opened.
         try {
-            new LoyaltyDAO().refreshActiveLoyaltyData(account.getId());
+            LoyaltyDAO loyaltyDAO = new LoyaltyDAO();
+            loyaltyDAO.refreshExpiredPoints(account.getId());
+            loyaltyDAO.refreshActiveLoyaltyData(account.getId());
         } catch (Exception refreshError) {
             getServletContext().log("Could not refresh loyalty data for customerId=" + account.getId(), refreshError);
         }

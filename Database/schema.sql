@@ -301,6 +301,18 @@ ON LoyaltyTransaction(booking_id, transaction_type)
 WHERE transaction_type = 'EARNED' AND booking_id IS NOT NULL;
 GO
 
+-- GI-05: one EXPIRED history row per point batch, even under concurrent refreshes.
+CREATE UNIQUE INDEX UX_LoyaltyTransaction_ExpiredBatch
+ON LoyaltyTransaction(point_batch_id, transaction_type)
+WHERE transaction_type = 'EXPIRED' AND point_batch_id IS NOT NULL;
+GO
+
+-- GI-05: supports event-based expiry lookup by customer and due time.
+CREATE INDEX IX_LoyaltyPointBatch_Expiry
+ON LoyaltyPointBatch(customer_id, status, expires_at)
+INCLUDE (remaining_points, earned_at);
+GO
+
 /* =========================
    5. Promotions and targeted delivery data
    ========================= */
