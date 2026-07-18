@@ -28,6 +28,7 @@ public class MainController extends HttpServlet {
     private static final String REGISTER_CONTROLLER = "/RegisterServlet";
     private static final String DASHBOARD_PAGE = "dashboard.jsp";
     private static final String HOME_PAGE = "dashboard.jsp";
+    private static final String DASHBOARD_CONTROLLER = "/DashboardServlet";
     private static final String ADD_VEHICLE_CONTROLLER = "/AddVehicleServlet";
     private static final String EDIT_VEHICLE_CONTROLLER = "/EditVehicleServlet";
     private static final String PROFILE_CONTROLLER = "/ProfileServlet";
@@ -78,11 +79,11 @@ public class MainController extends HttpServlet {
                 // Chuyển luồng xử lý xử lý dữ liệu đăng ký tới RegisterServlet
                 url = REGISTER_CONTROLLER;
             } else if (action.equals("Home")) {
-                // Điều phối về trang chủ Dashboard
-                url = HOME_PAGE;
+                // Điều phối về trang chủ Dashboard qua Servlet để lấy dữ liệu cá nhân
+                url = DASHBOARD_CONTROLLER;
             } else if (action.equals("Dashboard")) {
-                // Điều phối về trang hiển thị Dashboard
-                url = DASHBOARD_PAGE;
+                // Điều phối về trang hiển thị Dashboard qua Servlet để lấy dữ liệu cá nhân
+                url = DASHBOARD_CONTROLLER;
             } else if (action.equals("AddVehicle")) {
                 // Chuyển luồng xử lý thêm xe tới AddVehicleServlet
                 url = ADD_VEHICLE_CONTROLLER;

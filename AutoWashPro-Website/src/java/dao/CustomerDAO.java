@@ -27,7 +27,7 @@ public class CustomerDAO {
                 // Lệnh JOIN bảng Customer và Tier theo đúng thiết kế của Leader
                 // Thêm c.tier_id để lấy mã hạng thành viên chuẩn bị cho chức năng FR-06b: ràng
                 // buộc thời gian đặt lịch theo hạng thành viên
-                String sql = "SELECT c.customer_id, c.full_name, c.phone, c.email, c.join_date, c.total_points, "
+                String sql = "SELECT c.customer_id, c.full_name, c.phone, c.email, c.join_date, c.total_points, c.active_points, "
                         + "c.tier_id, t.tier_name, t.booking_window_days "
                         + "FROM Customer c "
                         + "LEFT JOIN MembershipTier t ON c.tier_id = t.tier_id "
@@ -44,6 +44,7 @@ public class CustomerDAO {
                     cus.setEmail(table.getString("email"));
                     cus.setJoinDate(table.getDate("join_date"));
                     cus.setTotalPoints(table.getInt("total_points"));
+                    cus.setActivePoints(table.getInt("active_points"));
 
                     String tier = table.getString("tier_name");
                     cus.setTierName(tier != null ? tier : "Thành viên mới");
@@ -79,7 +80,7 @@ public class CustomerDAO {
     }
 
     private Customer getBasicCustomerProfile(int customerId) {
-        String sql = "SELECT customer_id, full_name, phone, email, join_date, total_points, tier_id "
+        String sql = "SELECT customer_id, full_name, phone, email, join_date, total_points, active_points, tier_id "
                 + "FROM Customer WHERE customer_id = ?";
 
         try (Connection cn = DBUtils.getConnection();
@@ -94,6 +95,7 @@ public class CustomerDAO {
                     cus.setEmail(table.getString("email"));
                     cus.setJoinDate(table.getDate("join_date"));
                     cus.setTotalPoints(table.getInt("total_points"));
+                    cus.setActivePoints(table.getInt("active_points"));
                     cus.setTierId(table.getInt("tier_id"));
                     cus.setTierName("Member");
                     cus.setBookingWindowDays(7);

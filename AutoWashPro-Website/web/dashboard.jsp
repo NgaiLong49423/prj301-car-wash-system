@@ -1,5 +1,6 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="mylib.AppKeys"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 
 <!DOCTYPE html>
@@ -161,6 +162,120 @@
     </div>
 
 <main class="flex-grow pt-24 md:pt-32">
+<c:choose>
+    <c:when test="${not empty sessionScope.account}">
+        <!-- PERSONALIZED DASHBOARD -->
+        <section class="py-12 px-container-margin max-w-7xl mx-auto">
+            <div class="mb-8">
+                <h1 class="font-display-lg text-3xl font-bold text-on-background mb-2">Xin chào, ${sessionScope.account.fullName}!</h1>
+                <p class="text-on-surface-variant">Chào mừng trở lại trung tâm điều khiển Luxe Wash.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-12">
+                <!-- Loyalty Card -->
+                <div class="glass-panel p-lg rounded-xl border border-primary/30 relative overflow-hidden flex flex-col">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full translate-x-1/3 -translate-y-1/3"></div>
+                    <div class="relative z-10 flex items-center justify-between mb-4">
+                        <span class="font-title-md font-bold text-primary">Hạng Thành Viên</span>
+                        <span class="material-symbols-outlined text-primary">workspace_premium</span>
+                    </div>
+                    <div class="relative z-10 font-display-lg text-4xl font-bold text-on-surface mb-1">${requestScope.profile.tierName}</div>
+                    <div class="relative z-10 text-on-surface-variant mb-6">Điểm khả dụng: <span class="text-secondary font-bold">${requestScope.profile.activePoints}</span></div>
+                    
+                    <a href="<%= request.getContextPath() %>/MainController?action=Rewards" class="relative z-10 mt-auto bg-surface-container border border-outline-variant rounded-lg py-2 px-4 text-center hover:bg-surface-bright transition-colors font-label-bold text-sm">
+                        Xem Đặc Quyền & Quà Tặng
+                    </a>
+                </div>
+                
+                <!-- Quick Book Card -->
+                <div class="glass-panel p-lg rounded-xl flex flex-col justify-center items-center text-center">
+                    <span class="material-symbols-outlined text-4xl text-secondary mb-4">directions_car</span>
+                    <h3 class="font-title-md font-bold mb-2">Chăm sóc xe ngay</h3>
+                    <p class="text-sm text-on-surface-variant mb-6">Đặt lịch nhanh chóng với các ưu tiên dành riêng cho bạn.</p>
+                    <a href="<%= request.getContextPath() %>/MainController?action=Booking" class="bg-primary text-on-primary font-label-bold px-6 py-2 rounded-lg hover:bg-primary-container transition-colors w-full">
+                        Đặt Lịch Mới
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Recent Bookings -->
+            <div class="mb-12">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-title-md text-2xl font-bold text-on-background">Lịch Sử Đặt Lịch (Gần Nhất)</h2>
+                    <a href="<%= request.getContextPath() %>/MainController?action=BookingHistory" class="text-primary text-sm hover:underline font-label-bold">Xem tất cả</a>
+                </div>
+                
+                <c:choose>
+                    <c:when test="${not empty requestScope.recentBookings}">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <c:forEach var="booking" items="${requestScope.recentBookings}">
+                                <div class="glass-panel p-4 rounded-lg flex flex-col">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded">${booking.bookingDate}</span>
+                                        <span class="text-xs font-bold px-2 py-1 rounded
+                                            <c:choose>
+                                                <c:when test="${booking.status == 'COMPLETED'}">bg-green-500/20 text-green-400</c:when>
+                                                <c:when test="${booking.status == 'PENDING'}">bg-yellow-500/20 text-yellow-400</c:when>
+                                                <c:otherwise>bg-surface-container text-on-surface</c:otherwise>
+                                            </c:choose>">
+                                            ${booking.status}
+                                        </span>
+                                    </div>
+                                    <div class="font-title-md font-bold text-lg mb-1">${booking.bookingTime}</div>
+                                    <div class="text-sm text-on-surface-variant flex-grow">Mã xe: ${booking.vehicleId}</div>
+                                    <div class="text-lg font-bold text-primary mt-3">${booking.finalAmount} ₫</div>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="glass-panel p-8 rounded-lg text-center">
+                            <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">history</span>
+                            <p class="text-on-surface-variant">Bạn chưa có lịch sử đặt lịch nào.</p>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+            
+            <!-- Top Rewards -->
+            <div>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-title-md text-2xl font-bold text-on-background">Ưu Đãi Nổi Bật</h2>
+                    <a href="<%= request.getContextPath() %>/MainController?action=Rewards" class="text-primary text-sm hover:underline font-label-bold">Khám phá thêm</a>
+                </div>
+                
+                <c:choose>
+                    <c:when test="${not empty requestScope.topRewards}">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <c:forEach var="reward" items="${requestScope.topRewards}">
+                                <div class="glass-panel p-5 rounded-lg flex flex-col border border-outline-variant hover:border-primary/50 transition-colors">
+                                    <h3 class="font-title-md font-bold text-lg mb-2 text-on-surface">${reward.rewardName}</h3>
+                                    <p class="text-sm text-on-surface-variant mb-4 flex-grow">${reward.description}</p>
+                                    <div class="flex justify-between items-center mt-auto">
+                                        <span class="text-secondary font-bold flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-sm">stars</span> ${reward.requiredPoints} Điểm
+                                        </span>
+                                        <c:if test="${requestScope.profile.activePoints >= reward.requiredPoints}">
+                                            <button class="bg-surface-container hover:bg-primary/20 hover:text-primary transition-colors text-xs font-bold px-3 py-1.5 rounded border border-primary/50">Khả dụng</button>
+                                        </c:if>
+                                        <c:if test="${requestScope.profile.activePoints < reward.requiredPoints}">
+                                            <span class="text-xs text-on-surface-variant">Chưa đủ điểm</span>
+                                        </c:if>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="glass-panel p-8 rounded-lg text-center">
+                            <p class="text-on-surface-variant">Hiện chưa có phần thưởng nào.</p>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </section>
+    </c:when>
+    <c:otherwise>
 <!-- Hero Section -->
 <section class="relative w-full h-[70vh] min-h-[600px] flex items-center justify-center overflow-hidden px-container-margin">
 <div class="absolute inset-0 z-0">
@@ -312,6 +427,8 @@
 </div>
 </div>
 </section>
+</c:otherwise>
+</c:choose>
 </main>
 <!-- BottomNavBar (Mobile only) -->
 <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 bg-surface/90 dark:bg-surface/90 backdrop-blur-xl border-t border-white/5 shadow-[0px_-4px_20px_rgba(0,0,0,0.5)] rounded-t-xl">
