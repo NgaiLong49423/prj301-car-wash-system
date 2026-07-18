@@ -1,5 +1,6 @@
 ﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.UUID" %>
 <%@ page import="dto.RewardDTO" %>
 <%@ page import="mylib.AppKeys" %>
 <!DOCTYPE html>
@@ -121,6 +122,10 @@
         if (errorMessage == null) {
             errorMessage = "";
         }
+        String rewardSuccess = (String) session.getAttribute("rewardSuccess");
+        String rewardError = (String) session.getAttribute("rewardError");
+        session.removeAttribute("rewardSuccess");
+        session.removeAttribute("rewardError");
         // Tên hiển thị người dùng - fallback sang "Guest" nếu không có
         String userName = (String) request.getAttribute(AppKeys.REQ_USER_DISPLAY_NAME);
         if (userName == null || userName.trim().isEmpty()) {
@@ -218,6 +223,16 @@
          Chua cac section: error display, welcome, points balance, tiers, reward list, bottom nav.
     -->
     <main class="max-w-7xl mx-auto px-container-margin grid grid-cols-4 md:grid-cols-12 gap-gutter mt-lg">
+        <% if (rewardSuccess != null) { %>
+            <div class="col-span-4 md:col-span-12 glass-card rounded-xl p-md border border-green-500 text-green-400">
+                <%= rewardSuccess %>
+            </div>
+        <% } %>
+        <% if (rewardError != null) { %>
+            <div class="col-span-4 md:col-span-12 glass-card rounded-xl p-md border border-error text-error">
+                <%= rewardError %>
+            </div>
+        <% } %>
         
         <!-- ========== SECTION: ERROR DISPLAY ==========
              Hien thi thong bao loi tu controller (neu validation hoac DB fail).
@@ -462,6 +477,18 @@
                             RewardDTO reward = (RewardDTO) __r_obj;
                             // Calculate canRedeem: true if userPoints >= reward points threshold, else false for button state
                             boolean canRedeem = userPoints >= reward.getPointsRequired();
+                            String rewardBenefit;
+                            String rewardValue = reward.getRewardValue() == null
+                                    ? "0" : reward.getRewardValue().stripTrailingZeros().toPlainString();
+                            if ("PERCENT_DISCOUNT".equals(reward.getRewardType())) {
+                                rewardBenefit = "Giảm " + rewardValue + "%";
+                            } else if ("FIXED_DISCOUNT".equals(reward.getRewardType())) {
+                                rewardBenefit = "Giảm " + rewardValue + " VND";
+                            } else if ("FREE_SERVICE".equals(reward.getRewardType())) {
+                                rewardBenefit = "Miễn phí dịch vụ";
+                            } else {
+                                rewardBenefit = "Miễn phí lượt rửa";
+                            }
                             // Get icon for this reward from map: if key not found, default to "payments" icon
                             String icon = rewardIcons.get(rewardIndex) != null ? rewardIcons.get(rewardIndex) : "payments";
                 %>
@@ -482,8 +509,13 @@
                             <% if (reward.getDescription() != null && !reward.getDescription().isEmpty()) { %>
                                 <p class="font-body-sm text-body-sm text-on-surface-variant mb-md"><%= reward.getDescription() %></p>
                             <% } %>
+                            <p class="font-label-md text-label-md text-primary mb-xs"><%= rewardBenefit %></p>
+                            <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">Voucher có hạn <%= reward.getValidDays() %> ngày</p>
                             <!-- Redeem button: if canRedeem=true, button is enabled (blue), else disabled (gray) with lock icon -->
-                            <button <% if (!canRedeem) { %>disabled<% } %> class="mt-sm w-full <% if (canRedeem) { %>bg-primary hover:bg-primary-fixed text-on-primary<% } else { %>bg-surface-container border border-outline-variant text-on-surface-variant cursor-not-allowed flex items-center justify-center gap-xs<% } %> font-label-bold text-label-bold py-2 rounded-lg transition-colors active:scale-95">
+                            <form action="<%= request.getContextPath() %>/rewards/redeem" method="post">
+                            <input type="hidden" name="rewardId" value="<%= reward.getRewardId() %>" />
+                            <input type="hidden" name="requestToken" value="<%= UUID.randomUUID().toString() %>" />
+                            <button type="submit" <% if (!canRedeem) { %>disabled<% } %> class="mt-sm w-full <% if (canRedeem) { %>bg-primary hover:bg-primary-fixed text-on-primary<% } else { %>bg-surface-container border border-outline-variant text-on-surface-variant cursor-not-allowed flex items-center justify-center gap-xs<% } %> font-label-bold text-label-bold py-2 rounded-lg transition-colors active:scale-95">
                                 <% if (canRedeem) { %>
                                     <!-- If points sufficient: show green button with text "ĐỔI QUÀ" (Redeem) -->
                                     ĐỔI QUÀ
@@ -492,6 +524,7 @@
                                     <span class="material-symbols-outlined text-[16px]">lock</span> KHÓA
                                 <% } %>
                             </button>
+                            </form>
                         </div>
                     </div>
                 <%

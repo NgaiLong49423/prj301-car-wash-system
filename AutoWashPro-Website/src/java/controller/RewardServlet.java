@@ -43,18 +43,20 @@ public class RewardServlet extends HttpServlet {
             return;
         }
 
-        // Refresh active 12-month loyalty data when the loyalty page is opened.
+        String displayName = resolveDisplayName(session, account);
+        long totalSpentMoney = resolveTotalSpentMoney(session, account);
+        int userPoints = resolveUserPoints(session, account, totalSpentMoney);
+
+        // Refresh expiry first, then display the persisted spendable balance.
         try {
             LoyaltyDAO loyaltyDAO = new LoyaltyDAO();
             loyaltyDAO.refreshExpiredPoints(account.getId());
             loyaltyDAO.refreshActiveLoyaltyData(account.getId());
+            userPoints = loyaltyDAO.getActivePointBalance(account.getId());
+            session.setAttribute(AppKeys.SESSION_USER_POINTS, userPoints);
         } catch (Exception refreshError) {
             getServletContext().log("Could not refresh loyalty data for customerId=" + account.getId(), refreshError);
         }
-
-        String displayName = resolveDisplayName(session, account);
-        long totalSpentMoney = resolveTotalSpentMoney(session, account);
-        int userPoints = resolveUserPoints(session, account, totalSpentMoney);
 
         RewardDAO dao = new RewardDAO();
         // Lấy danh sách mốc phần thưởng từ DB để tính tiến độ đổi quà.

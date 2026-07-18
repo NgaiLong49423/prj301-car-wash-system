@@ -133,10 +133,10 @@ GO
 /* =========================
    6. Redemptions / vouchers and booking usage
    ========================= */
-INSERT INTO Redemption (customer_id, reward_id, points_used, redeem_date, valid_from, valid_until, status, applied_booking_id, used_at) VALUES
-(2, 1, 300, '2026-06-11 10:00:00', '2026-06-11 10:00:00', '2026-09-09 23:59:59', 'AVAILABLE', NULL, NULL),
-(4, 2, 500, '2026-06-24 10:00:00', '2026-06-24 10:00:00', '2026-09-22 23:59:59', 'USED', 10, '2026-06-25 10:00:00'),
-(6, 4, 1000, '2026-01-01 10:00:00', '2026-01-01 10:00:00', '2026-03-31 23:59:59', 'EXPIRED', NULL, NULL);
+INSERT INTO Redemption (customer_id, reward_id, points_used, redeem_date, valid_from, valid_until, status, applied_booking_id, used_at, voucher_code, reward_name_snapshot, reward_type_snapshot, reward_value_snapshot, request_token) VALUES
+(2, 1, 300, '2026-06-11 10:00:00', '2026-06-11 10:00:00', '2026-09-09 23:59:59', 'AVAILABLE', NULL, NULL, 'LW-SAMPLE000001', N'Free Wax', 'FREE_SERVICE', 1, 'sample-request-001'),
+(4, 2, 500, '2026-06-24 10:00:00', '2026-06-24 10:00:00', '2026-09-22 23:59:59', 'USED', 10, '2026-06-25 10:00:00', 'LW-SAMPLE000002', N'10% Discount', 'PERCENT_DISCOUNT', 10, 'sample-request-002'),
+(6, 4, 1000, '2026-01-01 10:00:00', '2026-01-01 10:00:00', '2026-03-31 23:59:59', 'EXPIRED', NULL, NULL, 'LW-SAMPLE000003', N'Free Basic Wash', 'FREE_WASH', 1, 'sample-request-003');
 GO
 
 UPDATE Booking SET applied_redemption_id = 2 WHERE booking_id = 10;
