@@ -13,6 +13,16 @@ public class Customer {
     private int tierId;
     private String tierName; 
     private int bookingWindowDays;
+    private int activePoints;
+
+    public int getActivePoints() {
+        return activePoints;
+    }
+
+    public void setActivePoints(int activePoints) {
+        this.activePoints = activePoints;
+    }
+
 
     public int getBookingWindowDays() {
         return bookingWindowDays;
