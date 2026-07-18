@@ -11,11 +11,12 @@ public class User {
     private String password;
     private BigDecimal totalSpentMoney;
     private int totalPoints;
+    private String roleName;
 
     public User() {
     }
 
-    public User(int id, String fullName, String phone, String email, String password, BigDecimal totalSpentMoney, int totalPoints) {
+    public User(int id, String fullName, String phone, String email, String password, BigDecimal totalSpentMoney, int totalPoints, String roleName) {
         this.id = id;
         this.fullName = fullName;
         this.phone = phone;
@@ -23,6 +24,7 @@ public class User {
         this.password = password;
         this.totalSpentMoney = totalSpentMoney;
         this.totalPoints = totalPoints;
+        this.roleName = roleName;
     }
 
 
@@ -80,5 +82,13 @@ public class User {
 
     public void setTotalPoints(int totalPoints) {
         this.totalPoints = totalPoints;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 }

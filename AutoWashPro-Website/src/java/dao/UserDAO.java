@@ -16,7 +16,7 @@ public class UserDAO {
 
     public User login(String email, String password) {
 
-        String query = "SELECT customer_id, full_name, phone, email, password, total_spent_money, total_points "
+        String query = "SELECT customer_id, full_name, phone, email, password, total_spent_money, total_points, role_name "
             + "FROM Customer WHERE email = ? AND password = ?";
 
         try (Connection conn = DBUtils.getConnection();
@@ -34,7 +34,8 @@ public class UserDAO {
                             rs.getString("email"),
                             rs.getString("password"),
                             rs.getBigDecimal("total_spent_money"),
-                            rs.getInt("total_points")
+                            rs.getInt("total_points"),
+                            rs.getString("role_name")
                     );
                 }
             }
