@@ -29,9 +29,6 @@ public class MainController extends HttpServlet {
     private static final String DASHBOARD_PAGE = "dashboard.jsp";
     private static final String HOME_PAGE = "dashboard.jsp";
     private static final String DASHBOARD_CONTROLLER = "/DashboardServlet";
-    private static final String ADD_VEHICLE_CONTROLLER = "/AddVehicleServlet";
-    private static final String EDIT_VEHICLE_CONTROLLER = "/EditVehicleServlet";
-    private static final String PROFILE_CONTROLLER = "/ProfileServlet";
     private static final String REWARDS_CONTROLLER = "/rewards";
     private static final String LOGOUT_CONTROLLER = "/logout";
     private static final String COMING_SOON_CONTROLLER = "/coming-soon";
@@ -84,12 +81,6 @@ public class MainController extends HttpServlet {
             } else if (action.equals("Dashboard")) {
                 // Điều phối về trang hiển thị Dashboard qua Servlet để lấy dữ liệu cá nhân
                 url = DASHBOARD_CONTROLLER;
-            } else if (action.equals("AddVehicle")) {
-                // Chuyển luồng xử lý thêm xe tới AddVehicleServlet
-                url = ADD_VEHICLE_CONTROLLER;
-            } else if (action.equals("Profile")) {
-                // Chuyển luồng hiển thị thông tin cá nhân và Garage tới ProfileServlet
-                url = PROFILE_CONTROLLER;
             } else if (action.equals("Rewards")) {
                 // Chuyển luồng tới RewardsServlet
                 url = REWARDS_CONTROLLER;
@@ -102,12 +93,6 @@ public class MainController extends HttpServlet {
             } else if (action.equals("Booking")) {
                 // Chuyển luồng đặt lịch rửa xe tới BookingServlet
                 url = BOOKING_CONTROLLER;
-            } else if (action.equals("AddVehiclePage")) {
-                // Điều phối trực tiếp hiển thị biểu mẫu thêm xe mới jsp
-                url = "addvehicle.jsp";
-            } else if (action.equals("EditVehicle")) {
-                // Chuyển luồng lấy thông tin xe chuẩn bị sửa tới EditVehicleServlet
-                url = EDIT_VEHICLE_CONTROLLER;
             } else if (action.equals("BookingHistory") || action.equals("WashingHistory")) {
                 // Điều phối luồng xử lý lịch sử sang Servlet lịch sử đặt lịch
                 url = BOOKING_HISTORY_CONTROLLER;
