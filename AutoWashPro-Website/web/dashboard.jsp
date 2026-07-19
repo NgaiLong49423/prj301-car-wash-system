@@ -3,6 +3,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 
+<%
+    String chatSupportFeature = (String) request.getAttribute(AppKeys.REQ_CHAT_SUPPORT_FEATURE);
+    String chatSupportResponse = (String) request.getAttribute(AppKeys.REQ_CHAT_SUPPORT_RESPONSE);
+    Boolean chatSupportHasCookie = (Boolean) request.getAttribute(AppKeys.REQ_CHAT_SUPPORT_HAS_COOKIE);
+    String chatSupportError = (String) request.getAttribute(AppKeys.REQ_CHAT_SUPPORT_ERROR);
+    boolean chatPanelOpen = (Boolean.TRUE.equals(chatSupportHasCookie) && chatSupportResponse != null)
+            || (chatSupportError != null && !chatSupportError.trim().isEmpty());
+%>
 <!DOCTYPE html>
 
 <html class="dark" lang="vi"><head>
@@ -315,14 +323,7 @@
 </div>
 </div>
 </section>
-<%
-    String chatSupportFeature = (String) request.getAttribute(AppKeys.REQ_CHAT_SUPPORT_FEATURE);
-    String chatSupportResponse = (String) request.getAttribute(AppKeys.REQ_CHAT_SUPPORT_RESPONSE);
-    Boolean chatSupportHasCookie = (Boolean) request.getAttribute(AppKeys.REQ_CHAT_SUPPORT_HAS_COOKIE);
-    String chatSupportError = (String) request.getAttribute(AppKeys.REQ_CHAT_SUPPORT_ERROR);
-    boolean chatPanelOpen = (Boolean.TRUE.equals(chatSupportHasCookie) && chatSupportResponse != null)
-            || (chatSupportError != null && !chatSupportError.trim().isEmpty());
-%>
+
 <!-- Services Section -->
 <section class="py-24 px-container-margin max-w-7xl mx-auto">
 <div class="text-center mb-16">
